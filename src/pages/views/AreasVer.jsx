@@ -44,7 +44,7 @@ const AreaVer = () => {
       .then((response) => {
         setResponsables(
           response.data.map((responsable) => ({
-            value: responsable.id, 
+            value: responsable.id,
             label: `${responsable.nombres} ${responsable.apellidos}`,
           }))
         );
@@ -90,8 +90,16 @@ const AreaVer = () => {
   };
 
   return (
-    <div style={{ padding: "30px", backgroundColor: "#f4f6f9", borderRadius: "8px" }}>
-      <h1 style={{ fontSize: "32px", fontWeight: "600", marginBottom: "20px" }}>Ver Áreas Comunes</h1>
+    <div
+      style={{
+        padding: "30px",
+        backgroundColor: "#f4f6f9",
+        borderRadius: "8px",
+      }}
+    >
+      <h1 style={{ fontSize: "32px", fontWeight: "600", marginBottom: "20px" }}>
+        Ver Áreas Comunes
+      </h1>
       <div>
         <h3>Filtrar Áreas</h3>
         <div>
@@ -121,8 +129,18 @@ const AreaVer = () => {
           />
         </div>
         <div>
-          <button onClick={resetFilters} style={{ ...buttonStyle, backgroundColor: "#e0e0e0" }}>Resetear Filtros</button>
-          <button onClick={() => navigate("/filtros")} style={{ ...buttonStyle, backgroundColor: "#ff5353" }}>Regresar</button>
+          <button
+            onClick={resetFilters}
+            style={{ ...buttonStyle, backgroundColor: "#e0e0e0" }}
+          >
+            Resetear Filtros
+          </button>
+          <button
+            onClick={() => navigate("/filtros")}
+            style={{ ...buttonStyle, backgroundColor: "#ff5353" }}
+          >
+            Regresar
+          </button>
         </div>
       </div>
       <h3>Áreas Registradas</h3>
@@ -144,7 +162,11 @@ const AreaVer = () => {
                 <tr key={area.areaId}>
                   <td>{area.areaId}</td>
                   <td>{area.nombreArea}</td>
-                  <td>{area.responsable ? `${area.responsable.nombres} ${area.responsable.apellidos}` : "No asignado"}</td>
+                  <td>
+                    {area.responsable
+                      ? `${area.responsable.nombres} ${area.responsable.apellidos}`
+                      : "No asignado"}
+                  </td>
                   <td>{area.status}</td>
                 </tr>
               ))}

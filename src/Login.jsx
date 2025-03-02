@@ -24,6 +24,12 @@ const Login = () => {
       if (rol === "ADMINISTRADOR") {
         navigate("/admin-dashboard");
       }
+      if (rol === "BECARIO") {
+        navigate("/becario-dashboard");
+      }
+      if (rol === "RESPONSABLE") {
+        navigate("/responsable-dashboard");
+      }
     } catch (err) {
       setError("Credenciales incorrectas");
       console.error(err);

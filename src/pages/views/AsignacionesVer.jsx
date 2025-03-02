@@ -34,7 +34,15 @@ const AsignacionesVer = () => {
   useEffect(() => {
     obtenerAsignaciones();
     cargarOpcionesFiltros();
-  }, [filtroStatus, filtroRol, filtroLugar, filtroTipoBien, filtroMarca, filtroModelo, filtroAreaComun]);
+  }, [
+    filtroStatus,
+    filtroRol,
+    filtroLugar,
+    filtroTipoBien,
+    filtroMarca,
+    filtroModelo,
+    filtroAreaComun,
+  ]);
 
   // Obtener todas las asignaciones
   const obtenerAsignaciones = () => {
@@ -72,12 +80,14 @@ const AsignacionesVer = () => {
                 headers: { Authorization: `Bearer ${token}` },
               })
               .then((response) => {
-                const asignacionesFiltradas = response.data.filter((asignacion) =>
-                  usuariosFiltrados.some(
-                    (usuario) => usuario.id === asignacion.usuario.id
-                  ) && bienesFiltrados.some(
-                    (bien) => bien.idBien === asignacion.bien.idBien
-                  )
+                const asignacionesFiltradas = response.data.filter(
+                  (asignacion) =>
+                    usuariosFiltrados.some(
+                      (usuario) => usuario.id === asignacion.usuario.id
+                    ) &&
+                    bienesFiltrados.some(
+                      (bien) => bien.idBien === asignacion.bien.idBien
+                    )
                 );
                 setAsignaciones(asignacionesFiltradas);
               })
@@ -260,19 +270,18 @@ const AsignacionesVer = () => {
           styles={customSelectStyles}
         />
 
-
         <button
-            onClick={resetearFiltros}
-            style={{ ...buttonStyle, backgroundColor: "#e0e0e0" }}
-          >
-            Resetear Filtros
-          </button>
-          <button
-            onClick={() => navigate("/usuarios")}
-            style={{ ...buttonStyle, backgroundColor: "#ff5353" }}
-          >
-            Regresar
-          </button>
+          onClick={resetearFiltros}
+          style={{ ...buttonStyle, backgroundColor: "#e0e0e0" }}
+        >
+          Resetear Filtros
+        </button>
+        <button
+          onClick={() => navigate("/usuarios")}
+          style={{ ...buttonStyle, backgroundColor: "#ff5353" }}
+        >
+          Regresar
+        </button>
       </div>
 
       <h3>Asignaciones Registradas</h3>

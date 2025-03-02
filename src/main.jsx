@@ -6,6 +6,8 @@ import Login from "./Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import Usuarios from "./pages/Usuarios";
 import Filtros from "./pages/Filtros";
+import BecarioDashboard from "./pages/BecarioDashboard";
+import ResponsableDashboard from "./pages/views/ResponsablesDashboard";
 
 // Vistas de usuarios";
 import UsuarioVer from "./pages/views/UsuarioVer";
@@ -23,9 +25,10 @@ root.render(
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/becario-dashboard" element={<BecarioDashboard />} />
+      <Route path="/responsable-dashboard" element={<ResponsableDashboard />} />
       <Route path="/usuarios" element={<Usuarios />} />
       <Route path="/filtros" element={<Filtros />} />
-
 
       {/* Rutas de usuarios */}
       <Route path="/usuarios/ver" element={<UsuarioVer />} />

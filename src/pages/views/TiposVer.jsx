@@ -73,8 +73,16 @@ const TipoBienVer = () => {
   };
 
   return (
-    <div style={{ padding: "30px", backgroundColor: "#f4f6f9", borderRadius: "8px" }}>
-      <h1 style={{ fontSize: "32px", fontWeight: "600", marginBottom: "20px" }}>Ver Tipos de Bien</h1>
+    <div
+      style={{
+        padding: "30px",
+        backgroundColor: "#f4f6f9",
+        borderRadius: "8px",
+      }}
+    >
+      <h1 style={{ fontSize: "32px", fontWeight: "600", marginBottom: "20px" }}>
+        Ver Tipos de Bien
+      </h1>
       <div>
         <h3>Filtrar Tipos de Bien</h3>
         <div>
@@ -87,8 +95,18 @@ const TipoBienVer = () => {
           />
         </div>
         <div>
-          <button onClick={resetearFiltros} style={{ ...buttonStyle, backgroundColor: "#e0e0e0" }}>Resetear Filtros</button>
-          <button onClick={() => navigate("/usuarios")} style={{ ...buttonStyle, backgroundColor: "#ff5353" }}>Regresar</button>
+          <button
+            onClick={resetearFiltros}
+            style={{ ...buttonStyle, backgroundColor: "#e0e0e0" }}
+          >
+            Resetear Filtros
+          </button>
+          <button
+            onClick={() => navigate("/usuarios")}
+            style={{ ...buttonStyle, backgroundColor: "#ff5353" }}
+          >
+            Regresar
+          </button>
         </div>
       </div>
       <h3>Tipos de Bien Registrados</h3>
