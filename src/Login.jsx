@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./assets/css/Login.css";
 import img from "./assets/img/ICON.png";
 import logo from "./assets/img/logo.png";
@@ -8,6 +9,7 @@ import roles3 from "./assets/img/account.svg";
 
 const Login = () => {
   const [rol, setRol] = useState("");
+  const navigate = useNavigate();
 
   const colores = {
     Administrador: {
@@ -85,6 +87,7 @@ const Login = () => {
                 color: colores[rol].btnTexto,
                 height: "60px",
               }}
+              onClick={() => navigate("/forgot")}
             >
               Olvidé mis datos
             </button>
@@ -94,6 +97,7 @@ const Login = () => {
                 backgroundColor: colores[rol].btnFondo,
                 color: colores[rol].btnTexto,
               }}
+              onClick={() => navigate("/form")}
             >
               Iniciar sesión
             </button>
