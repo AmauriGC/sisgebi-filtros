@@ -41,7 +41,7 @@ export default function Form() {
       sessionStorage.setItem("token", token);
 
       if (rol === "ADMINISTRADOR") {
-        navigate("/admin-dashboard");
+        navigate("/perfil");
       } else if (rol === "BECARIO") {
         navigate("/becario-dashboard");
       } else if (rol === "RESPONSABLE") {
