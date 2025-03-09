@@ -121,6 +121,7 @@ const Bienes = () => {
       .catch((error) => {
         console.error("Hubo un error al actualizar el bien:", error);
       });
+    // window.location.reload();
   };
 
   const handleEliminar = (idBien) => {
@@ -144,6 +145,7 @@ const Bienes = () => {
       .catch((error) => {
         console.error("Error al eliminar el bien:", error);
       });
+    window.location.reload();
   };
 
   const statusOptions = [

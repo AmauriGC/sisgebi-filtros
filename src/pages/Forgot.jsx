@@ -19,9 +19,7 @@ export default function Forgot() {
     }
 
     try {
-      const response = await axios.post(
-        `http://localhost:8080/auth/forgot?correo=${correo}`
-      );
+      const response = await axios.post(`http://localhost:8080/auth/forgot?correo=${correo}`);
 
       if (response.status === 200) {
         navigate("/form");
@@ -34,7 +32,10 @@ export default function Forgot() {
   };
 
   return (
-    <div className="d-flex min-vh-100 align-items-center justify-content-center">
+    <div
+      className="d-flex min-vh-100 align-items-center justify-content-center"
+      style={{ background: "linear-gradient(135deg, #254b5e, #546eab, #4697b4, #a7d0d2)" }}
+    >
       <div
         className="container"
         style={{
@@ -90,10 +91,7 @@ export default function Forgot() {
           </div>
         </div>
 
-        <p
-          className="mb-0"
-          style={{ fontSize: "20px", marginTop: "20px", color: "#254B5E" }}
-        >
+        <p className="mb-0" style={{ fontSize: "20px", marginTop: "20px", color: "#254B5E" }}>
           Ayuda de la cuenta
         </p>
         {/* Contenido */}
@@ -110,10 +108,7 @@ export default function Forgot() {
             height: "100%",
           }}
         >
-          <p
-            className="mb-0"
-            style={{ fontSize: "20px", marginTop: "20px", color: "#254B5E" }}
-          >
+          <p className="mb-0" style={{ fontSize: "20px", marginTop: "20px", color: "#254B5E" }}>
             Correo
           </p>
           <div>
@@ -159,10 +154,7 @@ export default function Forgot() {
             )}
           </div>
 
-          <div
-            className="d-flex justify-content-center align-items-center"
-            style={{ width: "100%" }}
-          >
+          <div className="d-flex justify-content-center align-items-center" style={{ width: "100%" }}>
             <button
               type="submit"
               className="btn w-50 fw-bold"

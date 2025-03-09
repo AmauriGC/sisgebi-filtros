@@ -48,13 +48,10 @@ const Login = () => {
   return (
     <div
       className="d-flex min-vh-100 align-items-center justify-content-center"
-      style={{ gap: "100px" }}
+      style={{ background: "linear-gradient(135deg, #254b5e, #546eab, #4697b4, #a7d0d2)", gap: "100px" }}
     >
       {/* Sección izquierda (cambia de color dinámicamente) */}
-      <div
-        className="d-flex flex-column align-items-center"
-        style={{ alignSelf: "flex-start" }}
-      >
+      <div className="d-flex flex-column align-items-center" style={{ alignSelf: "flex-start" }}>
         <div
           className="p-5 shadow text-center d-flex flex-column"
           style={{
@@ -106,10 +103,7 @@ const Login = () => {
       </div>
 
       {/* Sección derecha (selección de rol) */}
-      <div
-        className="d-flex flex-column align-items-center"
-        style={{ alignSelf: "flex-end" }}
-      >
+      <div className="d-flex flex-column align-items-center" style={{ alignSelf: "flex-end" }}>
         <div
           className="bg-white p-5 shadow text-center"
           style={{
@@ -126,8 +120,7 @@ const Login = () => {
               style={{
                 maxHeight: "240px",
                 maxWidth: "240px",
-                backgroundColor:
-                  rol === "" ? "transparent" : colores[rol].fondo,
+                backgroundColor: rol === "" ? "transparent" : colores[rol].fondo,
                 borderRadius: "50%",
                 padding: rol === "" ? "0" : "10px",
               }}

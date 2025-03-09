@@ -60,11 +60,11 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`p-3 d-flex flex-column transition-all`}
+      className={`p-3 d-flex flex-column transition-all `}
       style={{
         backgroundColor: "#A7D0D2",
         height: "100vh",
-        width: isExpanded ? "240px" : "70px",
+        width: isExpanded ? "250px" : "70px",
         overflow: "hidden",
         transition: "width 0.3s ease",
       }}
@@ -91,7 +91,7 @@ const Sidebar = () => {
         {expandedItem === "Perfil" && (
           <div className="ps-4" style={{ textAlign: "start", marginLeft: "20px" }}>
             <div
-              onClick={() => navigate("/perfil")}
+              onClick={() => navigate("/admin-dashboard")}
               style={{
                 marginTop: "-20px",
                 marginBottom: "20px",

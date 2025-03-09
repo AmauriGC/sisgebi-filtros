@@ -29,7 +29,6 @@ root.render(
       <Route path="/forgot" element={<Forgot />} />
 
       <Route path="/admin-dashboard" element={<Admin />} />
-      <Route path="/perfil" element={<Perfil />} />
       <Route path="/bienes" element={<Bienes />} />
       <Route path="/usuarios" element={<Usuarios />} />
       <Route path="/areas" element={<Areas />} />

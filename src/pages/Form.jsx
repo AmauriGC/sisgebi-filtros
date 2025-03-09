@@ -26,22 +26,18 @@ export default function Form() {
     }
 
     if (!contrasenaValida.test(contrasena)) {
-      setError(
-        "Contraseña inválida. Solo se permiten caracteres alfanuméricos."
-      );
+      setError("Contraseña inválida. Solo se permiten caracteres alfanuméricos.");
       return;
     }
 
     try {
-      const response = await axios.post(
-        `http://localhost:8080/auth/login?correo=${correo}&contrasena=${contrasena}`
-      );
+      const response = await axios.post(`http://localhost:8080/auth/login?correo=${correo}&contrasena=${contrasena}`);
 
       const { token, rol } = response.data;
       sessionStorage.setItem("token", token);
 
       if (rol === "ADMINISTRADOR") {
-        navigate("/perfil");
+        navigate("/admin-dashboard");
       } else if (rol === "BECARIO") {
         navigate("/becario-dashboard");
       } else if (rol === "RESPONSABLE") {
@@ -53,7 +49,10 @@ export default function Form() {
   };
 
   return (
-    <div className="d-flex min-vh-100 align-items-center justify-content-center">
+    <div
+      className="d-flex min-vh-100 align-items-center justify-content-center"
+      style={{ background: "linear-gradient(135deg, #254b5e, #546eab, #4697b4, #a7d0d2)" }}
+    >
       <div
         className="container"
         style={{
@@ -107,10 +106,7 @@ export default function Form() {
           </div>
 
           {/* Derecha: Iniciar sesión */}
-          <p
-            className="mb-0"
-            style={{ marginRight: "40px", fontSize: "20px", color: "#254B5E" }}
-          >
+          <p className="mb-0" style={{ marginRight: "40px", fontSize: "20px", color: "#254B5E" }}>
             Iniciar sesión
           </p>
         </div>
@@ -128,10 +124,7 @@ export default function Form() {
             height: "100%",
           }}
         >
-          <p
-            className="mb-0"
-            style={{ fontSize: "20px", marginTop: "20px", color: "#254B5E" }}
-          >
+          <p className="mb-0" style={{ fontSize: "20px", marginTop: "20px", color: "#254B5E" }}>
             Correo
           </p>
           <div>
@@ -211,18 +204,9 @@ export default function Form() {
               />
             </div>
 
-            {error && (
-              <p
-                style={{ color: "red", fontSize: "14px", marginBottom: "-5px" }}
-              >
-                {error}
-              </p>
-            )}
+            {error && <p style={{ color: "red", fontSize: "14px", marginBottom: "-5px" }}>{error}</p>}
           </div>
-          <div
-            className="d-flex justify-content-center align-items-center"
-            style={{ width: "100%" }}
-          >
+          <div className="d-flex justify-content-center align-items-center" style={{ width: "100%" }}>
             <button
               type="submit"
               className="btn w-50 fw-bold"
