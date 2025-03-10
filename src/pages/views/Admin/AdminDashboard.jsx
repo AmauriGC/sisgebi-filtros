@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../../../components/Sidebar";
 
-const Perfil = () => {
+const AdminDashboard = () => {
   return (
     <div style={{ display: "flex" }}>
       <Sidebar />
@@ -10,4 +10,4 @@ const Perfil = () => {
   );
 };
 
-export default Perfil;
+export default AdminDashboard;

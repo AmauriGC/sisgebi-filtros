@@ -1,14 +1,21 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import at from "../assets/img/at.svg";
+import at from "./assets/img/at.svg";
+import lock from "./assets/img/lock-outline.svg";
+import closeEye from "./assets/img/eye-off-outline.svg";
+import eye from "./assets/img/eye-outline.svg";
+import logo from "./assets/img/ICON.png";
 
-export default function Forgot() {
-  const navigate = useNavigate();
+export default function Form() {
   const [correo, setCorreo] = useState("");
+  const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState("");
+  const [mostrarContrasena, setMostrarContrasena] = useState(false);
+  const navigate = useNavigate();
 
-  const correoValido = /^[a-zA-Z0-9@._´-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/;
+  const correoValido = /^[a-zA-Z0-9@._´]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/;
+  const contrasenaValida = /^[a-zA-Z0-9@._´]+$/;
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,16 +25,26 @@ export default function Forgot() {
       return;
     }
 
-    try {
-      const response = await axios.post(`http://localhost:8080/auth/forgot?correo=${correo}`);
+    if (!contrasenaValida.test(contrasena)) {
+      setError("Contraseña inválida. Solo se permiten caracteres alfanuméricos.");
+      return;
+    }
 
-      if (response.status === 200) {
-        navigate("/form");
+    try {
+      const response = await axios.post(`http://localhost:8080/auth/login?correo=${correo}&contrasena=${contrasena}`);
+
+      const { token, rol } = response.data;
+      sessionStorage.setItem("token", token);
+
+      if (rol === "ADMINISTRADOR") {
+        navigate("/admin-dashboard");
+      } else if (rol === "BECARIO") {
+        navigate("/becario-dashboard");
+      } else if (rol === "RESPONSABLE") {
+        navigate("/responsable-dashboard");
       }
-    } catch (error) {
-      if (error.response && error.response.status === 403) {
-        setError("Correo inválido. Solo se permiten caracteres alfanuméricos.");
-      }
+    } catch (err) {
+      setError("Credenciales incorrectas");
     }
   };
 
@@ -40,7 +57,7 @@ export default function Forgot() {
         className="container"
         style={{
           width: "500px",
-          height: "400px",
+          height: "500px",
           backgroundColor: "#F1E6D2",
           borderRadius: "15px",
           boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
@@ -57,12 +74,22 @@ export default function Forgot() {
             width: "500px",
             borderRadius: "15px 15px 0 0",
             padding: "40px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
           }}
+          className="d-flex justify-content-between align-items-center"
         >
+          {/* Izquierda: Imagen + Correo */}
           <div className="d-flex align-items-center">
+            <img
+              src={logo}
+              alt="LOGO"
+              className="img-fluid"
+              style={{
+                maxHeight: "80px",
+                maxWidth: "80px",
+                marginRight: "30px",
+                marginLeft: "0px",
+              }}
+            />
             <Link to="/">
               <button
                 type="button"
@@ -71,35 +98,24 @@ export default function Forgot() {
                   color: "#254B5E",
                   textDecoration: "none",
                   fontSize: "20px",
-                  marginRight: "20px",
                 }}
               >
                 Regresar
               </button>
             </Link>
-
-            <text
-              className="btn btn-link"
-              style={{
-                color: "#254B5E",
-                textDecoration: "none",
-                fontSize: "20px",
-              }}
-            >
-              Olvide mis datos
-            </text>
           </div>
+
+          {/* Derecha: Iniciar sesión */}
+          <p className="mb-0" style={{ marginRight: "40px", fontSize: "20px", color: "#254B5E" }}>
+            Iniciar sesión
+          </p>
         </div>
 
-        <p className="mb-0" style={{ fontSize: "20px", marginTop: "20px", color: "#254B5E" }}>
-          Ayuda de la cuenta
-        </p>
         {/* Contenido */}
         <form
           onSubmit={handleLogin}
           style={{
             padding: "40px",
-            paddingTop: "0px",
             display: "flex",
             flexDirection: "column",
             alignItems: "start",
@@ -139,21 +155,57 @@ export default function Forgot() {
                 textAlign: "center",
               }}
             />
-
-            {error && (
-              <p
-                style={{
-                  color: "red",
-                  fontSize: "14px",
-                  marginTop: "10px",
-                  marginBottom: "-5px",
-                }}
-              >
-                {error}
-              </p>
-            )}
+            <p>No compartas tu correo con nadie por favor</p>
           </div>
 
+          <div>
+            <div style={{ position: "relative" }}>
+              <img
+                src={lock}
+                alt="at"
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  marginTop: "10px",
+                }}
+              />
+              <input
+                type={mostrarContrasena ? "text" : "password"}
+                name="contrasena"
+                id="contrasena"
+                placeholder="Contraseña"
+                value={contrasena}
+                onChange={(e) => setContrasena(e.target.value)}
+                required
+                style={{
+                  width: "350px",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  borderBottom: "2px solid #254B5E",
+                  marginTop: "10px",
+                  marginLeft: "20px",
+                  paddingRight: "30px",
+                  textAlign: "center",
+                }}
+              />
+              <img
+                src={mostrarContrasena ? closeEye : eye}
+                alt="eye"
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  right: "5px",
+                  transform: "translateY(-50%)",
+                  width: "20px",
+                  height: "20px",
+                  cursor: "pointer",
+                }}
+                onClick={() => setMostrarContrasena(!mostrarContrasena)}
+              />
+            </div>
+
+            {error && <p style={{ color: "red", fontSize: "14px", marginBottom: "-5px" }}>{error}</p>}
+          </div>
           <div className="d-flex justify-content-center align-items-center" style={{ width: "100%" }}>
             <button
               type="submit"
@@ -166,7 +218,7 @@ export default function Forgot() {
                 marginTop: "20px",
               }}
             >
-              Buscar
+              Ingresar
             </button>
           </div>
         </form>

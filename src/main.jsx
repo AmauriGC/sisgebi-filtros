@@ -6,18 +6,19 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Login from "./Login";
-import Form from "./pages/Form";
-import Forgot from "./pages/Forgot";
-import Admin from "./pages/AdminDashboard";
+import Form from "./Form";
+import Forgot from "./Forgot";
 
-import Perfil from "./pages/Perfil";
-import Bienes from "./pages/Bienes";
-import Usuarios from "./pages/Usuarios";
-import Areas from "./pages/Areas";
-import Tipos from "./pages/Tipos";
-import Marcas from "./pages/Marcas";
-import Modelos from "./pages/Modelos";
-import Asignaciones from "./pages/Asignaciones";
+import Admin from "./pages/views/Admin/AdminDashboard";
+
+import Bienes from "./pages/views/Admin/Bienes";
+import Usuarios from "./pages/views/Admin/Usuarios";
+import Areas from "./pages/views/Admin/Areas";
+import Tipos from "./pages/views/Admin/Tipos";
+import Marcas from "./pages/views/Admin/Marcas";
+import Modelos from "./pages/views/Admin/Modelos";
+import Asignaciones from "./pages/views/Admin/Asignaciones";
+
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 

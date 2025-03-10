@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
@@ -13,25 +12,23 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TablePagination from "@mui/material/TablePagination";
-import edit from "../assets/img/pencil.svg";
-import drop from "../assets/img/delete.svg";
-import Sidebar from "../components/Sidebar";
+import Select from "react-select";
+import edit from "../../../assets/img/pencil.svg";
+import drop from "../../../assets/img/delete.svg";
+import Sidebar from "../../../components/Sidebar";
 
-const Modelos = () => {
-  const [modelos, setModelos] = useState([]);
-  const [marcaOptions, setMarcaOptions] = useState([]);
+const Marcas = () => {
+  const [marcas, setMarcas] = useState([]);
   const [filtroStatus, setFiltroStatus] = useState(null);
-  const [filtroMarca, setFiltroMarca] = useState(null);
   const [openModalCrear, setOpenModalCrear] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalEliminar, setOpenModalEliminar] = useState(false);
-  const [modeloSeleccionado, setModeloSeleccionado] = useState(null);
+  const [marcaSeleccionada, setMarcaSeleccionada] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [nuevoModelo, setNuevoModelo] = useState({
-    nombreModelo: "",
-    marcaId: null,
+  const [nuevaMarca, setNuevaMarca] = useState({
+    nombreMarca: "",
     status: "ACTIVO",
   });
 
@@ -49,30 +46,13 @@ const Modelos = () => {
       return;
     }
 
-    // Obtener modelos
-    axios
-      .get("http://localhost:8080/api/modelo", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setModelos(response.data);
-      })
-      .catch((error) => {
-        console.error("Error al obtener los modelos:", error);
-      });
-
     // Obtener marcas
     axios
       .get("http://localhost:8080/api/marca", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setMarcaOptions(
-          response.data.map((marca) => ({
-            value: marca.marcaId,
-            label: marca.nombreMarca,
-          }))
-        );
+        setMarcas(response.data);
       })
       .catch((error) => {
         console.error("Error al obtener las marcas:", error);
@@ -81,12 +61,11 @@ const Modelos = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [filtroStatus, filtroMarca]);
+  }, [filtroStatus]);
 
   const applyFilters = () => {
     const params = {};
     if (filtroStatus) params.status = filtroStatus.value;
-    if (filtroMarca) params.marcaId = filtroMarca.value;
 
     const token = sessionStorage.getItem("token");
     if (!token) {
@@ -95,118 +74,111 @@ const Modelos = () => {
     }
 
     axios
-      .get("http://localhost:8080/api/modelo/filter", {
+      .get("http://localhost:8080/api/marca/filter", {
         headers: { Authorization: `Bearer ${token}` },
         params,
       })
       .then((response) => {
-        setModelos(response.data);
+        setMarcas(response.data);
       })
       .catch((error) => {
-        console.error("Error al filtrar los modelos:", error);
+        console.error("Error al filtrar las marcas:", error);
       });
   };
 
   const resetFilters = () => {
     setFiltroStatus(null);
-    setFiltroMarca(null);
     const token = sessionStorage.getItem("token");
     if (!token) {
       navigate("/");
       return;
     }
     axios
-      .get("http://localhost:8080/api/modelo", {
+      .get("http://localhost:8080/api/marca", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setModelos(response.data);
+        setMarcas(response.data);
       })
       .catch((error) => {
-        console.error("Error al obtener los modelos:", error);
+        console.error("Error al obtener las marcas:", error);
       });
   };
 
-  const handleCrearModelo = () => {
+  const handleCrearMarca = () => {
     const token = sessionStorage.getItem("token");
     if (!token) return;
 
-    const modeloParaEnviar = {
-      nombreModelo: nuevoModelo.nombreModelo,
-      marca: { marcaId: nuevoModelo.marcaId },
-      status: nuevoModelo.status,
+    const marcaParaEnviar = {
+      nombreMarca: nuevaMarca.nombreMarca,
+      status: nuevaMarca.status,
     };
 
     axios
-      .post("http://localhost:8080/api/modelo", modeloParaEnviar, {
+      .post("http://localhost:8080/api/marca", marcaParaEnviar, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setModelos([...modelos, response.data]);
+        setMarcas([...marcas, response.data]);
         setOpenModalCrear(false);
-        setNuevoModelo({
-          nombreModelo: "",
-          marcaId: null,
+        setNuevaMarca({
+          nombreMarca: "",
           status: "ACTIVO",
         });
-        window.location.reload();
       })
       .catch((error) => {
-        console.error("Hubo un error al crear el modelo:", error);
+        console.error("Hubo un error al crear la marca:", error);
       });
+    window.location.reload();
   };
 
-  const handleEditarModelo = (modelo) => {
-    setModeloSeleccionado({
-      ...modelo,
-      marcaId: modelo.marca ? modelo.marca.marcaId : null,
-    });
+  const handleEditarMarca = (marca) => {
+    setMarcaSeleccionada(marca);
     setOpenModalEditar(true);
   };
 
-  const handleActualizarModelo = () => {
+  const handleActualizarMarca = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !modeloSeleccionado) return;
+    if (!token || !marcaSeleccionada) return;
 
-    const modeloParaEnviar = {
-      nombreModelo: modeloSeleccionado.nombreModelo,
-      marca: { marcaId: modeloSeleccionado.marcaId },
-      status: modeloSeleccionado.status,
+    const marcaParaEnviar = {
+      nombreMarca: marcaSeleccionada.nombreMarca,
+      status: marcaSeleccionada.status,
     };
 
     axios
-      .put(`http://localhost:8080/api/modelo/${modeloSeleccionado.modeloId}`, modeloParaEnviar, {
+      .put(`http://localhost:8080/api/marca/${marcaSeleccionada.marcaId}`, marcaParaEnviar, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setModelos(modelos.map((modelo) => (modelo.modeloId === modeloSeleccionado.modeloId ? response.data : modelo)));
+        setMarcas(marcas.map((marca) => (marca.marcaId === marcaSeleccionada.marcaId ? response.data : marca)));
         setOpenModalEditar(false);
       })
       .catch((error) => {
-        console.error("Hubo un error al actualizar el modelo:", error);
+        console.error("Hubo un error al actualizar la marca:", error);
       });
   };
 
-  const handleEliminarModelo = (id) => {
-    const modelo = modelos.find((modelo) => modelo.modeloId === id);
-    setModeloSeleccionado(modelo);
+  const handleEliminarMarca = (id) => {
+    const marca = marcas.find((marca) => marca.marcaId === id);
+    setMarcaSeleccionada(marca);
     setOpenModalEliminar(true);
   };
 
-  const confirmarEliminarModelo = () => {
+  const confirmarEliminarMarca = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !modeloSeleccionado) return;
+    if (!token || !marcaSeleccionada) return;
 
     axios
-      .delete(`http://localhost:8080/api/modelo/${modeloSeleccionado.modeloId}`, {
+      .delete(`http://localhost:8080/api/marca/${marcaSeleccionada.marcaId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        setModelos(modelos.filter((modelo) => modelo.modeloId !== modeloSeleccionado.modeloId));
+        setMarcas(marcas.filter((marca) => marca.marcaId !== marcaSeleccionada.marcaId));
         setOpenModalEliminar(false);
       })
       .catch((error) => {
-        console.error("Hubo un error al eliminar el modelo:", error);
+        console.error("Hubo un error al eliminar la marca:", error);
       });
     window.location.reload();
   };
@@ -221,16 +193,15 @@ const Modelos = () => {
   };
 
   const columns = [
-    { id: "modeloId", label: "ID", minWidth: 50 },
-    { id: "nombreModelo", label: "Nombre", minWidth: 100 },
-    { id: "marca", label: "Marca", minWidth: 100 },
+    { id: "marcaId", label: "ID", minWidth: 50 },
+    { id: "nombreMarca", label: "Nombre", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 100 },
     { id: "crear", label: "Crear", minWidth: 50 },
   ];
 
   return (
     <div style={{ display: "flex", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
-      {/* Modal para crear modelo */}
+      {/* Modal para crear marca */}
       <Modal
         open={openModalCrear}
         onClose={() => setOpenModalCrear(false)}
@@ -239,34 +210,24 @@ const Modelos = () => {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Crear Modelo
+            Crear Marca
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleCrearModelo();
+                handleCrearMarca();
               }}
             >
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Nombre del Modelo:</label>
+                  <label>Nombre de la Marca:</label>
                   <input
                     type="text"
-                    value={nuevoModelo.nombreModelo}
-                    onChange={(e) => setNuevoModelo({ ...nuevoModelo, nombreModelo: e.target.value })}
+                    value={nuevaMarca.nombreMarca}
+                    onChange={(e) => setNuevaMarca({ ...nuevaMarca, nombreMarca: e.target.value })}
                     required
                     style={{ width: "100%" }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Marca:</label>
-                  <Select
-                    options={marcaOptions}
-                    value={marcaOptions.find((option) => option.value === nuevoModelo.marcaId)}
-                    onChange={(selected) => setNuevoModelo({ ...nuevoModelo, marcaId: selected.value })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
                   />
                 </div>
               </div>
@@ -275,8 +236,8 @@ const Modelos = () => {
                   <label>Estado:</label>
                   <Select
                     options={statusOptions}
-                    value={statusOptions.find((option) => option.value === nuevoModelo.status)}
-                    onChange={(selected) => setNuevoModelo({ ...nuevoModelo, status: selected.value })}
+                    value={statusOptions.find((option) => option.value === nuevaMarca.status)}
+                    onChange={(selected) => setNuevaMarca({ ...nuevaMarca, status: selected.value })}
                     required
                     styles={{ control: (base) => ({ ...base, width: "100%" }) }}
                   />
@@ -302,7 +263,7 @@ const Modelos = () => {
         </Box>
       </Modal>
 
-      {/* Modal para editar modelo */}
+      {/* Modal para editar marca */}
       <Modal
         open={openModalEditar}
         onClose={() => setOpenModalEditar(false)}
@@ -311,44 +272,29 @@ const Modelos = () => {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Editar Modelo
+            Editar Marca
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleActualizarModelo();
+                handleActualizarMarca();
               }}
             >
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Nombre del Modelo:</label>
+                  <label>Nombre de la Marca:</label>
                   <input
                     type="text"
-                    value={modeloSeleccionado?.nombreModelo || ""}
+                    value={marcaSeleccionada?.nombreMarca || ""}
                     onChange={(e) =>
-                      setModeloSeleccionado({
-                        ...modeloSeleccionado,
-                        nombreModelo: e.target.value,
+                      setMarcaSeleccionada({
+                        ...marcaSeleccionada,
+                        nombreMarca: e.target.value,
                       })
                     }
                     required
                     style={{ width: "100%" }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Marca:</label>
-                  <Select
-                    options={marcaOptions}
-                    value={marcaOptions.find((option) => option.value === modeloSeleccionado?.marcaId)}
-                    onChange={(selected) =>
-                      setModeloSeleccionado({
-                        ...modeloSeleccionado,
-                        marcaId: selected.value,
-                      })
-                    }
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
                   />
                 </div>
               </div>
@@ -357,10 +303,10 @@ const Modelos = () => {
                   <label>Estado:</label>
                   <Select
                     options={statusOptions}
-                    value={statusOptions.find((option) => option.value === modeloSeleccionado?.status)}
+                    value={statusOptions.find((option) => option.value === marcaSeleccionada?.status)}
                     onChange={(selected) =>
-                      setModeloSeleccionado({
-                        ...modeloSeleccionado,
+                      setMarcaSeleccionada({
+                        ...marcaSeleccionada,
                         status: selected.value,
                       })
                     }
@@ -389,7 +335,7 @@ const Modelos = () => {
         </Box>
       </Modal>
 
-      {/* Modal para eliminar modelo */}
+      {/* Modal para eliminar marca */}
       <Modal
         open={openModalEliminar}
         onClose={() => setOpenModalEliminar(false)}
@@ -398,24 +344,23 @@ const Modelos = () => {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Eliminar Modelo
+            Eliminar Marca
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            ¿Estás seguro de que deseas eliminar este modelo?
+            ¿Estás seguro de que deseas eliminar esta marca?
             <br />
-            <button onClick={confirmarEliminarModelo}>Confirmar</button>
+            <button onClick={confirmarEliminarMarca}>Confirmar</button>
             <button onClick={() => setOpenModalEliminar(false)}>Cancelar</button>
           </Typography>
         </Box>
       </Modal>
 
       <Sidebar />
-
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <Paper sx={{ overflow: "hidden" }} className="col-md-9 col-lg-9 col-xl-9" style={{ height: "fit-content" }}>
+        <Paper className="col-md-6 col-lg-6 col-xl-6" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB" }}>
-            <h3>Modelos Registrados</h3>
+            <h3>Marcas Registradas</h3>
             <div
               style={{
                 display: "flex",
@@ -441,15 +386,11 @@ const Modelos = () => {
                   options={statusOptions}
                   styles={customSelectStyles}
                 />
-                <Select
-                  placeholder="Marca"
-                  value={filtroMarca}
-                  onChange={setFiltroMarca}
-                  options={marcaOptions}
-                  styles={customSelectStyles}
-                />
                 <button onClick={resetFilters} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
                   Borrar
+                </button>
+                <button onClick={() => setOpenModalCrear(true)} style={{ ...buttonStyle }}>
+                  Crear
                 </button>
               </div>
             </div>
@@ -488,15 +429,15 @@ const Modelos = () => {
                         </button>
                       ) : (
                         column.label
-                      )}{" "}
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {modelos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((modelo) => {
+                {marcas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((marca) => {
                   return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={modelo.modeloId}>
+                    <TableRow hover role="checkbox" tabIndex={-1} key={marca.marcaId}>
                       {columns.map((column) => {
                         if (column.id === "crear") {
                           return (
@@ -510,7 +451,7 @@ const Modelos = () => {
                                   cursor: "pointer",
                                   marginRight: "10px",
                                 }}
-                                onClick={() => handleEditarModelo(modelo)}
+                                onClick={() => handleEditarMarca(marca)}
                               />
                               <img
                                 src={drop}
@@ -520,12 +461,12 @@ const Modelos = () => {
                                   height: "20px",
                                   cursor: "pointer",
                                 }}
-                                onClick={() => handleEliminarModelo(modelo.modeloId)}
+                                onClick={() => handleEliminarMarca(marca.marcaId)}
                               />
                             </TableCell>
                           );
                         } else {
-                          const value = column.id === "marca" ? modelo.marca?.nombreMarca : modelo[column.id];
+                          const value = marca[column.id];
                           return (
                             <TableCell
                               key={column.id}
@@ -548,7 +489,7 @@ const Modelos = () => {
           <TablePagination
             rowsPerPageOptions={[10, 25, 100]}
             component="div"
-            count={modelos.length}
+            count={marcas.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -559,7 +500,6 @@ const Modelos = () => {
     </div>
   );
 };
-
 const buttonStyle = {
   backgroundColor: "#254B5E",
   padding: "8px",
@@ -574,12 +514,13 @@ const customSelectStyles = {
   control: (base) => ({
     ...base,
     width: "150px",
+    fontSize: "16px ",
     backgroundColor: "#A7D0D2",
     border: "none",
   }),
   option: (base) => ({
     ...base,
-    fontSize: "12px",
+    fontSize: "14px",
     color: "#000",
     textAlign: "start",
   }),
@@ -588,37 +529,39 @@ const customSelectStyles = {
     fontSize: "14px",
     color: "#000",
     textAlign: "center",
+    backgroundColor: "#A7D0D2",
   }),
   placeholder: (base) => ({
     ...base,
-    fontSize: "12px",
+    fontSize: "14px",
     color: "#000",
     textAlign: "center",
   }),
   dropdownIndicator: (base) => ({
     ...base,
-    fontSize: "12px",
+    fontSize: "14px",
     color: "#000",
     textAlign: "center",
   }),
   menu: (base) => ({
     ...base,
-    fontSize: "12px",
+    fontSize: "14px",
     color: "#000",
     textAlign: "center",
+    // backgroundColor: "red",
   }),
   menuList: (base) => ({
     ...base,
-    fontSize: "12px",
+    fontSize: "14px",
     color: "#000",
     textAlign: "center",
+    // backgroundColor: "white",
   }),
   indicatorSeparator: (base) => ({
     ...base,
     backgroundColor: "#000",
   }),
 };
-
 const style = {
   position: "absolute",
   top: "50%",
@@ -631,4 +574,4 @@ const style = {
   p: 4,
 };
 
-export default Modelos;
+export default Marcas;

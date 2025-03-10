@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../../../components/Sidebar";
 
-const AdminDashboard = () => {
+const Asignaciones = () => {
   return (
     <div style={{ display: "flex" }}>
       <Sidebar />
-      <h1>perfil</h1>
+      <h1>asignaciones</h1>
     </div>
   );
 };
 
-export default AdminDashboard;
+export default Asignaciones;

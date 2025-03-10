@@ -7,15 +7,15 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import Sidebar from "../components/Sidebar";
 import axios from "axios";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
-import edit from "../assets/img/pencil.svg";
-import drop from "../assets/img/delete.svg";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import edit from "../../../assets/img/pencil.svg";
+import drop from "../../../assets/img/delete.svg";
+import Sidebar from "../../../components/Sidebar";
 
 const Bienes = () => {
   const [bienes, setBienes] = React.useState([]);
@@ -35,7 +35,7 @@ const Bienes = () => {
   const [usuarioOptions, setUsuarioOptions] = React.useState([]);
 
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(8);
 
   const navigate = useNavigate();
 
@@ -101,7 +101,7 @@ const Bienes = () => {
       });
   };
 
-  const handleEditar = (bien) => {
+  const handleEditarBien = (bien) => {
     setBienSeleccionado(bien);
     setopenModalActualizar(true);
   };
@@ -124,7 +124,7 @@ const Bienes = () => {
     // window.location.reload();
   };
 
-  const handleEliminar = (idBien) => {
+  const handleEliminarBien = (idBien) => {
     const bien = bienes.find((bien) => bien.idBien === idBien);
     setBienSeleccionado(bien);
     setOpenModalEliminar(true);
@@ -141,6 +141,7 @@ const Bienes = () => {
       .then(() => {
         setBienes(bienes.filter((bien) => bien.idBien !== bienSeleccionado.idBien));
         setOpenModalEliminar(false);
+        window.location.reload();
       })
       .catch((error) => {
         console.error("Error al eliminar el bien:", error);
@@ -166,19 +167,18 @@ const Bienes = () => {
   ];
 
   const columns = [
-    { id: "idBien", label: "ID", minWidth: 25 },
-    { id: "codigo", label: "Código", minWidth: 50 },
+    { id: "idBien", label: "#", minWidth: 25 },
+    { id: "codigo", label: "Código", minWidth: 40 },
     { id: "usuario", label: "Usuario", minWidth: 80 },
-    { id: "numeroSerie", label: "Número de Serie", minWidth: 50 },
-    { id: "tipoBien", label: "Tipo de Bien", minWidth: 80 },
+    { id: "numeroSerie", label: "No. Serie", minWidth: 40 },
+    { id: "tipoBien", label: "Tipo", minWidth: 80 },
     { id: "marca", label: "Marca", minWidth: 80 },
     { id: "modelo", label: "Modelo", minWidth: 80 },
     { id: "tipoUbicacion", label: "Tipo de Ubicación", minWidth: 80 },
-    { id: "areaComun", label: "Área Común", minWidth: 80 },
-    { id: "status", label: "Estado", minWidth: 80 },
-    { id: "disponibilidad", label: "Disponibilidad", minWidth: 80 },
-    { id: "editar", label: "Editar", minWidth: 50 },
-    { id: "eliminar", label: "Eliminar", minWidth: 50 },
+    { id: "areaComun", label: "Área Común", minWidth: 100 },
+    { id: "status", label: "Estado", minWidth: 60 },
+    { id: "disponibilidad", label: "Disponibilidad", minWidth: 60 },
+    { id: "crear", label: "Crear", minWidth: 50 },
   ];
 
   React.useEffect(() => {
@@ -733,18 +733,21 @@ const Bienes = () => {
 
       <Sidebar />
 
-      <div style={{ flex: 1, padding: "20px" }}>
-        <Paper sx={{ width: "100%", height: "100%", overflow: "hidden" }}>
+      <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}>
+        <Paper className="col-md-12 col-lg-12 col-xl-12" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
-          <Box sx={{ padding: "20px", borderBottom: "2px solid #C77AAB" }}>
+          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB" }}>
             <h3>Bienes existentes</h3>
-            <p style={{ color: "#C77AAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
+              <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
+              <button onClick={resetearFiltros} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
+                Borrar
+              </button>
+            </div>
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: "10px",
-                alignItems: "center",
               }}
             >
               {/* Primera fila de filtros */}
@@ -753,7 +756,10 @@ const Bienes = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: "10px",
+                  justifyContent: "center",
+                  marginBottom: "10px",
                 }}
+                className="col-sm-12 col-md-12 col-lg-12 col-xl-12"
               >
                 <Select
                   placeholder="Tipo"
@@ -783,6 +789,13 @@ const Bienes = () => {
                   options={usuarioOptions}
                   styles={customSelectStyles}
                 />
+                <Select
+                  placeholder="Ubicación"
+                  value={filtroTipoUbicacion}
+                  onChange={setFiltroTipoUbicacion}
+                  options={tipoUbicacionOptions}
+                  styles={customSelectStyles}
+                />
               </div>
 
               {/* Segunda fila de filtros */}
@@ -791,15 +804,9 @@ const Bienes = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: "10px", // Espacio entre elementos
+                  justifyContent: "center",
                 }}
               >
-                <Select
-                  placeholder="Ubicación"
-                  value={filtroTipoUbicacion}
-                  onChange={setFiltroTipoUbicacion}
-                  options={tipoUbicacionOptions}
-                  styles={customSelectStyles}
-                />
                 <Select
                   placeholder="Área"
                   value={filtroAreaComun}
@@ -821,19 +828,13 @@ const Bienes = () => {
                   options={disponibilidadOptions}
                   styles={customSelectStyles}
                 />
-                <button onClick={resetearFiltros} style={{ ...buttonStyle, backgroundColor: "#C77AAB" }}>
-                  Borrar
-                </button>
-                <button onClick={() => setOpenModalCrear(true)} style={{ ...buttonStyle }}>
-                  Crear
-                </button>
               </div>
             </div>
           </Box>
 
           {/* Tabla */}
-          <TableContainer sx={{ maxHeight: "50vh", width: "100%" }}>
-            <Table aria-label="sticky table">
+          <TableContainer sx={{ width: "100%", padding: "20px", paddingTop: "0px", paddingBottom: "0px" }}>
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   {columns.map((column) => (
@@ -846,7 +847,25 @@ const Bienes = () => {
                         color: "#546EAB",
                       }}
                     >
-                      {column.label}
+                      {column.id === "crear" ? (
+                        <button
+                          onClick={() => setOpenModalCrear(true)}
+                          style={{
+                            backgroundColor: "#254B5E",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                            fontSize: "13px",
+                            width: "100%",
+                            padding: "4px",
+                          }}
+                        >
+                          Crear
+                        </button>
+                      ) : (
+                        column.label
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -856,33 +875,29 @@ const Bienes = () => {
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={bien.idBien}>
                       {columns.map((column) => {
-                        if (column.id === "editar") {
+                        if (column.id === "crear") {
                           return (
                             <TableCell key={column.id} align={column.align}>
                               <img
                                 src={edit}
                                 alt="Editar"
                                 style={{
-                                  width: "15px",
-                                  height: "15px",
+                                  width: "20px",
+                                  height: "20px",
                                   cursor: "pointer",
+                                  marginRight: "8px",
                                 }}
-                                onClick={() => handleEditar(bien)}
+                                onClick={() => handleEditarBien(bien)}
                               />
-                            </TableCell>
-                          );
-                        } else if (column.id === "eliminar") {
-                          return (
-                            <TableCell key={column.id} align={column.align}>
                               <img
                                 src={drop}
                                 alt="Eliminar"
                                 style={{
-                                  width: "15px",
-                                  height: "15px",
+                                  width: "20px",
+                                  height: "20px",
                                   cursor: "pointer",
                                 }}
-                                onClick={() => handleEliminar(bien.idBien)}
+                                onClick={() => handleEliminarBien(bien.idBien)}
                               />
                             </TableCell>
                           );
@@ -900,7 +915,11 @@ const Bienes = () => {
                               ? bien.usuario?.nombres
                               : bien[column.id];
                           return (
-                            <TableCell key={column.id} align={column.align} style={{ fontSize: "10px" }}>
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              style={{ fontSize: "12px", textAlign: "start" }}
+                            >
                               {value}
                             </TableCell>
                           );
@@ -931,7 +950,7 @@ const Bienes = () => {
 
 const buttonStyle = {
   backgroundColor: "#254B5E",
-  padding: "8px",
+  padding: "5px",
   border: "none",
   borderRadius: "5px",
   color: "#fff",
@@ -942,22 +961,49 @@ const buttonStyle = {
 const customSelectStyles = {
   control: (base) => ({
     ...base,
-    width: "160px",
+    width: "200px",
+    backgroundColor: "#A7D0D2",
     border: "none",
-    fontSize: "12px ",
-    backgroundColor: "#f0f0f0",
-  }),
-  singleValue: (base) => ({
-    ...base,
-    fontSize: "10px",
-    color: "#000",
-    textAlign: "center",
   }),
   option: (base) => ({
     ...base,
-    fontSize: "11px",
+    fontSize: "12px",
     color: "#000",
     textAlign: "start",
+  }),
+  singleValue: (base) => ({
+    ...base,
+    fontSize: "14px",
+    color: "#000",
+    textAlign: "center",
+  }),
+  placeholder: (base) => ({
+    ...base,
+    fontSize: "12px",
+    color: "#000",
+    textAlign: "center",
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    fontSize: "12px",
+    color: "#000",
+    textAlign: "center",
+  }),
+  menu: (base) => ({
+    ...base,
+    fontSize: "12px",
+    color: "#000",
+    textAlign: "center",
+  }),
+  menuList: (base) => ({
+    ...base,
+    fontSize: "12px",
+    color: "#000",
+    textAlign: "center",
+  }),
+  indicatorSeparator: (base) => ({
+    ...base,
+    backgroundColor: "#000",
   }),
 };
 

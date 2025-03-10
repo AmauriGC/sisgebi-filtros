@@ -2,42 +2,37 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import Modal from "@mui/material/Modal";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import edit from "../assets/img/pencil.svg";
-import drop from "../assets/img/delete.svg";
-import Sidebar from "../components/Sidebar";
+import TablePagination from "@mui/material/TablePagination";
+import edit from "../../../assets/img/pencil.svg";
+import drop from "../../../assets/img/delete.svg";
+import Sidebar from "../../../components/Sidebar";
 
-const Usuarios = () => {
-  const [usuarios, setUsuarios] = useState([]);
+const Modelos = () => {
+  const [modelos, setModelos] = useState([]);
+  const [marcaOptions, setMarcaOptions] = useState([]);
   const [filtroStatus, setFiltroStatus] = useState(null);
-  const [filtroRol, setFiltroRol] = useState(null);
-  const [filtroLugar, setFiltroLugar] = useState(null);
-  const [lugarOptions, setLugarOptions] = useState([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [filtroMarca, setFiltroMarca] = useState(null);
   const [openModalCrear, setOpenModalCrear] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalEliminar, setOpenModalEliminar] = useState(false);
-  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
+  const [modeloSeleccionado, setModeloSeleccionado] = useState(null);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [nuevoUsuario, setNuevoUsuario] = useState({
-    nombres: "",
-    apellidos: "",
-    correo: "",
-    contrasena: "",
-    rol: "",
+  const [nuevoModelo, setNuevoModelo] = useState({
+    nombreModelo: "",
+    marcaId: null,
     status: "ACTIVO",
-    lugar: "",
   });
 
   const navigate = useNavigate();
@@ -47,105 +42,173 @@ const Usuarios = () => {
     { value: "INACTIVO", label: "Inactivo" },
   ];
 
-  const rolOptions = [
-    { value: "ADMINISTRADOR", label: "Administrador" },
-    { value: "RESPONSABLE", label: "Responsable" },
-    { value: "BECARIO", label: "Becario" },
-  ];
-
   useEffect(() => {
     const token = sessionStorage.getItem("token");
     if (!token) {
-      window.location.href = "/";
+      navigate("/");
       return;
     }
 
+    // Obtener modelos
     axios
-      .get("http://localhost:8080/api/usuarios", {
+      .get("http://localhost:8080/api/modelo", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setUsuarios(response.data);
+        setModelos(response.data);
       })
       .catch((error) => {
-        console.error("Hubo un error al obtener los usuarios:", error);
-        window.location.href = "/";
+        console.error("Error al obtener los modelos:", error);
       });
 
+    // Obtener marcas
     axios
-      .get("http://localhost:8080/api/usuarios/lugares", {
+      .get("http://localhost:8080/api/marca", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        const lugares = response.data.map((lugar) => ({
-          value: lugar,
-          label: lugar,
-        }));
-        setLugarOptions(lugares);
+        setMarcaOptions(
+          response.data.map((marca) => ({
+            value: marca.marcaId,
+            label: marca.nombreMarca,
+          }))
+        );
       })
       .catch((error) => {
-        console.error("Hubo un error al obtener los lugares:", error);
-        window.location.href = "/";
+        console.error("Error al obtener las marcas:", error);
       });
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     applyFilters();
-  }, [filtroStatus, filtroRol, filtroLugar]);
+  }, [filtroStatus, filtroMarca]);
 
   const applyFilters = () => {
     const params = {};
     if (filtroStatus) params.status = filtroStatus.value;
-    if (filtroRol) params.rol = filtroRol.value;
-    if (filtroLugar) params.lugar = filtroLugar.value;
+    if (filtroMarca) params.marcaId = filtroMarca.value;
 
     const token = sessionStorage.getItem("token");
-
     if (!token) {
-      console.error("No se encontró un token válido.");
-      window.location.href = "/";
+      navigate("/");
       return;
     }
 
     axios
-      .get("http://localhost:8080/api/usuarios/filter", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      .get("http://localhost:8080/api/modelo/filter", {
+        headers: { Authorization: `Bearer ${token}` },
         params,
       })
       .then((response) => {
-        setUsuarios(response.data);
+        setModelos(response.data);
       })
       .catch((error) => {
-        console.error("Hubo un error al filtrar los usuarios:", error);
-        if (error.response && error.response.status === 403) {
-          console.error("Token no válido, redirigiendo al login.");
-          window.location.href = "/";
-        }
+        console.error("Error al filtrar los modelos:", error);
       });
   };
 
   const resetFilters = () => {
     setFiltroStatus(null);
-    setFiltroRol(null);
-    setFiltroLugar(null);
+    setFiltroMarca(null);
     const token = sessionStorage.getItem("token");
     if (!token) {
-      window.location.href = "/";
+      navigate("/");
       return;
     }
     axios
-      .get("http://localhost:8080/api/usuarios", {
+      .get("http://localhost:8080/api/modelo", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setUsuarios(response.data);
+        setModelos(response.data);
       })
       .catch((error) => {
-        console.error("Hubo un error al obtener los usuarios:", error);
-        window.location.href = "/";
+        console.error("Error al obtener los modelos:", error);
       });
+  };
+
+  const handleCrearModelo = () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) return;
+
+    const modeloParaEnviar = {
+      nombreModelo: nuevoModelo.nombreModelo,
+      marca: { marcaId: nuevoModelo.marcaId },
+      status: nuevoModelo.status,
+    };
+
+    axios
+      .post("http://localhost:8080/api/modelo", modeloParaEnviar, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setModelos([...modelos, response.data]);
+        setOpenModalCrear(false);
+        setNuevoModelo({
+          nombreModelo: "",
+          marcaId: null,
+          status: "ACTIVO",
+        });
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error("Hubo un error al crear el modelo:", error);
+      });
+  };
+
+  const handleEditarModelo = (modelo) => {
+    setModeloSeleccionado({
+      ...modelo,
+      marcaId: modelo.marca ? modelo.marca.marcaId : null,
+    });
+    setOpenModalEditar(true);
+  };
+
+  const handleActualizarModelo = () => {
+    const token = sessionStorage.getItem("token");
+    if (!token || !modeloSeleccionado) return;
+
+    const modeloParaEnviar = {
+      nombreModelo: modeloSeleccionado.nombreModelo,
+      marca: { marcaId: modeloSeleccionado.marcaId },
+      status: modeloSeleccionado.status,
+    };
+
+    axios
+      .put(`http://localhost:8080/api/modelo/${modeloSeleccionado.modeloId}`, modeloParaEnviar, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setModelos(modelos.map((modelo) => (modelo.modeloId === modeloSeleccionado.modeloId ? response.data : modelo)));
+        setOpenModalEditar(false);
+      })
+      .catch((error) => {
+        console.error("Hubo un error al actualizar el modelo:", error);
+      });
+  };
+
+  const handleEliminarModelo = (id) => {
+    const modelo = modelos.find((modelo) => modelo.modeloId === id);
+    setModeloSeleccionado(modelo);
+    setOpenModalEliminar(true);
+  };
+
+  const confirmarEliminarModelo = () => {
+    const token = sessionStorage.getItem("token");
+    if (!token || !modeloSeleccionado) return;
+
+    axios
+      .delete(`http://localhost:8080/api/modelo/${modeloSeleccionado.modeloId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => {
+        setModelos(modelos.filter((modelo) => modelo.modeloId !== modeloSeleccionado.modeloId));
+        setOpenModalEliminar(false);
+      })
+      .catch((error) => {
+        console.error("Hubo un error al eliminar el modelo:", error);
+      });
+    window.location.reload();
   };
 
   const handleChangePage = (event, newPage) => {
@@ -157,91 +220,17 @@ const Usuarios = () => {
     setPage(0);
   };
 
-  const handleCrearUsuario = () => {
-    const token = sessionStorage.getItem("token");
-    if (!token) return;
-
-    axios
-      .post("http://localhost:8080/api/usuarios", nuevoUsuario, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setUsuarios([...usuarios, response.data]);
-        setOpenModalCrear(false);
-        setNuevoUsuario({
-          nombres: "",
-          apellidos: "",
-          rol: "",
-          status: "ACTIVO",
-          lugar: "",
-        });
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error("Hubo un error al crear el usuario:", error);
-      });
-  };
-
-  const handleEditarUsuario = (usuario) => {
-    setUsuarioSeleccionado(usuario);
-    setOpenModalEditar(true);
-  };
-
-  const handleActualizarUsuario = () => {
-    const token = sessionStorage.getItem("token");
-    if (!token || !usuarioSeleccionado) return;
-
-    axios
-      .put(`http://localhost:8080/api/usuarios/${usuarioSeleccionado.id}`, usuarioSeleccionado, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setUsuarios(usuarios.map((u) => (u.id === usuarioSeleccionado.id ? response.data : u)));
-        setOpenModalEditar(false);
-      })
-      .catch((error) => {
-        console.error("Hubo un error al actualizar el usuario:", error);
-      });
-  };
-
-  const handleEliminarUsuario = (id) => {
-    const usuario = usuarios.find((u) => u.id === id);
-    setUsuarioSeleccionado(usuario);
-    setOpenModalEliminar(true);
-  };
-
-  const confirmarEliminarUsuario = () => {
-    const token = sessionStorage.getItem("token");
-    if (!token || !usuarioSeleccionado) return;
-
-    axios
-      .delete(`http://localhost:8080/api/usuarios/${usuarioSeleccionado.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        setUsuarios(usuarios.filter((u) => u.id !== usuarioSeleccionado.id));
-        setOpenModalEliminar(false);
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error("Hubo un error al eliminar el usuario:", error);
-      });
-  };
-
   const columns = [
-    { id: "id", label: "ID", minWidth: 50 },
-    { id: "nombres", label: "Nombres", minWidth: 100 },
-    { id: "apellidos", label: "Apellidos", minWidth: 100 },
-    { id: "correo", label: "Correo", minWidth: 100 },
-    { id: "rol", label: "Rol", minWidth: 100 },
+    { id: "modeloId", label: "ID", minWidth: 50 },
+    { id: "nombreModelo", label: "Nombre", minWidth: 100 },
+    { id: "marca", label: "Marca", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 100 },
-    { id: "lugar", label: "Lugar", minWidth: 100 },
     { id: "crear", label: "Crear", minWidth: 50 },
   ];
 
   return (
     <div style={{ display: "flex", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
-      {/* Modal para crear usuario */}
+      {/* Modal para crear modelo */}
       <Modal
         open={openModalCrear}
         onClose={() => setOpenModalCrear(false)}
@@ -250,90 +239,46 @@ const Usuarios = () => {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Crear Usuario
+            Crear Modelo
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleCrearUsuario();
+                handleCrearModelo();
               }}
             >
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Nombres:</label>
+                  <label>Nombre del Modelo:</label>
                   <input
                     type="text"
-                    value={nuevoUsuario.nombres}
-                    onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, nombres: e.target.value })}
+                    value={nuevoModelo.nombreModelo}
+                    onChange={(e) => setNuevoModelo({ ...nuevoModelo, nombreModelo: e.target.value })}
                     required
                     style={{ width: "100%" }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label>Apellidos:</label>
-                  <input
-                    type="text"
-                    value={nuevoUsuario.apellidos}
-                    onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, apellidos: e.target.value })}
-                    required
-                    style={{ width: "100%" }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>Correo:</label>
-                  <input
-                    type="email"
-                    value={nuevoUsuario.correo}
-                    onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, correo: e.target.value })}
-                    required
-                    style={{ width: "100%" }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Contraseña:</label>
-                  <input
-                    type="password"
-                    value={nuevoUsuario.contrasena}
-                    onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, contrasena: e.target.value })}
-                    required
-                    style={{ width: "100%" }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>Rol:</label>
+                  <label>Marca:</label>
                   <Select
-                    options={rolOptions}
-                    value={rolOptions.find((option) => option.value === nuevoUsuario.rol)}
-                    onChange={(selected) => setNuevoUsuario({ ...nuevoUsuario, rol: selected.value })}
+                    options={marcaOptions}
+                    value={marcaOptions.find((option) => option.value === nuevoModelo.marcaId)}
+                    onChange={(selected) => setNuevoModelo({ ...nuevoModelo, marcaId: selected.value })}
                     required
                     styles={{ control: (base) => ({ ...base, width: "100%" }) }}
                   />
                 </div>
+              </div>
+              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
                   <label>Estado:</label>
                   <Select
                     options={statusOptions}
-                    value={statusOptions.find((option) => option.value === nuevoUsuario.status)}
-                    onChange={(selected) => setNuevoUsuario({ ...nuevoUsuario, status: selected.value })}
+                    value={statusOptions.find((option) => option.value === nuevoModelo.status)}
+                    onChange={(selected) => setNuevoModelo({ ...nuevoModelo, status: selected.value })}
                     required
                     styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>Lugar:</label>
-                  <input
-                    type="text"
-                    value={nuevoUsuario.lugar}
-                    onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, lugar: e.target.value })}
-                    required
-                    style={{ width: "100%" }}
                   />
                 </div>
               </div>
@@ -357,7 +302,7 @@ const Usuarios = () => {
         </Box>
       </Modal>
 
-      {/* Modal para editar usuario */}
+      {/* Modal para editar modelo */}
       <Modal
         open={openModalEditar}
         onClose={() => setOpenModalEditar(false)}
@@ -366,25 +311,25 @@ const Usuarios = () => {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Editar Usuario
+            Editar Modelo
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleActualizarUsuario();
+                handleActualizarModelo();
               }}
             >
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Nombres:</label>
+                  <label>Nombre del Modelo:</label>
                   <input
                     type="text"
-                    value={usuarioSeleccionado?.nombres || ""}
+                    value={modeloSeleccionado?.nombreModelo || ""}
                     onChange={(e) =>
-                      setUsuarioSeleccionado({
-                        ...usuarioSeleccionado,
-                        nombres: e.target.value,
+                      setModeloSeleccionado({
+                        ...modeloSeleccionado,
+                        nombreModelo: e.target.value,
                       })
                     }
                     required
@@ -392,99 +337,35 @@ const Usuarios = () => {
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label>Apellidos:</label>
-                  <input
-                    type="text"
-                    value={usuarioSeleccionado?.apellidos || ""}
-                    onChange={(e) =>
-                      setUsuarioSeleccionado({
-                        ...usuarioSeleccionado,
-                        apellidos: e.target.value,
-                      })
-                    }
-                    required
-                    style={{ width: "100%" }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>Correo:</label>
-                  <input
-                    type="email"
-                    value={usuarioSeleccionado?.correo || ""}
-                    onChange={(e) =>
-                      setUsuarioSeleccionado({
-                        ...usuarioSeleccionado,
-                        correo: e.target.value,
-                      })
-                    }
-                    required
-                    style={{ width: "100%" }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Contraseña:</label>
-                  <input
-                    type="password"
-                    value={usuarioSeleccionado?.contrasena || ""}
-                    onChange={(e) =>
-                      setUsuarioSeleccionado({
-                        ...usuarioSeleccionado,
-                        contrasena: e.target.value,
-                      })
-                    }
-                    required
-                    style={{ width: "100%" }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>Rol:</label>
+                  <label>Marca:</label>
                   <Select
-                    options={rolOptions}
-                    value={rolOptions.find((option) => option.value === usuarioSeleccionado?.rol)}
+                    options={marcaOptions}
+                    value={marcaOptions.find((option) => option.value === modeloSeleccionado?.marcaId)}
                     onChange={(selected) =>
-                      setUsuarioSeleccionado({
-                        ...usuarioSeleccionado,
-                        rol: selected.value,
+                      setModeloSeleccionado({
+                        ...modeloSeleccionado,
+                        marcaId: selected.value,
                       })
                     }
                     required
                     styles={{ control: (base) => ({ ...base, width: "100%" }) }}
                   />
                 </div>
+              </div>
+              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
                   <label>Estado:</label>
                   <Select
                     options={statusOptions}
-                    value={statusOptions.find((option) => option.value === usuarioSeleccionado?.status)}
+                    value={statusOptions.find((option) => option.value === modeloSeleccionado?.status)}
                     onChange={(selected) =>
-                      setUsuarioSeleccionado({
-                        ...usuarioSeleccionado,
+                      setModeloSeleccionado({
+                        ...modeloSeleccionado,
                         status: selected.value,
                       })
                     }
                     required
                     styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>Lugar:</label>
-                  <input
-                    type="text"
-                    value={usuarioSeleccionado?.lugar || ""}
-                    onChange={(e) =>
-                      setUsuarioSeleccionado({
-                        ...usuarioSeleccionado,
-                        lugar: e.target.value,
-                      })
-                    }
-                    required
-                    style={{ width: "100%" }}
                   />
                 </div>
               </div>
@@ -508,7 +389,7 @@ const Usuarios = () => {
         </Box>
       </Modal>
 
-      {/* Modal para eliminar usuario */}
+      {/* Modal para eliminar modelo */}
       <Modal
         open={openModalEliminar}
         onClose={() => setOpenModalEliminar(false)}
@@ -517,12 +398,12 @@ const Usuarios = () => {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Eliminar Usuario
+            Eliminar Modelo
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            ¿Estás seguro de que deseas eliminar este usuario?
+            ¿Estás seguro de que deseas eliminar este modelo?
             <br />
-            <button onClick={confirmarEliminarUsuario}>Confirmar</button>
+            <button onClick={confirmarEliminarModelo}>Confirmar</button>
             <button onClick={() => setOpenModalEliminar(false)}>Cancelar</button>
           </Typography>
         </Box>
@@ -531,10 +412,10 @@ const Usuarios = () => {
       <Sidebar />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <Paper className="col-md-10 col-lg-10 col-xl-11" style={{ height: "fit-content" }}>
+        <Paper sx={{ overflow: "hidden" }} className="col-md-9 col-lg-9 col-xl-9" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB" }}>
-            <h3>Usuarios existentes</h3>
+            <h3>Modelos Registrados</h3>
             <div
               style={{
                 display: "flex",
@@ -561,17 +442,10 @@ const Usuarios = () => {
                   styles={customSelectStyles}
                 />
                 <Select
-                  placeholder="Rol"
-                  value={filtroRol}
-                  onChange={setFiltroRol}
-                  options={rolOptions}
-                  styles={customSelectStyles}
-                />
-                <Select
-                  placeholder="Lugar"
-                  value={filtroLugar}
-                  onChange={setFiltroLugar}
-                  options={lugarOptions}
+                  placeholder="Marca"
+                  value={filtroMarca}
+                  onChange={setFiltroMarca}
+                  options={marcaOptions}
                   styles={customSelectStyles}
                 />
                 <button onClick={resetFilters} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
@@ -614,15 +488,15 @@ const Usuarios = () => {
                         </button>
                       ) : (
                         column.label
-                      )}
+                      )}{" "}
                     </TableCell>
                   ))}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {usuarios.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((usuario) => {
+                {modelos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((modelo) => {
                   return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={usuario.id}>
+                    <TableRow hover role="checkbox" tabIndex={-1} key={modelo.modeloId}>
                       {columns.map((column) => {
                         if (column.id === "crear") {
                           return (
@@ -636,7 +510,7 @@ const Usuarios = () => {
                                   cursor: "pointer",
                                   marginRight: "10px",
                                 }}
-                                onClick={() => handleEditarUsuario(usuario)}
+                                onClick={() => handleEditarModelo(modelo)}
                               />
                               <img
                                 src={drop}
@@ -646,12 +520,12 @@ const Usuarios = () => {
                                   height: "20px",
                                   cursor: "pointer",
                                 }}
-                                onClick={() => handleEliminarUsuario(usuario.id)}
+                                onClick={() => handleEliminarModelo(modelo.modeloId)}
                               />
                             </TableCell>
                           );
                         } else {
-                          const value = usuario[column.id];
+                          const value = column.id === "marca" ? modelo.marca?.nombreMarca : modelo[column.id];
                           return (
                             <TableCell
                               key={column.id}
@@ -674,7 +548,7 @@ const Usuarios = () => {
           <TablePagination
             rowsPerPageOptions={[10, 25, 100]}
             component="div"
-            count={usuarios.length}
+            count={modelos.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -757,4 +631,4 @@ const style = {
   p: 4,
 };
 
-export default Usuarios;
+export default Modelos;

@@ -13,9 +13,9 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "react-select";
-import edit from "../assets/img/pencil.svg";
-import drop from "../assets/img/delete.svg";
-import Sidebar from "../components/Sidebar";
+import edit from "../../../assets/img/pencil.svg";
+import drop from "../../../assets/img/delete.svg";
+import Sidebar from "../../../components/Sidebar";
 
 const Tipos = () => {
   const [tipoBienes, setTipoBienes] = useState([]);
