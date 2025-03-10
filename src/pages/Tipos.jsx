@@ -514,7 +514,7 @@ const buttonStyle = {
 const customSelectStyles = {
   control: (base) => ({
     ...base,
-    width: "160px",
+    width: "150px",
     fontSize: "16px ",
     backgroundColor: "#A7D0D2",
     border: "none",

@@ -196,8 +196,7 @@ const Marcas = () => {
     { id: "marcaId", label: "ID", minWidth: 50 },
     { id: "nombreMarca", label: "Nombre", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 100 },
-    { id: "editar", label: "Editar", minWidth: 50 },
-    { id: "eliminar", label: "Eliminar", minWidth: 50 },
+    { id: "crear", label: "Crear", minWidth: 50 },
   ];
 
   return (
@@ -357,19 +356,15 @@ const Marcas = () => {
       </Modal>
 
       <Sidebar />
-
-      <div style={{ flex: 1, padding: "20px" }}>
-        <Paper sx={{ width: "100%", height: "100%", overflow: "hidden" }}>
+      <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Paper className="col-md-6 col-lg-6 col-xl-6" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
-          <Box sx={{ padding: "20px", borderBottom: "2px solid #C77AAB" }}>
+          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB" }}>
             <h3>Marcas Registradas</h3>
-            <p style={{ color: "#C77AAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: "10px",
-                alignItems: "center",
               }}
             >
               {/* Filtros */}
@@ -378,8 +373,12 @@ const Marcas = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: "10px",
+                  justifyContent: "center",
                 }}
+                className="col-sm-12 col-md-12 col-lg-12 col-xl-12"
               >
+                <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
+
                 <Select
                   placeholder="Estado"
                   value={filtroStatus}
@@ -387,7 +386,7 @@ const Marcas = () => {
                   options={statusOptions}
                   styles={customSelectStyles}
                 />
-                <button onClick={resetFilters} style={{ ...buttonStyle, backgroundColor: "#C77AAB" }}>
+                <button onClick={resetFilters} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
                   Borrar
                 </button>
                 <button onClick={() => setOpenModalCrear(true)} style={{ ...buttonStyle }}>
@@ -398,8 +397,8 @@ const Marcas = () => {
           </Box>
 
           {/* Tabla */}
-          <TableContainer sx={{ maxHeight: "50vh", width: "100%" }}>
-            <Table aria-label="sticky table">
+          <TableContainer sx={{ width: "100%", padding: "20px", paddingTop: "0px", paddingBottom: "0px" }}>
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   {columns.map((column) => (
@@ -408,11 +407,29 @@ const Marcas = () => {
                       align={column.align}
                       style={{
                         minWidth: column.minWidth,
-                        fontSize: "12px",
+                        fontSize: "16px",
                         color: "#546EAB",
                       }}
                     >
-                      {column.label}
+                      {column.id === "crear" ? (
+                        <button
+                          onClick={() => setOpenModalCrear(true)}
+                          style={{
+                            backgroundColor: "#254B5E",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                            width: "100%",
+                            padding: "4px",
+                          }}
+                        >
+                          Crear
+                        </button>
+                      ) : (
+                        column.label
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -422,30 +439,26 @@ const Marcas = () => {
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={marca.marcaId}>
                       {columns.map((column) => {
-                        if (column.id === "editar") {
+                        if (column.id === "crear") {
                           return (
-                            <TableCell key={column.id} align={column.align}>
+                            <TableCell key={column.id} align={column.align} style={{ textAlign: "center" }}>
                               <img
                                 src={edit}
                                 alt="Editar"
                                 style={{
-                                  width: "15px",
-                                  height: "15px",
+                                  width: "20px",
+                                  height: "20px",
                                   cursor: "pointer",
+                                  marginRight: "10px",
                                 }}
                                 onClick={() => handleEditarMarca(marca)}
                               />
-                            </TableCell>
-                          );
-                        } else if (column.id === "eliminar") {
-                          return (
-                            <TableCell key={column.id} align={column.align}>
                               <img
                                 src={drop}
                                 alt="Eliminar"
                                 style={{
-                                  width: "15px",
-                                  height: "15px",
+                                  width: "20px",
+                                  height: "20px",
                                   cursor: "pointer",
                                 }}
                                 onClick={() => handleEliminarMarca(marca.marcaId)}
@@ -455,7 +468,11 @@ const Marcas = () => {
                         } else {
                           const value = marca[column.id];
                           return (
-                            <TableCell key={column.id} align={column.align} style={{ fontSize: "10px" }}>
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              style={{ fontSize: "12px", textAlign: "start" }}
+                            >
                               {value}
                             </TableCell>
                           );
@@ -483,7 +500,6 @@ const Marcas = () => {
     </div>
   );
 };
-
 const buttonStyle = {
   backgroundColor: "#254B5E",
   padding: "8px",
@@ -497,25 +513,55 @@ const buttonStyle = {
 const customSelectStyles = {
   control: (base) => ({
     ...base,
-    width: "160px",
+    width: "150px",
+    fontSize: "16px ",
+    backgroundColor: "#A7D0D2",
     border: "none",
-    fontSize: "12px ",
-    backgroundColor: "#f0f0f0",
-  }),
-  singleValue: (base) => ({
-    ...base,
-    fontSize: "10px",
-    color: "#000",
-    textAlign: "center",
   }),
   option: (base) => ({
     ...base,
-    fontSize: "11px",
+    fontSize: "14px",
     color: "#000",
     textAlign: "start",
   }),
+  singleValue: (base) => ({
+    ...base,
+    fontSize: "14px",
+    color: "#000",
+    textAlign: "center",
+    backgroundColor: "#A7D0D2",
+  }),
+  placeholder: (base) => ({
+    ...base,
+    fontSize: "14px",
+    color: "#000",
+    textAlign: "center",
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    fontSize: "14px",
+    color: "#000",
+    textAlign: "center",
+  }),
+  menu: (base) => ({
+    ...base,
+    fontSize: "14px",
+    color: "#000",
+    textAlign: "center",
+    // backgroundColor: "red",
+  }),
+  menuList: (base) => ({
+    ...base,
+    fontSize: "14px",
+    color: "#000",
+    textAlign: "center",
+    // backgroundColor: "white",
+  }),
+  indicatorSeparator: (base) => ({
+    ...base,
+    backgroundColor: "#000",
+  }),
 };
-
 const style = {
   position: "absolute",
   top: "50%",
