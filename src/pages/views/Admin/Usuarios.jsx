@@ -627,27 +627,29 @@ const Usuarios = () => {
                         if (column.id === "crear") {
                           return (
                             <TableCell key={column.id} align={column.align} style={{ textAlign: "center" }}>
-                              <img
-                                src={edit}
-                                alt="Editar"
-                                style={{
-                                  width: "20px",
-                                  height: "20px",
-                                  cursor: "pointer",
-                                  marginRight: "10px",
-                                }}
-                                onClick={() => handleEditarUsuario(usuario)}
-                              />
-                              <img
-                                src={drop}
-                                alt="Eliminar"
-                                style={{
-                                  width: "20px",
-                                  height: "20px",
-                                  cursor: "pointer",
-                                }}
-                                onClick={() => handleEliminarUsuario(usuario.id)}
-                              />
+                              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                <img
+                                  src={edit}
+                                  alt="Editar"
+                                  style={{
+                                    width: "20px",
+                                    height: "20px",
+                                    cursor: "pointer",
+                                    marginRight: "8px",
+                                  }}
+                                  onClick={() => handleEditarAsignaciones(asignacion)}
+                                />
+                                <img
+                                  src={drop}
+                                  alt="Eliminar"
+                                  style={{
+                                    width: "20px",
+                                    height: "20px",
+                                    cursor: "pointer",
+                                  }}
+                                  onClick={() => handleEliminarAsignaciones(asignacion.asignacionesId)}
+                                />
+                              </div>
                             </TableCell>
                           );
                         } else {
