@@ -25,14 +25,11 @@ const Bienes = () => {
   const [filtroTipoBien, setFiltroTipoBien] = React.useState(null);
   const [filtroMarca, setFiltroMarca] = React.useState(null);
   const [filtroModelo, setFiltroModelo] = React.useState(null);
-  const [filtroTipoUbicacion, setFiltroTipoUbicacion] = React.useState(null);
-  const [filtroUsuario, setFiltroUsuario] = React.useState(null);
 
   const [areaComunOptions, setAreaComunOptions] = React.useState([]);
   const [tipoBienOptions, setTipoBienOptions] = React.useState([]);
   const [marcaOptions, setMarcaOptions] = React.useState([]);
   const [modeloOptions, setModeloOptions] = React.useState([]);
-  const [usuarioOptions, setUsuarioOptions] = React.useState([]);
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(8);
@@ -40,6 +37,7 @@ const Bienes = () => {
   const navigate = useNavigate();
 
   const [bienSeleccionado, setBienSeleccionado] = React.useState(null);
+  const [motivoEliminar, setMotivoEliminar] = React.useState("");
 
   const [openModalActualizar, setopenModalActualizar] = React.useState(false);
   const [openModalEliminar, setOpenModalEliminar] = React.useState(false);
@@ -48,14 +46,13 @@ const Bienes = () => {
   const [nuevoBien, setNuevoBien] = React.useState({
     codigo: "",
     numeroSerie: "",
-    usuario: null,
     tipoBien: null,
     marca: null,
     modelo: null,
-    tipoUbicacion: null,
     areaComun: null,
     status: "ACTIVO",
     disponibilidad: "DISPONIBLE",
+    motivo: "",
   });
 
   const handleCrear = () => {
@@ -65,14 +62,13 @@ const Bienes = () => {
     const bienParaEnviar = {
       codigo: nuevoBien.codigo,
       numeroSerie: nuevoBien.numeroSerie,
-      usuario: { id: nuevoBien.usuario.value },
       tipoBien: { tipoBienId: nuevoBien.tipoBien.value },
       marca: { marcaId: nuevoBien.marca.value },
       modelo: { modeloId: nuevoBien.modelo.value },
-      tipoUbicacion: nuevoBien.tipoUbicacion,
       areaComun: nuevoBien.areaComun ? { areaId: nuevoBien.areaComun.value } : null,
       status: nuevoBien.status,
       disponibilidad: nuevoBien.disponibilidad,
+      motivo: "",
     };
 
     axios
@@ -85,14 +81,13 @@ const Bienes = () => {
         setNuevoBien({
           codigo: "",
           numeroSerie: "",
-          usuario: null,
           tipoBien: null,
           marca: null,
           modelo: null,
-          tipoUbicacion: null,
           areaComun: null,
           status: "ACTIVO",
           disponibilidad: "DISPONIBLE",
+          motivo: "",
         });
         window.location.reload();
       })
@@ -137,6 +132,7 @@ const Bienes = () => {
     axios
       .delete(`http://localhost:8080/api/bienes/${bienSeleccionado.idBien}`, {
         headers: { Authorization: `Bearer ${token}` },
+        data: { motivo: motivoEliminar },
       })
       .then(() => {
         setBienes(bienes.filter((bien) => bien.idBien !== bienSeleccionado.idBien));
@@ -159,25 +155,16 @@ const Bienes = () => {
     { value: "OCUPADO", label: "Ocupado" },
   ];
 
-  const tipoUbicacionOptions = [
-    { value: "AREA_COMUN", label: "Área Común" },
-    { value: "BECARIO", label: "Becario" },
-    { value: "RESPONSABLE", label: "Usuario" },
-    { value: "EXTERNO", label: "Externo" },
-  ];
-
   const columns = [
-    { id: "idBien", label: "#", minWidth: 25 },
+    { id: "bienId", label: "#", minWidth: 25 },
     { id: "codigo", label: "Código", minWidth: 40 },
-    { id: "usuario", label: "Usuario", minWidth: 80 },
     { id: "numeroSerie", label: "No. Serie", minWidth: 40 },
     { id: "tipoBien", label: "Tipo", minWidth: 80 },
     { id: "marca", label: "Marca", minWidth: 80 },
     { id: "modelo", label: "Modelo", minWidth: 80 },
-    { id: "tipoUbicacion", label: "Tipo de Ubicación", minWidth: 80 },
     { id: "areaComun", label: "Área Común", minWidth: 100 },
-    { id: "status", label: "Estado", minWidth: 60 },
     { id: "disponibilidad", label: "Disponibilidad", minWidth: 60 },
+    { id: "status", label: "Estado", minWidth: 60 },
     { id: "crear", label: "Crear", minWidth: 50 },
   ];
 
@@ -188,16 +175,7 @@ const Bienes = () => {
 
   React.useEffect(() => {
     aplicarFiltros();
-  }, [
-    filtroStatus,
-    filtroDisponibilidad,
-    filtroUsuario,
-    filtroAreaComun,
-    filtroTipoBien,
-    filtroMarca,
-    filtroModelo,
-    filtroTipoUbicacion,
-  ]);
+  }, [filtroStatus, filtroDisponibilidad, filtroAreaComun, filtroTipoBien, filtroMarca, filtroModelo]);
 
   const obtenerBienes = () => {
     const token = sessionStorage.getItem("token");
@@ -290,23 +268,6 @@ const Bienes = () => {
       .catch((error) => {
         console.error("Error al cargar modelos:", error);
       });
-
-    // Cargar usuarios
-    axios
-      .get("http://localhost:8080/api/usuarios", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setUsuarioOptions(
-          response.data.map((usuario) => ({
-            value: usuario.id,
-            label: usuario.nombres,
-          }))
-        );
-      })
-      .catch((error) => {
-        console.error("Error al cargar usuarios:", error);
-      });
   };
 
   const aplicarFiltros = () => {
@@ -317,8 +278,6 @@ const Bienes = () => {
     if (filtroTipoBien) params.tipoBienId = filtroTipoBien.value;
     if (filtroMarca) params.marcaId = filtroMarca.value;
     if (filtroModelo) params.modeloId = filtroModelo.value;
-    if (filtroTipoUbicacion) params.tipoUbicacion = filtroTipoUbicacion.value;
-    if (filtroUsuario) params.id = filtroUsuario.value;
 
     const token = sessionStorage.getItem("token");
     if (!token) {
@@ -345,8 +304,6 @@ const Bienes = () => {
     setFiltroTipoBien(null);
     setFiltroMarca(null);
     setFiltroModelo(null);
-    setFiltroTipoUbicacion(null);
-    setFiltroUsuario(null);
     obtenerBienes();
   };
 
@@ -379,7 +336,7 @@ const Bienes = () => {
                 handleCrear();
               }}
             >
-              {/* Primera fila: Código, Número de Serie, Usuario, Marca */}
+              {/* Primera fila: Código, Número de Serie, Marca */}
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
                   <label>Código:</label>
@@ -401,16 +358,7 @@ const Bienes = () => {
                     style={{ width: "100%" }}
                   />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <label>Usuario:</label>
-                  <Select
-                    options={usuarioOptions}
-                    value={nuevoBien.usuario}
-                    onChange={(selected) => setNuevoBien({ ...nuevoBien, usuario: selected })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
+
                 <div style={{ flex: 1 }}>
                   <label>Marca:</label>
                   <Select
@@ -423,7 +371,7 @@ const Bienes = () => {
                 </div>
               </div>
 
-              {/* Segunda fila: Modelo, Tipo de Bien, Área Común, Tipo de Ubicación */}
+              {/* Segunda fila: Modelo, Tipo de Bien, Área Común */}
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
                   <label>Modelo:</label>
@@ -451,16 +399,6 @@ const Bienes = () => {
                     options={areaComunOptions}
                     value={nuevoBien.areaComun}
                     onChange={(selected) => setNuevoBien({ ...nuevoBien, areaComun: selected })}
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Tipo de Ubicación:</label>
-                  <Select
-                    options={tipoUbicacionOptions}
-                    value={tipoUbicacionOptions.find((option) => option.value === nuevoBien.tipoUbicacion)}
-                    onChange={(selected) => setNuevoBien({ ...nuevoBien, tipoUbicacion: selected.value })}
-                    required
                     styles={{ control: (base) => ({ ...base, width: "100%" }) }}
                   />
                 </div>
@@ -529,7 +467,7 @@ const Bienes = () => {
                 handleActualizar();
               }}
             >
-              {/* Primera fila: Código, Número de Serie, Usuario, Marca */}
+              {/* Primera fila: Código, Número de Serie, Marca */}
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
                   <label>Código:</label>
@@ -561,21 +499,7 @@ const Bienes = () => {
                     style={{ width: "100%" }}
                   />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <label>Usuario:</label>
-                  <Select
-                    options={usuarioOptions}
-                    value={usuarioOptions.find((option) => option.value === bienSeleccionado?.usuario?.id)}
-                    onChange={(selected) =>
-                      setBienSeleccionado({
-                        ...bienSeleccionado,
-                        usuario: { id: selected.value },
-                      })
-                    }
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
+
                 <div style={{ flex: 1 }}>
                   <label>Marca:</label>
                   <Select
@@ -593,7 +517,7 @@ const Bienes = () => {
                 </div>
               </div>
 
-              {/* Segunda fila: Modelo, Tipo de Bien, Área Común, Tipo de Ubicación */}
+              {/* Segunda fila: Modelo, Tipo de Bien, Área Común */}
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
                   <label>Modelo:</label>
@@ -636,21 +560,6 @@ const Bienes = () => {
                         areaComun: { areaId: selected.value },
                       })
                     }
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Tipo de Ubicación:</label>
-                  <Select
-                    options={tipoUbicacionOptions}
-                    value={tipoUbicacionOptions.find((option) => option.value === bienSeleccionado?.tipoUbicacion)}
-                    onChange={(selected) =>
-                      setBienSeleccionado({
-                        ...bienSeleccionado,
-                        tipoUbicacion: selected.value,
-                      })
-                    }
-                    required
                     styles={{ control: (base) => ({ ...base, width: "100%" }) }}
                   />
                 </div>
@@ -725,6 +634,8 @@ const Bienes = () => {
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             ¿Estás seguro de que deseas eliminar este bien?
             <br />
+            <label>Motivo de eliminación:</label>
+            <input type="text" value={motivoEliminar} onChange={(e) => setMotivoEliminar(e.target.value)} required />
             <button onClick={confirmarEliminar}>Confirmar</button>
             <button onClick={() => setOpenModalEliminar(false)}>Cancelar</button>
           </Typography>
@@ -780,20 +691,6 @@ const Bienes = () => {
                   value={filtroModelo}
                   onChange={setFiltroModelo}
                   options={modeloOptions}
-                  styles={customSelectStyles}
-                />
-                <Select
-                  placeholder="Usuario"
-                  value={filtroUsuario}
-                  onChange={setFiltroUsuario}
-                  options={usuarioOptions}
-                  styles={customSelectStyles}
-                />
-                <Select
-                  placeholder="Ubicación"
-                  value={filtroTipoUbicacion}
-                  onChange={setFiltroTipoUbicacion}
-                  options={tipoUbicacionOptions}
                   styles={customSelectStyles}
                 />
               </div>
@@ -913,8 +810,6 @@ const Bienes = () => {
                               ? bien.modelo?.nombreModelo
                               : column.id === "areaComun"
                               ? bien.areaComun?.nombreArea
-                              : column.id === "usuario"
-                              ? bien.usuario?.nombres
                               : bien[column.id];
                           return (
                             <TableCell

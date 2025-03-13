@@ -19,9 +19,7 @@ import Sidebar from "../../../components/Sidebar";
 
 const Modelos = () => {
   const [modelos, setModelos] = useState([]);
-  const [marcaOptions, setMarcaOptions] = useState([]);
   const [filtroStatus, setFiltroStatus] = useState(null);
-  const [filtroMarca, setFiltroMarca] = useState(null);
   const [openModalCrear, setOpenModalCrear] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalEliminar, setOpenModalEliminar] = useState(false);
@@ -31,7 +29,6 @@ const Modelos = () => {
 
   const [nuevoModelo, setNuevoModelo] = useState({
     nombreModelo: "",
-    marcaId: null,
     status: "ACTIVO",
   });
 
@@ -60,33 +57,15 @@ const Modelos = () => {
       .catch((error) => {
         console.error("Error al obtener los modelos:", error);
       });
-
-    // Obtener marcas
-    axios
-      .get("http://localhost:8080/api/marca", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setMarcaOptions(
-          response.data.map((marca) => ({
-            value: marca.marcaId,
-            label: marca.nombreMarca,
-          }))
-        );
-      })
-      .catch((error) => {
-        console.error("Error al obtener las marcas:", error);
-      });
   }, [navigate]);
 
   useEffect(() => {
     applyFilters();
-  }, [filtroStatus, filtroMarca]);
+  }, [filtroStatus]);
 
   const applyFilters = () => {
     const params = {};
     if (filtroStatus) params.status = filtroStatus.value;
-    if (filtroMarca) params.marcaId = filtroMarca.value;
 
     const token = sessionStorage.getItem("token");
     if (!token) {
@@ -109,7 +88,6 @@ const Modelos = () => {
 
   const resetFilters = () => {
     setFiltroStatus(null);
-    setFiltroMarca(null);
     const token = sessionStorage.getItem("token");
     if (!token) {
       navigate("/");
@@ -133,7 +111,6 @@ const Modelos = () => {
 
     const modeloParaEnviar = {
       nombreModelo: nuevoModelo.nombreModelo,
-      marca: { marcaId: nuevoModelo.marcaId },
       status: nuevoModelo.status,
     };
 
@@ -146,7 +123,6 @@ const Modelos = () => {
         setOpenModalCrear(false);
         setNuevoModelo({
           nombreModelo: "",
-          marcaId: null,
           status: "ACTIVO",
         });
         window.location.reload();
@@ -159,7 +135,7 @@ const Modelos = () => {
   const handleEditarModelo = (modelo) => {
     setModeloSeleccionado({
       ...modelo,
-      marcaId: modelo.marca ? modelo.marca.marcaId : null,
+      modeloId: modelo.modeloId,
     });
     setOpenModalEditar(true);
   };
@@ -170,7 +146,6 @@ const Modelos = () => {
 
     const modeloParaEnviar = {
       nombreModelo: modeloSeleccionado.nombreModelo,
-      marca: { marcaId: modeloSeleccionado.marcaId },
       status: modeloSeleccionado.status,
     };
 
@@ -223,7 +198,6 @@ const Modelos = () => {
   const columns = [
     { id: "modeloId", label: "ID", minWidth: 50 },
     { id: "nombreModelo", label: "Nombre", minWidth: 100 },
-    { id: "marca", label: "Marca", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 100 },
     { id: "crear", label: "Crear", minWidth: 50 },
   ];
@@ -257,16 +231,6 @@ const Modelos = () => {
                     onChange={(e) => setNuevoModelo({ ...nuevoModelo, nombreModelo: e.target.value })}
                     required
                     style={{ width: "100%" }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Marca:</label>
-                  <Select
-                    options={marcaOptions}
-                    value={marcaOptions.find((option) => option.value === nuevoModelo.marcaId)}
-                    onChange={(selected) => setNuevoModelo({ ...nuevoModelo, marcaId: selected.value })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
                   />
                 </div>
               </div>
@@ -334,21 +298,6 @@ const Modelos = () => {
                     }
                     required
                     style={{ width: "100%" }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Marca:</label>
-                  <Select
-                    options={marcaOptions}
-                    value={marcaOptions.find((option) => option.value === modeloSeleccionado?.marcaId)}
-                    onChange={(selected) =>
-                      setModeloSeleccionado({
-                        ...modeloSeleccionado,
-                        marcaId: selected.value,
-                      })
-                    }
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
                   />
                 </div>
               </div>
@@ -441,13 +390,7 @@ const Modelos = () => {
                   options={statusOptions}
                   styles={customSelectStyles}
                 />
-                <Select
-                  placeholder="Marca"
-                  value={filtroMarca}
-                  onChange={setFiltroMarca}
-                  options={marcaOptions}
-                  styles={customSelectStyles}
-                />
+
                 <button onClick={resetFilters} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
                   Borrar
                 </button>
@@ -527,7 +470,7 @@ const Modelos = () => {
                             </TableCell>
                           );
                         } else {
-                          const value = column.id === "marca" ? modelo.marca?.nombreMarca : modelo[column.id];
+                          const value = modelo[column.id];
                           return (
                             <TableCell
                               key={column.id}

@@ -229,13 +229,13 @@ const Usuarios = () => {
   };
 
   const columns = [
-    { id: "id", label: "ID", minWidth: 50 },
+    { id: "id", label: "#", minWidth: 50 },
     { id: "nombres", label: "Nombres", minWidth: 100 },
     { id: "apellidos", label: "Apellidos", minWidth: 100 },
     { id: "correo", label: "Correo", minWidth: 100 },
     { id: "rol", label: "Rol", minWidth: 100 },
-    { id: "status", label: "Estado", minWidth: 100 },
     { id: "lugar", label: "Lugar", minWidth: 100 },
+    { id: "status", label: "Estado", minWidth: 100 },
     { id: "crear", label: "Crear", minWidth: 50 },
   ];
 

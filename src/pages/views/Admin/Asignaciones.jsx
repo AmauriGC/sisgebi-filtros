@@ -91,9 +91,9 @@ const Asignaciones = () => {
     const token = sessionStorage.getItem("token");
     if (!token) return;
 
-    // Obtener solo responsables
+    // Obtener solo becarios
     axios
-      .get("http://localhost:8080/api/usuarios/responsables", {
+      .get("http://localhost:8080/api/usuarios/becarios", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -105,7 +105,7 @@ const Asignaciones = () => {
         );
       })
       .catch((error) => {
-        console.error("Error al cargar responsables:", error);
+        console.error("Error al cargar becarios:", error);
       });
 
     // Obtener bienes
@@ -526,34 +526,34 @@ const Asignaciones = () => {
                           return (
                             <TableCell key={column.id} align={column.align}>
                               <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                              <img
-                                src={edit}
-                                alt="Editar"
-                                style={{
-                                  width: "20px",
-                                  height: "20px",
-                                  cursor: "pointer",
-                                  marginRight: "8px",
-                                }}
-                                onClick={() => handleEditarAsignaciones(asignacion)}
-                              />
-                              <img
-                                src={drop}
-                                alt="Eliminar"
-                                style={{
-                                  width: "20px",
-                                  height: "20px",
-                                  cursor: "pointer",
-                                }}
-                                onClick={() => handleEliminarAsignaciones(asignacion.asignacionesId)}
-                              />
+                                <img
+                                  src={edit}
+                                  alt="Editar"
+                                  style={{
+                                    width: "20px",
+                                    height: "20px",
+                                    cursor: "pointer",
+                                    marginRight: "8px",
+                                  }}
+                                  onClick={() => handleEditarAsignaciones(asignacion)}
+                                />
+                                <img
+                                  src={drop}
+                                  alt="Eliminar"
+                                  style={{
+                                    width: "20px",
+                                    height: "20px",
+                                    cursor: "pointer",
+                                  }}
+                                  onClick={() => handleEliminarAsignaciones(asignacion.asignacionesId)}
+                                />
                               </div>
                             </TableCell>
                           );
                         } else {
                           const value =
                             column.id === "usuario"
-                              ? asignacion.usuario?.nombres
+                              ? asignacion.becario?.nombres
                               : column.id === "bien"
                               ? asignacion.bien?.codigo
                               : column.id === "status"
@@ -565,7 +565,7 @@ const Asignaciones = () => {
                             <TableCell
                               key={column.id}
                               align={column.align}
-                              style={{ fontSize: "12px", textAlign: "start"}}
+                              style={{ fontSize: "12px", textAlign: "start" }}
                             >
                               {value}
                             </TableCell>

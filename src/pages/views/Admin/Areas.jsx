@@ -19,9 +19,7 @@ import Sidebar from "../../../components/Sidebar";
 
 const Areas = () => {
   const [areas, setAreas] = useState([]);
-  const [responsableOptions, setResponsableOptions] = useState([]);
   const [filtroStatus, setFiltroStatus] = useState(null);
-  const [filtroResponsable, setFiltroResponsable] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openModalCrear, setOpenModalCrear] = useState(false);
@@ -31,7 +29,6 @@ const Areas = () => {
 
   const [nuevaArea, setNuevaArea] = useState({
     nombreArea: "",
-    responsableId: null,
     status: "ACTIVO",
   });
 
@@ -61,34 +58,15 @@ const Areas = () => {
         console.error("Error al obtener las áreas comunes:", error);
         window.location.href = "/";
       });
-
-    // Obtener los responsables
-    axios
-      .get("http://localhost:8080/api/usuarios/responsables", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setResponsableOptions(
-          response.data.map((responsable) => ({
-            value: responsable.id,
-            label: `${responsable.nombres} ${responsable.apellidos}`,
-          }))
-        );
-      })
-      .catch((error) => {
-        console.error("Error al obtener los responsables:", error);
-        window.location.href = "/";
-      });
   }, []);
 
   useEffect(() => {
     applyFilters();
-  }, [filtroStatus, filtroResponsable]);
+  }, [filtroStatus]);
 
   const applyFilters = () => {
     const params = {};
     if (filtroStatus) params.status = filtroStatus.value;
-    if (filtroResponsable) params.responsableId = filtroResponsable.value;
 
     const token = sessionStorage.getItem("token");
 
@@ -119,7 +97,6 @@ const Areas = () => {
 
   const resetFilters = () => {
     setFiltroStatus(null);
-    setFiltroResponsable(null);
     const token = sessionStorage.getItem("token");
     if (!token) {
       window.location.href = "/";
@@ -153,7 +130,6 @@ const Areas = () => {
 
     const areaParaEnviar = {
       nombreArea: nuevaArea.nombreArea,
-      responsable: { id: nuevaArea.responsableId },
       status: nuevaArea.status,
     };
 
@@ -166,7 +142,6 @@ const Areas = () => {
         setOpenModalCrear(false);
         setNuevaArea({
           nombreArea: "",
-          responsableId: null,
           status: "ACTIVO",
         });
         window.location.reload();
@@ -179,7 +154,7 @@ const Areas = () => {
   const handleEditarArea = (area) => {
     setAreaSeleccionada({
       ...area,
-      responsableId: area.responsable ? area.responsable.id : null,
+      areaId: area.areaId,
     });
     setOpenModalEditar(true);
   };
@@ -190,7 +165,6 @@ const Areas = () => {
 
     const areaParaEnviar = {
       nombreArea: areaSeleccionada.nombreArea,
-      responsable: { id: areaSeleccionada.responsableId },
       status: areaSeleccionada.status,
     };
 
@@ -234,7 +208,6 @@ const Areas = () => {
   const columns = [
     { id: "areaId", label: "ID", minWidth: 50 },
     { id: "nombreArea", label: "Nombre", minWidth: 100 },
-    { id: "responsable", label: "Responsable", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 100 },
     { id: "crear", label: "Crear", minWidth: 50 },
   ];
@@ -268,16 +241,6 @@ const Areas = () => {
                     onChange={(e) => setNuevaArea({ ...nuevaArea, nombreArea: e.target.value })}
                     required
                     style={{ width: "100%" }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Responsable:</label>
-                  <Select
-                    options={responsableOptions}
-                    value={responsableOptions.find((option) => option.value === nuevaArea.responsableId)}
-                    onChange={(selected) => setNuevaArea({ ...nuevaArea, responsableId: selected.value })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
                   />
                 </div>
               </div>
@@ -345,21 +308,6 @@ const Areas = () => {
                     }
                     required
                     style={{ width: "100%" }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Responsable:</label>
-                  <Select
-                    options={responsableOptions}
-                    value={responsableOptions.find((option) => option.value === areaSeleccionada?.responsableId)}
-                    onChange={(selected) =>
-                      setAreaSeleccionada({
-                        ...areaSeleccionada,
-                        responsableId: selected.value,
-                      })
-                    }
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
                   />
                 </div>
               </div>
@@ -452,13 +400,6 @@ const Areas = () => {
                   options={statusOptions}
                   styles={customSelectStyles}
                 />
-                <Select
-                  placeholder="Responsable"
-                  value={filtroResponsable}
-                  onChange={setFiltroResponsable}
-                  options={responsableOptions}
-                  styles={customSelectStyles}
-                />
                 <button onClick={resetFilters} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
                   Borrar
                 </button>
@@ -532,18 +473,13 @@ const Areas = () => {
                                     height: "20px",
                                     cursor: "pointer",
                                   }}
-                                  onClick={() => handleEliminarArea(area.areasId)}
+                                  onClick={() => handleEliminarArea(area.areaId)}
                                 />
                               </div>
                             </TableCell>
                           );
                         } else {
-                          const value =
-                            column.id === "responsable"
-                              ? area.responsable
-                                ? `${area.responsable.nombres} ${area.responsable.apellidos}`
-                                : "No asignado"
-                              : area[column.id];
+                          const value = column.id === "area" ? area.area.nombreArea : area[column.id];
                           return (
                             <TableCell
                               key={column.id}
