@@ -389,9 +389,6 @@ const Marcas = () => {
                 <button onClick={resetFilters} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
                   Borrar
                 </button>
-                <button onClick={() => setOpenModalCrear(true)} style={{ ...buttonStyle }}>
-                  Crear
-                </button>
               </div>
             </div>
           </Box>
@@ -452,7 +449,7 @@ const Marcas = () => {
                                     cursor: "pointer",
                                     marginRight: "8px",
                                   }}
-                                  onClick={() => handleEditarAsignaciones(asignacion)}
+                                  onClick={() => handleEditarMarca(marca)}
                                 />
                                 <img
                                   src={drop}
@@ -462,7 +459,7 @@ const Marcas = () => {
                                     height: "20px",
                                     cursor: "pointer",
                                   }}
-                                  onClick={() => handleEliminarAsignaciones(asignacion.asignacionesId)}
+                                  onClick={() => handleEliminarMarca(marca.marcaId)}
                                 />
                               </div>
                             </TableCell>

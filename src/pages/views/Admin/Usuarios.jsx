@@ -637,7 +637,7 @@ const Usuarios = () => {
                                     cursor: "pointer",
                                     marginRight: "8px",
                                   }}
-                                  onClick={() => handleEditarAsignaciones(asignacion)}
+                                  onClick={() => handleEditarUsuario(usuario)}
                                 />
                                 <img
                                   src={drop}
@@ -647,7 +647,7 @@ const Usuarios = () => {
                                     height: "20px",
                                     cursor: "pointer",
                                   }}
-                                  onClick={() => handleEliminarAsignaciones(asignacion.asignacionesId)}
+                                  onClick={() => handleEliminarUsuario(usuario.id)}
                                 />
                               </div>
                             </TableCell>

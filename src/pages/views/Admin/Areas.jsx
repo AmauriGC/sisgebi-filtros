@@ -522,7 +522,7 @@ const Areas = () => {
                                     cursor: "pointer",
                                     marginRight: "8px",
                                   }}
-                                  onClick={() => handleEditarAsignaciones(asignacion)}
+                                  onClick={() => handleEditarArea(area)}
                                 />
                                 <img
                                   src={drop}
@@ -532,7 +532,7 @@ const Areas = () => {
                                     height: "20px",
                                     cursor: "pointer",
                                   }}
-                                  onClick={() => handleEliminarAsignaciones(asignacion.asignacionesId)}
+                                  onClick={() => handleEliminarArea(area.areasId)}
                                 />
                               </div>
                             </TableCell>

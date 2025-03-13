@@ -511,7 +511,7 @@ const Modelos = () => {
                                     cursor: "pointer",
                                     marginRight: "8px",
                                   }}
-                                  onClick={() => handleEditarAsignaciones(asignacion)}
+                                  onClick={() => handleEditarModelo(modelo)}
                                 />
                                 <img
                                   src={drop}
@@ -521,7 +521,7 @@ const Modelos = () => {
                                     height: "20px",
                                     cursor: "pointer",
                                   }}
-                                  onClick={() => handleEliminarAsignaciones(asignacion.asignacionesId)}
+                                  onClick={() => handleEliminarModelo(modelo.modeloId)}
                                 />
                               </div>
                             </TableCell>

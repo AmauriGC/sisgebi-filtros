@@ -888,7 +888,7 @@ const Bienes = () => {
                                     cursor: "pointer",
                                     marginRight: "8px",
                                   }}
-                                  onClick={() => handleEditarAsignaciones(asignacion)}
+                                  onClick={() => handleEditarBien(bien)}
                                 />
                                 <img
                                   src={drop}
@@ -898,7 +898,7 @@ const Bienes = () => {
                                     height: "20px",
                                     cursor: "pointer",
                                   }}
-                                  onClick={() => handleEliminarAsignaciones(asignacion.asignacionesId)}
+                                  onClick={() => handleEliminarBien(bien.bienId)}
                                 />
                               </div>
                             </TableCell>

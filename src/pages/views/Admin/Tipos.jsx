@@ -452,7 +452,7 @@ const Tipos = () => {
                                     cursor: "pointer",
                                     marginRight: "8px",
                                   }}
-                                  onClick={() => handleEditarAsignaciones(asignacion)}
+                                  onClick={() => handleEditarTipoBien(tipo)}
                                 />
                                 <img
                                   src={drop}
@@ -462,7 +462,7 @@ const Tipos = () => {
                                     height: "20px",
                                     cursor: "pointer",
                                   }}
-                                  onClick={() => handleEliminarAsignaciones(asignacion.asignacionesId)}
+                                  onClick={() => handleEliminarTipoBien(tipo.tipoBienId)}
                                 />
                               </div>
                             </TableCell>
