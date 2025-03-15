@@ -10,56 +10,39 @@ import TableRow from "@mui/material/TableRow";
 import axios from "axios";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
-import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import edit from "../../../assets/img/pencil.svg";
-import drop from "../../../assets/img/delete.svg";
 import Sidebar from "../../../components/Sidebar";
+import eye from "../../../assets/img/eye-outline.svg";
+import Modal from "@mui/material/Modal";
+import Typography from "@mui/material/Typography";
 
 const Asignaciones = () => {
   const [asignaciones, setAsignaciones] = React.useState([]);
   const [filtroStatus, setFiltroStatus] = React.useState(null);
   const [filtroUsuario, setFiltroUsuario] = React.useState(null);
-  const [filtroDisponibilidad, setFiltroDisponibilidad] = React.useState(null);
 
   const [usuarioOptions, setUsuarioOptions] = React.useState([]);
-  const [bienOptions, setBienOptions] = React.useState([]);
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(8);
 
   const navigate = useNavigate();
 
-  const [asignacionesSeleccionado, setAsignacionesSeleccionado] = React.useState(null);
-
-  const [openModalActualizar, setOpenModalActualizar] = React.useState(false);
-  const [openModalEliminar, setOpenModalEliminar] = React.useState(false);
-  const [openModalCrear, setOpenModalCrear] = React.useState(false);
-
-  const [nuevaAsignaciones, setNuevaAsignaciones] = React.useState({
-    usuario: null,
-    bien: null,
-    status: "ACTIVO",
-  });
+  // Estado para controlar el modal y los detalles del bien
+  const [openModalBien, setOpenModalBien] = React.useState(false);
+  const [bienSeleccionado, setBienSeleccionado] = React.useState(null);
 
   const statusOptions = [
     { value: "ACTIVO", label: "Activo" },
     { value: "INACTIVO", label: "Inactivo" },
   ];
 
-  const disponibilidadOptions = [
-    { value: "DISPONIBLE", label: "Disponible" },
-    { value: "OCUPADO", label: "Ocupado" },
-  ];
-
   const columns = [
     { id: "asignacionesId", label: "#", minWidth: 25 },
     { id: "usuario", label: "Usuario", minWidth: 80 },
     { id: "bien", label: "Bien", minWidth: 80 },
-    { id: "status", label: "Estado", minWidth: 60 },
-    { id: "disponibilidad", label: "Disponibilidad", minWidth: 80 },
-    { id: "crear", label: "Crear", minWidth: 80 },
+    { id: "status", label: "Estado de la asignacion", minWidth: 60 },
+    { id: "acciones", label: "Acciones", minWidth: 80 },
   ];
 
   React.useEffect(() => {
@@ -69,7 +52,7 @@ const Asignaciones = () => {
 
   React.useEffect(() => {
     aplicarFiltros();
-  }, [filtroStatus, filtroDisponibilidad, filtroUsuario]);
+  }, [filtroStatus, filtroUsuario]);
 
   const obtenerAsignaciones = () => {
     const token = sessionStorage.getItem("token");
@@ -91,38 +74,37 @@ const Asignaciones = () => {
     const token = sessionStorage.getItem("token");
     if (!token) return;
 
-    // Obtener solo becarios
+    // Obtener las asignaciones para extraer los IDs de los usuarios con asignaciones
     axios
-      .get("http://localhost:8080/api/usuarios/becarios", {
+      .get("http://localhost:8080/api/asignaciones", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setUsuarioOptions(
-          response.data.map((usuario) => ({
-            value: usuario.id,
-            label: usuario.nombres,
-          }))
-        );
-      })
-      .catch((error) => {
-        console.error("Error al cargar becarios:", error);
-      });
+        const usuariosConAsignaciones = response.data.map((asignacion) => asignacion.usuario.id);
 
-    // Obtener bienes
-    axios
-      .get("http://localhost:8080/api/bienes", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setBienOptions(
-          response.data.map((bien) => ({
-            value: bien.idBien,
-            label: bien.codigo,
-          }))
-        );
+        // Obtener solo los becarios que tienen asignaciones
+        axios
+          .get("http://localhost:8080/api/usuarios/becarios", {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then((response) => {
+            const becariosConAsignaciones = response.data.filter((usuario) =>
+              usuariosConAsignaciones.includes(usuario.id)
+            );
+
+            setUsuarioOptions(
+              becariosConAsignaciones.map((usuario) => ({
+                value: usuario.id,
+                label: usuario.nombres,
+              }))
+            );
+          })
+          .catch((error) => {
+            console.error("Error al cargar becarios:", error);
+          });
       })
       .catch((error) => {
-        console.error("Error al cargar bienes:", error);
+        console.error("Error al obtener las asignaciones:", error);
       });
   };
 
@@ -141,19 +123,14 @@ const Asignaciones = () => {
         params: paramsAsignaciones,
       });
 
-      // Parámetros para filtrar bienes por disponibilidad
-      const paramsBienes = {};
-      if (filtroDisponibilidad) paramsBienes.disponibilidad = filtroDisponibilidad.value;
-
       // Obtener bienes filtrados por disponibilidad
       const responseBienes = await axios.get("http://localhost:8080/api/bienes/filter", {
         headers: { Authorization: `Bearer ${token}` },
-        params: paramsBienes,
       });
 
       // Filtrar asignaciones que coincidan con los bienes disponibles
       const asignacionesFiltradas = responseAsignaciones.data.filter((asignacion) =>
-        responseBienes.data.some((bien) => bien.idBien === asignacion.bien.idBien)
+        responseBienes.data.some((bien) => bien.bienId === asignacion.bien.bienId)
       );
 
       // Actualizar el estado de las asignaciones
@@ -165,96 +142,8 @@ const Asignaciones = () => {
 
   const resetearFiltros = () => {
     setFiltroStatus(null);
-    setFiltroDisponibilidad(null);
     setFiltroUsuario(null);
     obtenerAsignaciones();
-  };
-
-  const handleCrear = () => {
-    const token = sessionStorage.getItem("token");
-    if (!token) return;
-
-    const asignacionesParaEnviar = {
-      usuario: { id: nuevaAsignaciones.usuario.value },
-      bien: { idBien: nuevaAsignaciones.bien.value },
-      status: nuevaAsignaciones.status,
-    };
-
-    axios
-      .post("http://localhost:8080/api/asignaciones", asignacionesParaEnviar, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setAsignaciones([...asignaciones, response.data]);
-        setOpenModalCrear(false);
-        setNuevaAsignaciones({
-          usuario: null,
-          bien: null,
-          status: "ACTIVO",
-        });
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error("Hubo un error al crear la asignación:", error.response?.data || error.message);
-      });
-  };
-
-  const handleEditarAsignaciones = (asignacion) => {
-    setAsignacionesSeleccionado(asignacion);
-    setOpenModalActualizar(true);
-  };
-
-  const handleActualizar = () => {
-    const token = sessionStorage.getItem("token");
-    if (!token || !asignacionesSeleccionado) return;
-
-    const asignacionParaEnviar = {
-      usuario: { id: asignacionesSeleccionado.usuario.id },
-      bien: { idBien: asignacionesSeleccionado.bien.idBien },
-      status: asignacionesSeleccionado.status,
-    };
-
-    axios
-      .put(`http://localhost:8080/api/asignaciones/${asignacionesSeleccionado.asignacionesId}`, asignacionParaEnviar, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setAsignaciones(
-          asignaciones.map((asignacion) =>
-            asignacion.asignacionesId === asignacionesSeleccionado.asignacionesId ? response.data : asignacion
-          )
-        );
-        setOpenModalActualizar(false);
-      })
-      .catch((error) => {
-        console.error("Hubo un error al actualizar la asignación:", error);
-      });
-  };
-
-  const handleEliminarAsignaciones = (asignacionesId) => {
-    const asignacion = asignaciones.find((asignacion) => asignacion.asignacionesId === asignacionesId);
-    setAsignacionesSeleccionado(asignacion);
-    setOpenModalEliminar(true);
-  };
-
-  const confirmarEliminar = () => {
-    const token = sessionStorage.getItem("token");
-    if (!token || !asignacionesSeleccionado) return;
-
-    axios
-      .delete(`http://localhost:8080/api/asignaciones/${asignacionesSeleccionado.asignacionesId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        setAsignaciones(
-          asignaciones.filter((asignacion) => asignacion.asignacionesId !== asignacionesSeleccionado.asignacionesId)
-        );
-        setOpenModalEliminar(false);
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error("Error al eliminar la asignación:", error);
-      });
   };
 
   const handleChangePage = (event, newPage) => {
@@ -266,164 +155,26 @@ const Asignaciones = () => {
     setPage(0);
   };
 
+  // Función para abrir el modal y obtener los detalles del bien
+  const handleVerBien = (bien) => {
+    const token = sessionStorage.getItem("token");
+    if (!token) return;
+
+    axios
+      .get(`http://localhost:8080/api/bienes/${bien.bienId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setBienSeleccionado(response.data); // Guardar los detalles del bien
+        setOpenModalBien(true); // Abrir el modal
+      })
+      .catch((error) => {
+        console.error("Error al obtener los detalles del bien:", error);
+      });
+  };
+
   return (
     <div style={{ display: "flex", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
-      {/* Modal para crear */}
-      <Modal
-        open={openModalCrear}
-        onClose={() => setOpenModalCrear(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Crear Asignación
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleCrear();
-              }}
-            >
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>Usuario:</label>
-                  <Select
-                    options={usuarioOptions}
-                    value={nuevaAsignaciones.usuario}
-                    onChange={(selected) => setNuevaAsignaciones({ ...nuevaAsignaciones, usuario: selected })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Bien:</label>
-                  <Select
-                    options={bienOptions}
-                    value={nuevaAsignaciones.bien}
-                    onChange={(selected) => setNuevaAsignaciones({ ...nuevaAsignaciones, bien: selected })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Estado:</label>
-                  <Select
-                    options={statusOptions}
-                    value={statusOptions.find((option) => option.value === nuevaAsignaciones.status)}
-                    onChange={(selected) => setNuevaAsignaciones({ ...nuevaAsignaciones, status: selected.value })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Crear
-                </button>
-              </div>
-            </form>
-          </Typography>
-        </Box>
-      </Modal>
-
-      {/* Modal para editar */}
-      <Modal
-        open={openModalActualizar}
-        onClose={() => setOpenModalActualizar(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Editar Asignación
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleActualizar();
-              }}
-            >
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>Usuario:</label>
-                  <Select
-                    options={usuarioOptions}
-                    value={usuarioOptions.find((option) => option.value === asignacionesSeleccionado?.usuario?.id)}
-                    onChange={(selected) =>
-                      setAsignacionesSeleccionado({
-                        ...asignacionesSeleccionado,
-                        usuario: { id: selected.value },
-                      })
-                    }
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Estado:</label>
-                  <Select
-                    options={statusOptions}
-                    value={statusOptions.find((option) => option.value === asignacionesSeleccionado?.status)}
-                    onChange={(selected) =>
-                      setAsignacionesSeleccionado({
-                        ...asignacionesSeleccionado,
-                        status: selected.value,
-                      })
-                    }
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Guardar cambios
-                </button>
-              </div>
-            </form>
-          </Typography>
-        </Box>
-      </Modal>
-
-      {/* Modal para eliminar */}
-      <Modal
-        open={openModalEliminar}
-        onClose={() => setOpenModalEliminar(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Eliminar Asignación
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            ¿Estás seguro de que deseas eliminar esta asignación?
-            <br />
-            <button onClick={confirmarEliminar}>Confirmar</button>
-            <button onClick={() => setOpenModalEliminar(false)}>Cancelar</button>
-          </Typography>
-        </Box>
-      </Modal>
-
       <Sidebar />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}>
@@ -468,13 +219,6 @@ const Asignaciones = () => {
                   options={statusOptions}
                   styles={customSelectStyles}
                 />
-                <Select
-                  placeholder="Disponibilidad"
-                  value={filtroDisponibilidad}
-                  onChange={setFiltroDisponibilidad}
-                  options={disponibilidadOptions}
-                  styles={customSelectStyles}
-                />
               </div>
             </div>
           </Box>
@@ -494,25 +238,7 @@ const Asignaciones = () => {
                         color: "#546EAB",
                       }}
                     >
-                      {column.id === "crear" ? (
-                        <button
-                          onClick={() => setOpenModalCrear(true)}
-                          style={{
-                            backgroundColor: "#254B5E",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                            fontSize: "13px",
-                            width: "100%",
-                            padding: "4px",
-                          }}
-                        >
-                          Crear
-                        </button>
-                      ) : (
-                        column.label
-                      )}
+                      {column.label}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -522,30 +248,20 @@ const Asignaciones = () => {
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={asignacion.asignacionesId}>
                       {columns.map((column) => {
-                        if (column.id === "crear") {
+                        if (column.id === "acciones") {
                           return (
                             <TableCell key={column.id} align={column.align}>
-                              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                              <div style={{ display: "flex" }}>
                                 <img
-                                  src={edit}
-                                  alt="Editar"
+                                  src={eye}
+                                  alt="Ver"
                                   style={{
                                     width: "20px",
                                     height: "20px",
                                     cursor: "pointer",
                                     marginRight: "8px",
                                   }}
-                                  onClick={() => handleEditarAsignaciones(asignacion)}
-                                />
-                                <img
-                                  src={drop}
-                                  alt="Eliminar"
-                                  style={{
-                                    width: "20px",
-                                    height: "20px",
-                                    cursor: "pointer",
-                                  }}
-                                  onClick={() => handleEliminarAsignaciones(asignacion.asignacionesId)}
+                                  onClick={() => handleVerBien(asignacion.bien)} // Pasar el bien seleccionado
                                 />
                               </div>
                             </TableCell>
@@ -553,13 +269,11 @@ const Asignaciones = () => {
                         } else {
                           const value =
                             column.id === "usuario"
-                              ? asignacion.becario?.nombres
+                              ? asignacion.usuario?.nombres
                               : column.id === "bien"
                               ? asignacion.bien?.codigo
                               : column.id === "status"
                               ? asignacion.status
-                              : column.id === "disponibilidad"
-                              ? asignacion.bien?.disponibilidad
                               : asignacion[column.id];
                           return (
                             <TableCell
@@ -591,6 +305,50 @@ const Asignaciones = () => {
           />
         </Paper>
       </div>
+
+      {/* Modal para mostrar los detalles del bien */}
+      <Modal
+        open={openModalBien}
+        onClose={() => setOpenModalBien(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Detalles del Bien
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            {bienSeleccionado && (
+              <div>
+                <p>
+                  <strong>Código:</strong> {bienSeleccionado.codigo}
+                </p>
+                <p>
+                  <strong>Número de Serie:</strong> {bienSeleccionado.numeroSerie}
+                </p>
+                <p>
+                  <strong>Tipo de Bien:</strong> {bienSeleccionado.tipoBien?.nombreTipoBien}
+                </p>
+                <p>
+                  <strong>Marca:</strong> {bienSeleccionado.marca?.nombreMarca}
+                </p>
+                <p>
+                  <strong>Modelo:</strong> {bienSeleccionado.modelo?.nombreModelo}
+                </p>
+                <p>
+                  <strong>Área Común:</strong> {bienSeleccionado.areaComun?.nombreArea || "N/A"}
+                </p>
+                <p>
+                  <strong>Estado del bien:</strong> {bienSeleccionado.status}
+                </p>
+                <p>
+                  <strong>Disponibilidad:</strong> {bienSeleccionado.disponibilidad}
+                </p>
+              </div>
+            )}
+          </Typography>
+        </Box>
+      </Modal>
     </div>
   );
 };

@@ -97,7 +97,10 @@ const Bienes = () => {
   };
 
   const handleEditarBien = (bien) => {
-    setBienSeleccionado(bien);
+    setBienSeleccionado({
+      ...bien,
+      motivo: bien.motivo || "", // Asegúrate de que 'motivo' tenga un valor predeterminado vacío
+    });
     setopenModalActualizar(true);
   };
 
@@ -105,44 +108,56 @@ const Bienes = () => {
     const token = sessionStorage.getItem("token");
     if (!token || !bienSeleccionado) return;
 
+    // Si el motivo está vacío o no se ha establecido, asignamos un string vacío
+    const bienParaActualizar = {
+      ...bienSeleccionado,
+      motivo: bienSeleccionado.motivo || "", // Si 'motivo' no existe, asignamos ""
+    };
+
     axios
-      .put(`http://localhost:8080/api/bienes/${bienSeleccionado.idBien}`, bienSeleccionado, {
+      .put(`http://localhost:8080/api/bienes/${bienSeleccionado.bienId}`, bienParaActualizar, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setBienes(bienes.map((bien) => (bien.idBien === bienSeleccionado.idBien ? response.data : bien)));
+        setBienes(bienes.map((bien) => (bien.bienId === bienSeleccionado.bienId ? response.data : bien)));
         setopenModalActualizar(false);
       })
       .catch((error) => {
         console.error("Hubo un error al actualizar el bien:", error);
       });
-    // window.location.reload();
   };
 
-  const handleEliminarBien = (idBien) => {
-    const bien = bienes.find((bien) => bien.idBien === idBien);
+  const handleEliminarBien = (bienId) => {
+    // Encuentra el bien que quieres eliminar basado en el id
+    const bien = bienes.find((bien) => bien.bienId === bienId);
+
+    // Establece el bien seleccionado para la eliminación
     setBienSeleccionado(bien);
+
+    // Abre el modal de confirmación para eliminar
     setOpenModalEliminar(true);
   };
 
   const confirmarEliminar = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !bienSeleccionado) return;
+    if (!token || !bienSeleccionado || !motivoEliminar) return;
 
+    // Se asegura de que el motivo se pase correctamente en la URL
     axios
-      .delete(`http://localhost:8080/api/bienes/${bienSeleccionado.idBien}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        data: { motivo: motivoEliminar },
-      })
+      .delete(
+        `http://localhost:8080/api/bienes/${bienSeleccionado.bienId}?motivo=${encodeURIComponent(motivoEliminar)}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then(() => {
-        setBienes(bienes.filter((bien) => bien.idBien !== bienSeleccionado.idBien));
+        setBienes(bienes.filter((bien) => bien.bienId !== bienSeleccionado.bienId));
         setOpenModalEliminar(false);
         window.location.reload();
       })
       .catch((error) => {
         console.error("Error al eliminar el bien:", error);
       });
-    window.location.reload();
   };
 
   const statusOptions = [
@@ -431,7 +446,8 @@ const Bienes = () => {
               {/* Cuarta fila: Botón de Crear */}
               <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
                 <button
-                  type="submit"
+                  type="button" // Cambiado a "button" para evitar submit
+                  onClick={() => handleCrear()} // Llamamos la función de creación directamente
                   style={{
                     padding: "10px 20px",
                     backgroundColor: "#4CAF50",
@@ -602,17 +618,16 @@ const Bienes = () => {
               {/* Cuarta fila: Botón de Guardar cambios */}
               <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
                 <button
-                  type="submit"
+                  type="submit" // Este debería ser un submit, no un button normal
                   style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
+                    backgroundColor: "#4CAF50", // Color verde para indicar guardar
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
                     cursor: "pointer",
                   }}
                 >
-                  Guardar cambios
+                  Guardar Cambios
                 </button>
               </div>
             </form>
@@ -770,7 +785,7 @@ const Bienes = () => {
               <TableBody>
                 {bienes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((bien) => {
                   return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={bien.idBien}>
+                    <TableRow hover role="checkbox" tabIndex={-1} key={bien.bienId}>
                       {columns.map((column) => {
                         if (column.id === "crear") {
                           return (
