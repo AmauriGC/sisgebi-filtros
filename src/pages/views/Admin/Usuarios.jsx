@@ -25,10 +25,12 @@ const Usuarios = () => {
   const [lugarOptions, setLugarOptions] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [openModalCrear, setOpenModalCrear] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalEliminar, setOpenModalEliminar] = useState(false);
-  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
+  const [mensajeAlerta, setMensajeAlerta] = useState("");
+  const [colorAlerta, setColorAlerta] = useState("");
 
   const [nuevoUsuario, setNuevoUsuario] = useState({
     nombres: "",
@@ -166,7 +168,10 @@ const Usuarios = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        // Agregar el nuevo usuario al estado
         setUsuarios([...usuarios, response.data]);
+
+        // Cerrar el modal y resetear el formulario
         setOpenModalCrear(false);
         setNuevoUsuario({
           nombres: "",
@@ -175,10 +180,27 @@ const Usuarios = () => {
           status: "ACTIVO",
           lugar: "",
         });
-        window.location.reload();
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("Usuario creado correctamente");
+        setColorAlerta("#64C267"); // Color verde para éxito
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       })
       .catch((error) => {
         console.error("Hubo un error al crear el usuario:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se pudo crear el usuario");
+        setColorAlerta("#C26464"); // Color rojo para error
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       });
   };
 
@@ -191,16 +213,43 @@ const Usuarios = () => {
     const token = sessionStorage.getItem("token");
     if (!token || !usuarioSeleccionado) return;
 
+    // Crear un objeto para enviar al backend, excluyendo la contraseña hasheada
+    const usuarioActualizado = {
+      ...usuarioSeleccionado,
+      contrasena: usuarioSeleccionado.nuevaContrasena || null, // Envía la nueva contraseña solo si existe
+    };
+
     axios
-      .put(`http://localhost:8080/api/usuarios/${usuarioSeleccionado.id}`, usuarioSeleccionado, {
+      .put(`http://localhost:8080/api/usuarios/${usuarioSeleccionado.id}`, usuarioActualizado, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        // Actualizar el usuario en el estado
         setUsuarios(usuarios.map((u) => (u.id === usuarioSeleccionado.id ? response.data : u)));
+
+        // Cerrar el modal de edición
         setOpenModalEditar(false);
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("Usuario actualizado correctamente");
+        setColorAlerta("#64C267");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       })
       .catch((error) => {
         console.error("Hubo un error al actualizar el usuario:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se pudo actualizar el usuario");
+        setColorAlerta("#C26464");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       });
   };
 
@@ -214,17 +263,36 @@ const Usuarios = () => {
     const token = sessionStorage.getItem("token");
     if (!token || !usuarioSeleccionado) return;
 
+    // Solo envía el ID del usuario
     axios
       .delete(`http://localhost:8080/api/usuarios/${usuarioSeleccionado.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        setUsuarios(usuarios.filter((u) => u.id !== usuarioSeleccionado.id));
+        // Actualizar el estado del usuario a INACTIVO
+        setUsuarios(usuarios.map((u) => (u.id === usuarioSeleccionado.id ? { ...u, status: "INACTIVO" } : u)));
+
+        // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
-        window.location.reload();
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("El usuario se ha eliminado correctamente");
+        setColorAlerta("#64C267");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       })
-      .catch((error) => {
-        console.error("Hubo un error al eliminar el usuario:", error);
+      .catch(() => {
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se ha podido eliminar el usuario");
+        setColorAlerta("#C26464");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       });
   };
 
@@ -236,7 +304,7 @@ const Usuarios = () => {
     { id: "rol", label: "Rol", minWidth: 100 },
     { id: "lugar", label: "Lugar", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 100 },
-    { id: "crear", label: "Acciones", minWidth: 50 },
+    { id: "acciones", label: "Acciones", minWidth: 50 },
   ];
 
   return (
@@ -249,8 +317,8 @@ const Usuarios = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Crear Usuario
+          <Typography id="modal-modal-title" variant="h4" component="h2">
+            <strong>Registrar usuario</strong>
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
@@ -261,95 +329,114 @@ const Usuarios = () => {
             >
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Nombres:</label>
+                  <label>
+                    <strong>Nombre:</strong>
+                  </label>
                   <input
                     type="text"
+                    placeholder="Nombre"
                     value={nuevoUsuario.nombres}
                     onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, nombres: e.target.value })}
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label>Apellidos:</label>
+                  <label>
+                    <strong>Apellidos:</strong>
+                  </label>
                   <input
                     type="text"
+                    placeholder="Apellidos"
                     value={nuevoUsuario.apellidos}
                     onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, apellidos: e.target.value })}
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
               </div>
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Correo:</label>
+                  <label>
+                    <strong>Correo:</strong>
+                  </label>
                   <input
                     type="email"
+                    placeholder="Correo"
                     value={nuevoUsuario.correo}
                     onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, correo: e.target.value })}
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label>Contraseña:</label>
+                  <label>
+                    <strong>Contraseña:</strong>
+                  </label>
                   <input
                     type="password"
+                    placeholder="Contraseña"
                     value={nuevoUsuario.contrasena}
                     onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, contrasena: e.target.value })}
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
               </div>
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Rol:</label>
+                  <label>
+                    <strong>Rol:</strong>
+                  </label>
                   <Select
                     options={rolOptions}
+                    placeholder="Seleccione un rol"
                     value={rolOptions.find((option) => option.value === nuevoUsuario.rol)}
                     onChange={(selected) => setNuevoUsuario({ ...nuevoUsuario, rol: selected.value })}
                     required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label>Estado:</label>
-                  <Select
-                    options={statusOptions}
-                    value={statusOptions.find((option) => option.value === nuevoUsuario.status)}
-                    onChange={(selected) => setNuevoUsuario({ ...nuevoUsuario, status: selected.value })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>Lugar:</label>
+                  <label>
+                    <strong>Lugar:</strong>
+                  </label>
                   <input
                     type="text"
+                    placeholder="Lugar"
                     value={nuevoUsuario.lugar}
                     onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, lugar: e.target.value })}
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
               </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
                 <button
-                  type="submit"
+                  onClick={() => setOpenModalCrear(false)}
                   style={{
                     padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
+                    backgroundColor: "#b7b7b7",
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
                     cursor: "pointer",
                   }}
                 >
-                  Crear
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#254B5E",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Registrar
                 </button>
               </div>
             </form>
@@ -365,8 +452,8 @@ const Usuarios = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Editar Usuario
+          <Typography id="modal-modal-title" variant="h4" component="h2">
+            <strong>Editar Usuario</strong>
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
@@ -377,7 +464,9 @@ const Usuarios = () => {
             >
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Nombres:</label>
+                  <label>
+                    <strong>Nombres:</strong>
+                  </label>
                   <input
                     type="text"
                     value={usuarioSeleccionado?.nombres || ""}
@@ -388,11 +477,13 @@ const Usuarios = () => {
                       })
                     }
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label>Apellidos:</label>
+                  <label>
+                    <strong>Apellidos:</strong>
+                  </label>
                   <input
                     type="text"
                     value={usuarioSeleccionado?.apellidos || ""}
@@ -403,13 +494,15 @@ const Usuarios = () => {
                       })
                     }
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
               </div>
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Correo:</label>
+                  <label>
+                    <strong>Correo:</strong>
+                  </label>
                   <input
                     type="email"
                     value={usuarioSeleccionado?.correo || ""}
@@ -420,43 +513,31 @@ const Usuarios = () => {
                       })
                     }
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label>Contraseña:</label>
+                  <label>
+                    <strong>Nueva Contraseña: (Opcional)</strong>
+                  </label>
                   <input
                     type="password"
-                    value={usuarioSeleccionado?.contrasena || ""}
+                    placeholder="Nueva contraseña"
                     onChange={(e) =>
                       setUsuarioSeleccionado({
                         ...usuarioSeleccionado,
-                        contrasena: e.target.value,
+                        nuevaContrasena: e.target.value,
                       })
                     }
-                    required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
-                </div>
+                </div>{" "}
               </div>
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Rol:</label>
-                  <Select
-                    options={rolOptions}
-                    value={rolOptions.find((option) => option.value === usuarioSeleccionado?.rol)}
-                    onChange={(selected) =>
-                      setUsuarioSeleccionado({
-                        ...usuarioSeleccionado,
-                        rol: selected.value,
-                      })
-                    }
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Estado:</label>
+                  <label>
+                    <strong>Estado:</strong>
+                  </label>
                   <Select
                     options={statusOptions}
                     value={statusOptions.find((option) => option.value === usuarioSeleccionado?.status)}
@@ -467,13 +548,13 @@ const Usuarios = () => {
                       })
                     }
                     required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Lugar:</label>
+                  <label>
+                    <strong>Lugar:</strong>
+                  </label>
                   <input
                     type="text"
                     value={usuarioSeleccionado?.lugar || ""}
@@ -484,16 +565,30 @@ const Usuarios = () => {
                       })
                     }
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
               </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
+                <button
+                  onClick={() => setOpenModalEditar(false)}
+                  type="button"
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#b7b7b7",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancelar
+                </button>
                 <button
                   type="submit"
                   style={{
                     padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
+                    backgroundColor: "#254B5E",
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
@@ -515,15 +610,75 @@ const Usuarios = () => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: "10px",
+          }}
+        >
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Eliminar Usuario
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             ¿Estás seguro de que deseas eliminar este usuario?
-            <br />
-            <button onClick={confirmarEliminarUsuario}>Confirmar</button>
-            <button onClick={() => setOpenModalEliminar(false)}>Cancelar</button>
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
+            <button
+              onClick={() => setOpenModalEliminar(false)}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#b7b7b7",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={confirmarEliminarUsuario}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#254B5E",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Eliminar
+            </button>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Modal de alerta */}
+      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 3,
+            borderRadius: "10px",
+            textAlign: "center",
+            border: `3px solid ${colorAlerta}`,
+          }}
+        >
+          <Typography id="alerta-modal-title" sx={{ color: colorAlerta, fontWeight: "bold" }}>
+            {mensajeAlerta}
           </Typography>
         </Box>
       </Modal>
@@ -531,7 +686,7 @@ const Usuarios = () => {
       <Sidebar />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <Paper className="col-md-10 col-lg-10 col-xl-11" style={{ height: "fit-content" }}>
+        <Paper className="col-md-8 col-lg-10 col-xl-10" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Usuarios existentes</h3>
@@ -541,14 +696,6 @@ const Usuarios = () => {
               {/* Filtros alineados a la izquierda */}
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
-
-                <Select
-                  placeholder="Estado"
-                  value={filtroStatus}
-                  onChange={setFiltroStatus}
-                  options={statusOptions}
-                  styles={customSelectStyles}
-                />
                 <Select
                   placeholder="Rol"
                   value={filtroRol}
@@ -561,6 +708,13 @@ const Usuarios = () => {
                   value={filtroLugar}
                   onChange={setFiltroLugar}
                   options={lugarOptions}
+                  styles={customSelectStyles}
+                />
+                <Select
+                  placeholder="Estado"
+                  value={filtroStatus}
+                  onChange={setFiltroStatus}
+                  options={statusOptions}
                   styles={customSelectStyles}
                 />
               </div>
@@ -613,7 +767,7 @@ const Usuarios = () => {
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={usuario.id}>
                       {columns.map((column) => {
-                        if (column.id === "crear") {
+                        if (column.id === "acciones") {
                           return (
                             <TableCell key={column.id} align={column.align} style={{ textAlign: "center" }}>
                               <div style={{ display: "flex" }}>
@@ -670,6 +824,25 @@ const Usuarios = () => {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Filas por página"
+            SelectProps={{
+              native: true,
+            }}
+            sx={{
+              "& .MuiTablePagination-selectLabel": {
+                fontSize: "14px",
+                color: "#546EAB",
+              },
+              "& .MuiTablePagination-displayedRows": {
+                fontSize: "14px",
+                color: "#546EAB",
+              },
+              "& .MuiTablePagination-select": {
+                fontSize: "14px",
+                color: "#546EAB",
+                textAlign: "center",
+              },
+            }}
           />
         </Paper>
       </div>
@@ -747,6 +920,36 @@ const style = {
   borderRadius: "8px",
   boxShadow: 24,
   p: 4,
+};
+
+const SelectOptionsStyles = {
+  control: (base) => ({
+    ...base,
+    width: "100%",
+    height: "40px",
+    border: "solid 1px #c2c2c2",
+  }),
+  option: (base) => ({
+    ...base,
+    color: "#000",
+    textAlign: "start",
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: "#000",
+  }),
+  placeholder: (base) => ({
+    ...base,
+    color: "#757575",
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    color: "#000",
+  }),
+  indicatorSeparator: (base) => ({
+    ...base,
+    backgroundColor: "#c2c2c2",
+  }),
 };
 
 export default Usuarios;

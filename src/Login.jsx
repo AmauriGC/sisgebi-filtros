@@ -50,7 +50,10 @@ const Login = () => {
       style={{ background: "linear-gradient(135deg, #254b5e, #546eab, #4697b4, #a7d0d2)", gap: "100px" }}
     >
       {/* Sección izquierda (cambia de color dinámicamente) */}
-      <div className="d-flex flex-column align-items-center" style={{ alignSelf: "flex-start" }}>
+      <div
+        className="d-flex flex-column align-items-center col-6 col-sm-6 col-md-4 col-lg-4"
+        style={{ alignSelf: "flex-start" }}
+      >
         <div
           className="p-5 shadow text-center d-flex flex-column"
           style={{
@@ -102,7 +105,10 @@ const Login = () => {
       </div>
 
       {/* Sección derecha (selección de rol) */}
-      <div className="d-flex flex-column align-items-center" style={{ alignSelf: "flex-end" }}>
+      <div
+        className="d-flex flex-column align-items-center col-6 col-sm-6 col-md-4 col-lg-4"
+        style={{ alignSelf: "flex-end" }}
+      >
         <div
           className="bg-white p-5 shadow text-center"
           style={{

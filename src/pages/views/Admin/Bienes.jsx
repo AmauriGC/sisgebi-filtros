@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import ver from "../../../assets/img/eye-outline.svg";
 import edit from "../../../assets/img/pencil.svg";
 import drop from "../../../assets/img/delete.svg";
 import Sidebar from "../../../components/Sidebar";
@@ -32,7 +33,7 @@ const Bienes = () => {
   const [modeloOptions, setModeloOptions] = React.useState([]);
 
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(8);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const navigate = useNavigate();
 
@@ -42,6 +43,10 @@ const Bienes = () => {
   const [openModalActualizar, setopenModalActualizar] = React.useState(false);
   const [openModalEliminar, setOpenModalEliminar] = React.useState(false);
   const [openModalCrear, setOpenModalCrear] = React.useState(false);
+  const [openModalVer, setOpenModalVer] = React.useState(false);
+
+  const [mensajeAlerta, setMensajeAlerta] = useState("");
+  const [colorAlerta, setColorAlerta] = useState("");
 
   const [nuevoBien, setNuevoBien] = React.useState({
     codigo: "",
@@ -54,111 +59,6 @@ const Bienes = () => {
     disponibilidad: "DISPONIBLE",
     motivo: "",
   });
-
-  const handleCrear = () => {
-    const token = sessionStorage.getItem("token");
-    if (!token) return;
-
-    const bienParaEnviar = {
-      codigo: nuevoBien.codigo,
-      numeroSerie: nuevoBien.numeroSerie,
-      tipoBien: { tipoBienId: nuevoBien.tipoBien.value },
-      marca: { marcaId: nuevoBien.marca.value },
-      modelo: { modeloId: nuevoBien.modelo.value },
-      areaComun: nuevoBien.areaComun ? { areaId: nuevoBien.areaComun.value } : null,
-      status: nuevoBien.status,
-      disponibilidad: nuevoBien.disponibilidad,
-      motivo: "",
-    };
-
-    axios
-      .post("http://localhost:8080/api/bienes", bienParaEnviar, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setBienes([...bienes, response.data]);
-        setOpenModalCrear(false);
-        setNuevoBien({
-          codigo: "",
-          numeroSerie: "",
-          tipoBien: null,
-          marca: null,
-          modelo: null,
-          areaComun: null,
-          status: "ACTIVO",
-          disponibilidad: "DISPONIBLE",
-          motivo: "",
-        });
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error("Hubo un error al crear el bien:", error.response?.data || error.message);
-      });
-  };
-
-  const handleEditarBien = (bien) => {
-    setBienSeleccionado({
-      ...bien,
-      motivo: bien.motivo || "", // Asegúrate de que 'motivo' tenga un valor predeterminado vacío
-    });
-    setopenModalActualizar(true);
-  };
-
-  const handleActualizar = () => {
-    const token = sessionStorage.getItem("token");
-    if (!token || !bienSeleccionado) return;
-
-    // Si el motivo está vacío o no se ha establecido, asignamos un string vacío
-    const bienParaActualizar = {
-      ...bienSeleccionado,
-      motivo: bienSeleccionado.motivo || "", // Si 'motivo' no existe, asignamos ""
-    };
-
-    axios
-      .put(`http://localhost:8080/api/bienes/${bienSeleccionado.bienId}`, bienParaActualizar, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setBienes(bienes.map((bien) => (bien.bienId === bienSeleccionado.bienId ? response.data : bien)));
-        setopenModalActualizar(false);
-      })
-      .catch((error) => {
-        console.error("Hubo un error al actualizar el bien:", error);
-      });
-  };
-
-  const handleEliminarBien = (bienId) => {
-    // Encuentra el bien que quieres eliminar basado en el id
-    const bien = bienes.find((bien) => bien.bienId === bienId);
-
-    // Establece el bien seleccionado para la eliminación
-    setBienSeleccionado(bien);
-
-    // Abre el modal de confirmación para eliminar
-    setOpenModalEliminar(true);
-  };
-
-  const confirmarEliminar = () => {
-    const token = sessionStorage.getItem("token");
-    if (!token || !bienSeleccionado || !motivoEliminar) return;
-
-    // Se asegura de que el motivo se pase correctamente en la URL
-    axios
-      .delete(
-        `http://localhost:8080/api/bienes/${bienSeleccionado.bienId}?motivo=${encodeURIComponent(motivoEliminar)}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      )
-      .then(() => {
-        setBienes(bienes.filter((bien) => bien.bienId !== bienSeleccionado.bienId));
-        setOpenModalEliminar(false);
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error("Error al eliminar el bien:", error);
-      });
-  };
 
   const statusOptions = [
     { value: "ACTIVO", label: "Activo" },
@@ -174,13 +74,9 @@ const Bienes = () => {
     { id: "bienId", label: "#", minWidth: 25 },
     { id: "codigo", label: "Código", minWidth: 40 },
     { id: "numeroSerie", label: "No. Serie", minWidth: 40 },
-    { id: "tipoBien", label: "Tipo", minWidth: 80 },
-    { id: "marca", label: "Marca", minWidth: 80 },
-    { id: "modelo", label: "Modelo", minWidth: 80 },
-    { id: "areaComun", label: "Área Común", minWidth: 100 },
     { id: "disponibilidad", label: "Disponibilidad", minWidth: 60 },
     { id: "status", label: "Estado", minWidth: 60 },
-    { id: "crear", label: "Crear", minWidth: 50 },
+    { id: "acciones", label: "Acciones", minWidth: 50 },
   ];
 
   React.useEffect(() => {
@@ -331,8 +227,181 @@ const Bienes = () => {
     setPage(0);
   };
 
+  const handleCrear = () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) return;
+
+    const bienParaEnviar = {
+      codigo: nuevoBien.codigo,
+      numeroSerie: nuevoBien.numeroSerie,
+      tipoBien: { tipoBienId: nuevoBien.tipoBien.value },
+      marca: { marcaId: nuevoBien.marca.value },
+      modelo: { modeloId: nuevoBien.modelo.value },
+      areaComun: nuevoBien.areaComun ? { areaId: nuevoBien.areaComun.value } : null,
+      status: nuevoBien.status,
+      disponibilidad: nuevoBien.disponibilidad,
+      motivo: "",
+    };
+
+    axios
+      .post("http://localhost:8080/api/bienes", bienParaEnviar, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        // Agregar el nuevo bien al estado
+        setBienes([...bienes, response.data]);
+
+        // Cerrar el modal y resetear el formulario
+        setOpenModalCrear(false);
+        setNuevoBien({
+          codigo: "",
+          numeroSerie: "",
+          tipoBien: null,
+          marca: null,
+          modelo: null,
+          areaComun: null,
+          status: "ACTIVO",
+          disponibilidad: "DISPONIBLE",
+          motivo: "",
+        });
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("Bien creado correctamente");
+        setColorAlerta("#64C267"); // Color verde para éxito
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
+      })
+      .catch((error) => {
+        console.error("Hubo un error al crear el bien:", error.response?.data || error.message);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se pudo crear el bien");
+        setColorAlerta("#C26464"); // Color rojo para error
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
+      });
+  };
+
+  const handleEditarBien = (bien) => {
+    setBienSeleccionado({
+      ...bien,
+      motivo: bien.motivo || "", // Asegúrate de que 'motivo' tenga un valor predeterminado vacío
+    });
+    setopenModalActualizar(true);
+  };
+
+  const handleActualizar = () => {
+    const token = sessionStorage.getItem("token");
+    if (!token || !bienSeleccionado) return;
+
+    const bienParaActualizar = {
+      ...bienSeleccionado,
+      motivo: bienSeleccionado.motivo || "", // Si 'motivo' no existe, asignamos ""
+    };
+
+    axios
+      .put(`http://localhost:8080/api/bienes/${bienSeleccionado.bienId}`, bienParaActualizar, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        // Actualizar el bien en el estado
+        setBienes(bienes.map((bien) => (bien.bienId === bienSeleccionado.bienId ? response.data : bien)));
+
+        // Cerrar el modal de edición
+        setopenModalActualizar(false);
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("Bien actualizado correctamente");
+        setColorAlerta("#64C267"); // Color verde para éxito
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
+      })
+      .catch((error) => {
+        console.error("Hubo un error al actualizar el bien:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se pudo actualizar el bien");
+        setColorAlerta("#C26464"); // Color rojo para error
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
+      });
+  };
+
+  const handleEliminarBien = (bienId) => {
+    const bien = bienes.find((bien) => bien.bienId === bienId);
+    setBienSeleccionado(bien);
+    setOpenModalEliminar(true);
+  };
+
+  const confirmarEliminar = () => {
+    const token = sessionStorage.getItem("token");
+    if (!token || !bienSeleccionado || !motivoEliminar) return;
+
+    axios
+      .put(
+        // Cambia DELETE por PUT para eliminación lógica
+        `http://localhost:8080/api/bienes/${bienSeleccionado.bienId}`,
+        { ...bienSeleccionado, status: "INACTIVO", motivo: motivoEliminar }, // Envía el motivo y el nuevo estado
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then((response) => {
+        // Reemplazar el bien en el estado con la nueva versión (INACTIVO)
+        const bienActualizado = response.data; // Asegúrate de que el backend devuelva el bien actualizado
+        setBienes(bienes.map((bien) => (bien.bienId === bienActualizado.bienId ? bienActualizado : bien)));
+
+        // Cerrar el modal de eliminación
+        setOpenModalEliminar(false);
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("El bien se ha eliminado correctamente");
+        setColorAlerta("#64C267"); // Color verde para éxito
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
+      })
+      .catch((error) => {
+        console.error("Error al eliminar el bien:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se ha podido eliminar el bien");
+        setColorAlerta("#C26464"); // Color rojo para error
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
+      });
+  };
+
+  const handleVerBien = (bien) => {
+    setBienSeleccionado(bien); // Establece el bien seleccionado
+    setOpenModalVer(true); // Abre el modal de detalles
+  };
+
   return (
-    <div style={{ display: "flex", height: "100%", width: "100%", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100%",
+        width: "100%",
+        backgroundColor: "#F0F0F0",
+        fontFamily: "Montserrat, sans-serif",
+      }}
+    >
       {/* Modal para crear */}
       <Modal
         open={openModalCrear}
@@ -341,8 +410,8 @@ const Bienes = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Crear Bien
+          <Typography id="modal-modal-title" variant="h4" component="h2">
+            <strong>Crear Bien</strong>
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
@@ -354,34 +423,29 @@ const Bienes = () => {
               {/* Primera fila: Código, Número de Serie, Marca */}
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Código:</label>
+                  <label>
+                    <strong>Código:</strong>
+                  </label>
                   <input
                     type="text"
                     value={nuevoBien.codigo}
+                    placeholder="Código"
                     onChange={(e) => setNuevoBien({ ...nuevoBien, codigo: e.target.value })}
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label>Número de Serie:</label>
+                  <label>
+                    <strong>Número de Serie:</strong>
+                  </label>
                   <input
                     type="text"
+                    placeholder="Número de Serie"
                     value={nuevoBien.numeroSerie}
                     onChange={(e) => setNuevoBien({ ...nuevoBien, numeroSerie: e.target.value })}
                     required
-                    style={{ width: "100%" }}
-                  />
-                </div>
-
-                <div style={{ flex: 1 }}>
-                  <label>Marca:</label>
-                  <Select
-                    options={marcaOptions}
-                    value={nuevoBien.marca}
-                    onChange={(selected) => setNuevoBien({ ...nuevoBien, marca: selected })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
               </div>
@@ -389,32 +453,29 @@ const Bienes = () => {
               {/* Segunda fila: Modelo, Tipo de Bien, Área Común */}
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Modelo:</label>
+                  <label>
+                    <strong>Marca:</strong>
+                  </label>
+                  <Select
+                    options={marcaOptions}
+                    placeholder="Seleccione la marca"
+                    value={nuevoBien.marca}
+                    onChange={(selected) => setNuevoBien({ ...nuevoBien, marca: selected })}
+                    required
+                    styles={SelectOptionsStyles}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label>
+                    <strong>Modelo:</strong>
+                  </label>
                   <Select
                     options={modeloOptions}
+                    placeholder="Seleccione el modelo"
                     value={nuevoBien.modelo}
                     onChange={(selected) => setNuevoBien({ ...nuevoBien, modelo: selected })}
                     required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Tipo de Bien:</label>
-                  <Select
-                    options={tipoBienOptions}
-                    value={nuevoBien.tipoBien}
-                    onChange={(selected) => setNuevoBien({ ...nuevoBien, tipoBien: selected })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Área Común:</label>
-                  <Select
-                    options={areaComunOptions}
-                    value={nuevoBien.areaComun}
-                    onChange={(selected) => setNuevoBien({ ...nuevoBien, areaComun: selected })}
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
               </div>
@@ -422,35 +483,52 @@ const Bienes = () => {
               {/* Tercera fila: Estado, Disponibilidad */}
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Estado:</label>
+                  <label>
+                    <strong>Tipo de Bien:</strong>
+                  </label>
                   <Select
-                    options={statusOptions}
-                    value={statusOptions.find((option) => option.value === nuevoBien.status)}
-                    onChange={(selected) => setNuevoBien({ ...nuevoBien, status: selected.value })}
+                    options={tipoBienOptions}
+                    placeholder="Seleccione el tipo de bien"
+                    value={nuevoBien.tipoBien}
+                    onChange={(selected) => setNuevoBien({ ...nuevoBien, tipoBien: selected })}
                     required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label>Disponibilidad:</label>
+                  <label>
+                    <strong>Área Común:</strong>
+                  </label>
                   <Select
-                    options={disponibilidadOptions}
-                    value={disponibilidadOptions.find((option) => option.value === nuevoBien.disponibilidad)}
-                    onChange={(selected) => setNuevoBien({ ...nuevoBien, disponibilidad: selected.value })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    options={areaComunOptions}
+                    placeholder="Seleccione el área común"
+                    value={nuevoBien.areaComun}
+                    onChange={(selected) => setNuevoBien({ ...nuevoBien, areaComun: selected })}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
               </div>
 
-              {/* Cuarta fila: Botón de Crear */}
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              {/* Botones de Cancelar y Crear */}
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
                 <button
-                  type="button" // Cambiado a "button" para evitar submit
-                  onClick={() => handleCrear()} // Llamamos la función de creación directamente
+                  onClick={() => setOpenModalCrear(false)}
                   style={{
                     padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
+                    backgroundColor: "#b7b7b7",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#254B5E",
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
@@ -473,8 +551,8 @@ const Bienes = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Editar Bien
+          <Typography id="modal-modal-title" variant="h4" component="h2">
+            <strong>Editar Bien</strong>
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
@@ -486,7 +564,9 @@ const Bienes = () => {
               {/* Primera fila: Código, Número de Serie, Marca */}
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Código:</label>
+                  <label>
+                    <strong>Código:</strong>
+                  </label>
                   <input
                     type="text"
                     value={bienSeleccionado?.codigo || ""}
@@ -497,11 +577,13 @@ const Bienes = () => {
                       })
                     }
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label>Número de Serie:</label>
+                  <label>
+                    <strong>Número de Serie:</strong>
+                  </label>
                   <input
                     type="text"
                     value={bienSeleccionado?.numeroSerie || ""}
@@ -512,12 +594,17 @@ const Bienes = () => {
                       })
                     }
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
+              </div>
 
+              {/* Segunda fila: Modelo, Tipo de Bien, Área Común */}
+              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Marca:</label>
+                  <label>
+                    <strong>Marca:</strong>
+                  </label>
                   <Select
                     options={marcaOptions}
                     value={marcaOptions.find((option) => option.value === bienSeleccionado?.marca?.marcaId)}
@@ -528,15 +615,14 @@ const Bienes = () => {
                       })
                     }
                     required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
-              </div>
 
-              {/* Segunda fila: Modelo, Tipo de Bien, Área Común */}
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Modelo:</label>
+                  <label>
+                    <strong>Modelo:</strong>
+                  </label>
                   <Select
                     options={modeloOptions}
                     value={modeloOptions.find((option) => option.value === bienSeleccionado?.modelo?.modeloId)}
@@ -547,11 +633,17 @@ const Bienes = () => {
                       })
                     }
                     required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
+              </div>
+
+              {/* Tercera fila: Estado, Disponibilidad */}
+              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Tipo de Bien:</label>
+                  <label>
+                    <strong>Tipo de Bien:</strong>
+                  </label>
                   <Select
                     options={tipoBienOptions}
                     value={tipoBienOptions.find((option) => option.value === bienSeleccionado?.tipoBien?.tipoBienId)}
@@ -562,11 +654,13 @@ const Bienes = () => {
                       })
                     }
                     required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label>Área Común:</label>
+                  <label>
+                    <strong>Área Común:</strong>
+                  </label>
                   <Select
                     options={areaComunOptions}
                     value={areaComunOptions.find((option) => option.value === bienSeleccionado?.areaComun?.areaId)}
@@ -576,15 +670,17 @@ const Bienes = () => {
                         areaComun: { areaId: selected.value },
                       })
                     }
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
               </div>
 
-              {/* Tercera fila: Estado, Disponibilidad */}
+              {/* Cuarta fila: */}
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Estado:</label>
+                  <label>
+                    <strong>Estado:</strong>
+                  </label>
                   <Select
                     options={statusOptions}
                     value={statusOptions.find((option) => option.value === bienSeleccionado?.status)}
@@ -595,39 +691,38 @@ const Bienes = () => {
                       })
                     }
                     required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label>Disponibilidad:</label>
-                  <Select
-                    options={disponibilidadOptions}
-                    value={disponibilidadOptions.find((option) => option.value === bienSeleccionado?.disponibilidad)}
-                    onChange={(selected) =>
-                      setBienSeleccionado({
-                        ...bienSeleccionado,
-                        disponibilidad: selected.value,
-                      })
-                    }
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
               </div>
 
-              {/* Cuarta fila: Botón de Guardar cambios */}
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              {/* Botones de Cancelar y Guardar cambios */}
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
                 <button
-                  type="submit" // Este debería ser un submit, no un button normal
+                  onClick={() => setopenModalActualizar(false)}
                   style={{
-                    backgroundColor: "#4CAF50", // Color verde para indicar guardar
+                    padding: "10px 20px",
+                    backgroundColor: "#b7b7b7",
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
                     cursor: "pointer",
                   }}
                 >
-                  Guardar Cambios
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#254B5E",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Guardar cambios
                 </button>
               </div>
             </form>
@@ -642,17 +737,213 @@ const Bienes = () => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: "10px",
+          }}
+        >
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Eliminar Bien
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             ¿Estás seguro de que deseas eliminar este bien?
-            <br />
-            <label>Motivo de eliminación:</label>
-            <input type="text" value={motivoEliminar} onChange={(e) => setMotivoEliminar(e.target.value)} required />
-            <button onClick={confirmarEliminar}>Confirmar</button>
-            <button onClick={() => setOpenModalEliminar(false)}>Cancelar</button>
+          </Typography>
+          <Box sx={{ mt: 2 }}>
+            <label>
+              <strong>Motivo de eliminación:</strong>
+            </label>
+            <input
+              type="text"
+              value={motivoEliminar}
+              onChange={(e) => setMotivoEliminar(e.target.value)}
+              required
+              style={{
+                width: "100%",
+                height: "40px",
+                border: "solid 1px #c2c2c2",
+                borderRadius: "5px",
+                marginTop: "10px",
+              }}
+            />
+          </Box>
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
+            <button
+              onClick={() => setOpenModalEliminar(false)}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#b7b7b7",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={confirmarEliminar}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#254B5E",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Confirmar
+            </button>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Modal de alerta */}
+      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 3,
+            borderRadius: "10px",
+            textAlign: "center",
+            border: `3px solid ${colorAlerta}`,
+          }}
+        >
+          <Typography id="alerta-modal-title" sx={{ color: colorAlerta, fontWeight: "bold" }}>
+            {mensajeAlerta}
+          </Typography>
+        </Box>
+      </Modal>
+      {/* Modal para ver detalles de un bien */}
+      <Modal
+        open={openModalVer}
+        onClose={() => setOpenModalVer(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 500,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: "10px",
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h5" component="h2" sx={{ fontWeight: "bold", color: "#254B5E" }}>
+            Detalles del Bien
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            {/* Lista de detalles del bien */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                backgroundColor: "#f9f9f9",
+                p: 3,
+                borderRadius: "8px",
+                border: "1px solid #e0e0e0",
+              }}
+            >
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Código:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.codigo}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Número de Serie:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.numeroSerie}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Marca:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.marca?.nombreMarca}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Modelo:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.modelo?.nombreModelo}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Tipo de Bien:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.tipoBien?.nombreTipoBien}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Área Común:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.areaComun?.nombreArea}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Estado:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.status}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Disponibilidad:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.disponibilidad}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Motivo:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.motivo}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Fecha de eliminación:
+                </Typography>
+                <Typography variant="body1">
+                  {bienSeleccionado?.deleteAt ? new Date(bienSeleccionado?.deleteAt).toLocaleString() : "No eliminado"}
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Botón de Cerrar */}
+            <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              <button
+                onClick={() => setOpenModalVer(false)}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#254B5E",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                }}
+              >
+                Cerrar
+              </button>
+            </Box>
           </Typography>
         </Box>
       </Modal>
@@ -660,70 +951,22 @@ const Bienes = () => {
       <Sidebar />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}>
-        <Paper className="col-md-12 col-lg-12 col-xl-12" style={{ height: "fit-content" }}>
+        <Paper className="col-md-8 col-lg-6 col-xl-6" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
-          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB" }}>
+          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Bienes existentes</h3>
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
-              <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
-              <button onClick={resetearFiltros} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
-                Borrar
-              </button>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {/* Primera fila de filtros */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  justifyContent: "center",
-                  marginBottom: "10px",
-                }}
-                className="col-sm-12 col-md-12 col-lg-12 col-xl-12"
-              >
-                <Select
-                  placeholder="Tipo"
-                  value={filtroTipoBien}
-                  onChange={setFiltroTipoBien}
-                  options={tipoBienOptions}
-                  styles={customSelectStyles}
-                />
-                <Select
-                  placeholder="Marca"
-                  value={filtroMarca}
-                  onChange={setFiltroMarca}
-                  options={marcaOptions}
-                  styles={customSelectStyles}
-                />
-                <Select
-                  placeholder="Modelo"
-                  value={filtroModelo}
-                  onChange={setFiltroModelo}
-                  options={modeloOptions}
-                  styles={customSelectStyles}
-                />
-              </div>
 
-              {/* Segunda fila de filtros */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px", // Espacio entre elementos
-                  justifyContent: "center",
-                }}
-              >
+            {/* Contenedor principal con distribución adecuada */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              {/* Filtros alineados a la izquierda */}
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
+                {/* Primera fila de filtros */}
                 <Select
-                  placeholder="Área"
-                  value={filtroAreaComun}
-                  onChange={setFiltroAreaComun}
-                  options={areaComunOptions}
+                  placeholder="Disponibilidad"
+                  value={filtroDisponibilidad}
+                  onChange={setFiltroDisponibilidad}
+                  options={disponibilidadOptions}
                   styles={customSelectStyles}
                 />
                 <Select
@@ -733,17 +976,30 @@ const Bienes = () => {
                   options={statusOptions}
                   styles={customSelectStyles}
                 />
-                <Select
-                  placeholder="Disponibilidad"
-                  value={filtroDisponibilidad}
-                  onChange={setFiltroDisponibilidad}
-                  options={disponibilidadOptions}
-                  styles={customSelectStyles}
-                />
+              </div>
+
+              {/* Botones alineados a la derecha en columna */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginLeft: "auto" }}>
+                <button onClick={resetearFiltros} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
+                  Borrar
+                </button>
+                <button
+                  onClick={() => setOpenModalCrear(true)}
+                  style={{
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    backgroundColor: "#254B5E",
+                    padding: "8px",
+                  }}
+                >
+                  Crear
+                </button>
               </div>
             </div>
           </Box>
-
           {/* Tabla */}
           <TableContainer sx={{ width: "100%", padding: "20px", paddingTop: "0px", paddingBottom: "0px" }}>
             <Table size="small">
@@ -759,25 +1015,7 @@ const Bienes = () => {
                         color: "#546EAB",
                       }}
                     >
-                      {column.id === "crear" ? (
-                        <button
-                          onClick={() => setOpenModalCrear(true)}
-                          style={{
-                            backgroundColor: "#254B5E",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                            fontSize: "13px",
-                            width: "100%",
-                            padding: "4px",
-                          }}
-                        >
-                          Crear
-                        </button>
-                      ) : (
-                        column.label
-                      )}
+                      {column.label}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -787,10 +1025,21 @@ const Bienes = () => {
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={bien.bienId}>
                       {columns.map((column) => {
-                        if (column.id === "crear") {
+                        if (column.id === "acciones") {
                           return (
                             <TableCell key={column.id} align={column.align}>
-                              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                              <div style={{ display: "flex" }}>
+                                <img
+                                  src={ver}
+                                  alt="Ver"
+                                  style={{
+                                    width: "20px",
+                                    height: "20px",
+                                    cursor: "pointer",
+                                    marginRight: "8px",
+                                  }}
+                                  onClick={() => handleVerBien(bien)}
+                                />
                                 <img
                                   src={edit}
                                   alt="Editar"
@@ -853,6 +1102,25 @@ const Bienes = () => {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Filas por página"
+            SelectProps={{
+              native: true,
+            }}
+            sx={{
+              "& .MuiTablePagination-selectLabel": {
+                fontSize: "14px",
+                color: "#546EAB",
+              },
+              "& .MuiTablePagination-displayedRows": {
+                fontSize: "14px",
+                color: "#546EAB",
+              },
+              "& .MuiTablePagination-select": {
+                fontSize: "14px",
+                color: "#546EAB",
+                textAlign: "center",
+              },
+            }}
           />
         </Paper>
       </div>
@@ -862,12 +1130,13 @@ const Bienes = () => {
 
 const buttonStyle = {
   backgroundColor: "#254B5E",
-  padding: "5px",
+  padding: "8px",
   border: "none",
   borderRadius: "5px",
   color: "#fff",
   fontSize: "14px",
   cursor: "pointer",
+  width: "150px",
 };
 
 const customSelectStyles = {
@@ -931,4 +1200,33 @@ const style = {
   p: 4,
 };
 
+const SelectOptionsStyles = {
+  control: (base) => ({
+    ...base,
+    width: "100%",
+    height: "40px",
+    border: "solid 1px #c2c2c2",
+  }),
+  option: (base) => ({
+    ...base,
+    color: "#000",
+    textAlign: "start",
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: "#000",
+  }),
+  placeholder: (base) => ({
+    ...base,
+    color: "#757575",
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    color: "#000",
+  }),
+  indicatorSeparator: (base) => ({
+    ...base,
+    backgroundColor: "#c2c2c2",
+  }),
+};
 export default Bienes;

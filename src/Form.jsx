@@ -155,7 +155,6 @@ export default function Form() {
                 textAlign: "center",
                 paddingRight: "30px",
                 marginBottom: "20px",
-                borderRadius: "5px",
               }}
             />
           </div>
