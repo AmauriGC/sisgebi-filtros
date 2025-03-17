@@ -236,7 +236,7 @@ const Usuarios = () => {
     { id: "rol", label: "Rol", minWidth: 100 },
     { id: "lugar", label: "Lugar", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 100 },
-    { id: "crear", label: "Crear", minWidth: 50 },
+    { id: "crear", label: "Acciones", minWidth: 50 },
   ];
 
   return (
@@ -533,24 +533,13 @@ const Usuarios = () => {
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
         <Paper className="col-md-10 col-lg-10 col-xl-11" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
-          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB" }}>
+          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Usuarios existentes</h3>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {/* Filtros */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  justifyContent: "center",
-                }}
-                className="col-sm-12 col-md-12 col-lg-12 col-xl-12"
-              >
+
+            {/* Contenedor principal con distribución adecuada */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              {/* Filtros alineados a la izquierda */}
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
 
                 <Select
@@ -574,8 +563,26 @@ const Usuarios = () => {
                   options={lugarOptions}
                   styles={customSelectStyles}
                 />
+              </div>
+
+              {/* Botones alineados a la derecha en columna */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginLeft: "auto" }}>
                 <button onClick={resetFilters} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
                   Borrar
+                </button>
+                <button
+                  onClick={() => setOpenModalCrear(true)}
+                  style={{
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    backgroundColor: "#254B5E",
+                    padding: "8px",
+                  }}
+                >
+                  Crear
                 </button>
               </div>
             </div>
@@ -596,25 +603,7 @@ const Usuarios = () => {
                         color: "#546EAB",
                       }}
                     >
-                      {column.id === "crear" ? (
-                        <button
-                          onClick={() => setOpenModalCrear(true)}
-                          style={{
-                            backgroundColor: "#254B5E",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                            fontSize: "14px",
-                            width: "100%",
-                            padding: "4px",
-                          }}
-                        >
-                          Crear
-                        </button>
-                      ) : (
-                        column.label
-                      )}
+                      {column.label}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -627,7 +616,7 @@ const Usuarios = () => {
                         if (column.id === "crear") {
                           return (
                             <TableCell key={column.id} align={column.align} style={{ textAlign: "center" }}>
-                              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                              <div style={{ display: "flex" }}>
                                 <img
                                   src={edit}
                                   alt="Editar"
@@ -696,6 +685,7 @@ const buttonStyle = {
   color: "#fff",
   fontSize: "14px",
   cursor: "pointer",
+  width: "150px",
 };
 
 const customSelectStyles = {

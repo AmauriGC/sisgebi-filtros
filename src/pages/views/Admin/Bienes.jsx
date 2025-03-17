@@ -332,7 +332,7 @@ const Bienes = () => {
   };
 
   return (
-    <div style={{ display: "flex", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
+    <div style={{ display: "flex", height: "100%", width: "100%", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
       {/* Modal para crear */}
       <Modal
         open={openModalCrear}

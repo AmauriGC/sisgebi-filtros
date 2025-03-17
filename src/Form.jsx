@@ -153,9 +153,11 @@ export default function Form() {
                 marginTop: "10px",
                 marginLeft: "20px",
                 textAlign: "center",
+                paddingRight: "30px",
+                marginBottom: "20px",
+                borderRadius: "5px",
               }}
             />
-            <p>No compartas tu correo con nadie por favor</p>
           </div>
 
           <div>

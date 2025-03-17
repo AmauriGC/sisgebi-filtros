@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import menu from "../assets/img/menu.svg";
 import asignaciones from "../assets/img/clipboard-check.svg";
-import bienes from "../assets/img/laptop.svg";
+import bienes from "../assets/img/package-variant.svg";
 import catalogos from "../assets/img/book.svg";
 import usuario from "../assets/img/account.svg";
 import usuarios from "../assets/img/account-group.svg";
 import salir from "../assets/img/logout.svg";
+import areas from "../assets/img/office-building-marker.svg";
+import modelos from "../assets/img/laptop.svg";
+import marcas from "../assets/img/text-box-outline.svg";
+import tipos from "../assets/img/packages.png";
 import arrow from "../assets/img/arrow-right.svg";
 
 const SidebarItem = ({ icon, label, isExpanded, isSelected, onClick, children }) => {
@@ -15,7 +19,7 @@ const SidebarItem = ({ icon, label, isExpanded, isSelected, onClick, children })
     <div>
       <div
         className={`d-flex align-items-center p-1 cursor-pointer rounded transition-colors ${
-          isSelected ? "bg-white text-black fw-bold" : "hover:bg-light"
+          isSelected ? "bg-white fw-bold" : "hover:bg-light"
         }`}
         onClick={onClick}
         style={{
@@ -24,6 +28,7 @@ const SidebarItem = ({ icon, label, isExpanded, isSelected, onClick, children })
           overflow: "hidden",
           marginBottom: "25px",
           textAlign: "start",
+          color: "#254B5E",
         }}
       >
         <img
@@ -58,15 +63,24 @@ const Sidebar = () => {
     }
   };
 
+  // Manejo de redimensionamiento de pantalla
+  useEffect(() => {
+    const handleResize = () => {
+      setIsExpanded(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <div
       className={`p-3 d-flex flex-column transition-all `}
       style={{
         backgroundColor: "#A7D0D2",
-        height: "100vh",
+        minHeight: "100vh",
         width: isExpanded ? "250px" : "70px",
         overflow: "hidden",
-        transition: "width 0.3s ease",
+        transition: "width 0.2s ease",
       }}
       onMouseEnter={expandSidebar}
       onMouseLeave={collapseSidebar}
@@ -98,7 +112,7 @@ const Sidebar = () => {
                 marginLeft: "-40px",
               }}
             >
-              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px" }} />
+              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
               Ver mis datos
             </div>
             {/* Otras opciones de submenú */}
@@ -114,7 +128,7 @@ const Sidebar = () => {
         onClick={() => handleItemClick("Bienes")}
       >
         {expandedItem === "Bienes" && (
-          <div className="ps-4" style={{ textAlign: "start", marginLeft: "20px" }}>
+          <div className="ps-4" style={{ textAlign: "start", marginLeft: "20px", marginRight: "15px" }}>
             <div
               onClick={() => navigate("/bienes")}
               style={{
@@ -123,7 +137,7 @@ const Sidebar = () => {
                 marginLeft: "-40px",
               }}
             >
-              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px" }} />
+              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
               Mostrar bienes
             </div>
             {/* Otras opciones de submenú */}
@@ -148,7 +162,7 @@ const Sidebar = () => {
                 marginLeft: "-40px",
               }}
             >
-              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px" }} />
+              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
               Mostrar usuarios
             </div>
             {/* Otras opciones de submenú */}
@@ -173,8 +187,8 @@ const Sidebar = () => {
                 marginLeft: "-40px",
               }}
             >
-              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px" }} />
-              Mostrar áreas comunes
+              <img src={areas} alt="areas" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
+              Áreas comunes
             </div>
             <div
               onClick={() => navigate("/tipos")}
@@ -184,8 +198,8 @@ const Sidebar = () => {
                 marginLeft: "-40px",
               }}
             >
-              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px" }} />
-              Mostrar tipos de bienes
+              <img src={tipos} alt="tipos" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
+              Tipos de bienes
             </div>
             <div
               onClick={() => navigate("/marcas")}
@@ -195,8 +209,8 @@ const Sidebar = () => {
                 marginLeft: "-40px",
               }}
             >
-              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px" }} />
-              Mostrar marcas
+              <img src={marcas} alt="marcas" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
+              Marcas
             </div>
             <div
               onClick={() => navigate("/modelos")}
@@ -206,8 +220,8 @@ const Sidebar = () => {
                 marginLeft: "-40px",
               }}
             >
-              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px" }} />
-              Mostrar modelos
+              <img src={modelos} alt="modelos" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
+              Modelos
             </div>
             {/* Otras opciones de submenú */}
           </div>
@@ -231,7 +245,7 @@ const Sidebar = () => {
                 marginLeft: "-40px",
               }}
             >
-              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px" }} />
+              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
               Mostrar asignaciones
             </div>
             {/* Otras opciones de submenú */}
@@ -245,7 +259,6 @@ const Sidebar = () => {
           icon={salir}
           label="Salir"
           isExpanded={isExpanded}
-          isSelected={selectedItem === "Salir"}
           onClick={() => {
             handleItemClick("Salir");
             navigate("/");

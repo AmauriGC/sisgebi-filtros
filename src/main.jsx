@@ -20,7 +20,6 @@ import Marcas from "./pages/views/Admin/Marcas";
 import Modelos from "./pages/views/Admin/Modelos";
 import Asignaciones from "./pages/views/Admin/Asignaciones";
 
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(

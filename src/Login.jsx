@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./assets/css/Login.css";
-import img from "./assets/img/ICON.png";
-import logo from "./assets/img/logo.png";
+import logo from "./assets/img/sisgebi.jpeg";
 import roles from "./assets/img/account-tie.svg";
 import roles2 from "./assets/img/account-badge.svg";
 import roles3 from "./assets/img/account.svg";
@@ -68,7 +67,7 @@ const Login = () => {
               src={logo}
               alt="LOGO"
               className="img-fluid mt-3 mb-3 p-3 "
-              style={{ maxHeight: "240px", maxWidth: "240px" }}
+              style={{ maxHeight: "240px", maxWidth: "240px", borderRadius: "50%" }}
             />
           </div>
 
