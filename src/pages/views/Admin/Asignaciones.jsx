@@ -20,17 +20,17 @@ const Asignaciones = () => {
   const [asignaciones, setAsignaciones] = React.useState([]);
   const [filtroStatus, setFiltroStatus] = React.useState(null);
   const [filtroUsuario, setFiltroUsuario] = React.useState(null);
-
   const [usuarioOptions, setUsuarioOptions] = React.useState([]);
-
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(8);
-
-  const navigate = useNavigate();
 
   // Estado para controlar el modal y los detalles del bien
   const [openModalBien, setOpenModalBien] = React.useState(false);
   const [bienSeleccionado, setBienSeleccionado] = React.useState(null);
+
+  // Estado para el modal de alerta
+  const [mensajeAlerta, setMensajeAlerta] = React.useState("");
+  const [colorAlerta, setColorAlerta] = React.useState("");
 
   const statusOptions = [
     { value: "ACTIVO", label: "Activo" },
@@ -41,7 +41,7 @@ const Asignaciones = () => {
     { id: "asignacionesId", label: "#", minWidth: 25 },
     { id: "usuario", label: "Usuario", minWidth: 80 },
     { id: "bien", label: "Bien", minWidth: 80 },
-    { id: "status", label: "Estado de la asignacion", minWidth: 60 },
+    { id: "status", label: "Estado de la asignación", minWidth: 60 },
     { id: "acciones", label: "Acciones", minWidth: 80 },
   ];
 
@@ -175,36 +175,171 @@ const Asignaciones = () => {
 
   return (
     <div style={{ display: "flex", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
+      {/* Modal para mostrar los detalles del bien */}
+      <Modal
+        open={openModalBien}
+        onClose={() => setOpenModalBien(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 500,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: "10px",
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h5" component="h2" sx={{ fontWeight: "bold", color: "#254B5E" }}>
+            Detalles del Bien
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            {/* Lista de detalles del bien */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                backgroundColor: "#f9f9f9",
+                p: 3,
+                borderRadius: "8px",
+                border: "1px solid #e0e0e0",
+              }}
+            >
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Código:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.codigo}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Número de Serie:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.numeroSerie}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Marca:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.marca?.nombreMarca}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Modelo:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.modelo?.nombreModelo}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Tipo de Bien:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.tipoBien?.nombreTipoBien}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Área Común:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.areaComun?.nombreArea}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Estado:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.status}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Disponibilidad:
+                </Typography>
+                <Typography variant="body1">{bienSeleccionado?.disponibilidad}</Typography>
+              </Box>
+            </Box>
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+            <button
+              onClick={() => setOpenModalBien(false)}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#254B5E",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Cerrar
+            </button>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Modal de alerta */}
+      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: "10px",
+            textAlign: "center",
+            border: `3px solid ${colorAlerta}`,
+          }}
+        >
+          <Typography
+            id="alerta-modal-title"
+            variant="h6"
+            component="h2"
+            sx={{
+              color: colorAlerta,
+              fontWeight: "bold",
+              mb: 2,
+            }}
+          >
+            {mensajeAlerta}
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+            <button
+              onClick={() => setMensajeAlerta("")}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#254B5E",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
+            >
+              Cerrar
+            </button>
+          </Box>
+        </Box>
+      </Modal>
+
       <Sidebar />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}>
-        <Paper className="col-md-8 col-lg-8 col-xl-8" style={{ height: "fit-content" }}>
+        <Paper className="col-md-8 col-lg-8 col-xl-6" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
-          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB" }}>
+          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Asignaciones realizadas</h3>
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
-              <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
-              <button onClick={resetearFiltros} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
-                Borrar
-              </button>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {/* Filtros */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  justifyContent: "center",
-                  marginBottom: "10px",
-                }}
-                className="col-sm-12 col-md-12 col-lg-12 col-xl-12"
-              >
+
+            {/* Contenedor principal con distribución adecuada */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              {/* Filtros alineados a la izquierda */}
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
                 <Select
                   placeholder="Usuario"
                   value={filtroUsuario}
@@ -219,6 +354,13 @@ const Asignaciones = () => {
                   options={statusOptions}
                   styles={customSelectStyles}
                 />
+              </div>
+
+              {/* Botones alineados a la derecha en columna */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginLeft: "auto" }}>
+                <button onClick={resetearFiltros} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
+                  Borrar
+                </button>
               </div>
             </div>
           </Box>
@@ -302,65 +444,41 @@ const Asignaciones = () => {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Filas por página"
+            SelectProps={{
+              native: true,
+            }}
+            sx={{
+              "& .MuiTablePagination-selectLabel": {
+                fontSize: "14px",
+                color: "#546EAB",
+              },
+              "& .MuiTablePagination-displayedRows": {
+                fontSize: "14px",
+                color: "#546EAB",
+              },
+              "& .MuiTablePagination-select": {
+                fontSize: "14px",
+                color: "#546EAB",
+                textAlign: "center",
+              },
+            }}
           />
         </Paper>
       </div>
-
-      {/* Modal para mostrar los detalles del bien */}
-      <Modal
-        open={openModalBien}
-        onClose={() => setOpenModalBien(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Detalles del Bien
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {bienSeleccionado && (
-              <div>
-                <p>
-                  <strong>Código:</strong> {bienSeleccionado.codigo}
-                </p>
-                <p>
-                  <strong>Número de Serie:</strong> {bienSeleccionado.numeroSerie}
-                </p>
-                <p>
-                  <strong>Tipo de Bien:</strong> {bienSeleccionado.tipoBien?.nombreTipoBien}
-                </p>
-                <p>
-                  <strong>Marca:</strong> {bienSeleccionado.marca?.nombreMarca}
-                </p>
-                <p>
-                  <strong>Modelo:</strong> {bienSeleccionado.modelo?.nombreModelo}
-                </p>
-                <p>
-                  <strong>Área Común:</strong> {bienSeleccionado.areaComun?.nombreArea || "N/A"}
-                </p>
-                <p>
-                  <strong>Estado del bien:</strong> {bienSeleccionado.status}
-                </p>
-                <p>
-                  <strong>Disponibilidad:</strong> {bienSeleccionado.disponibilidad}
-                </p>
-              </div>
-            )}
-          </Typography>
-        </Box>
-      </Modal>
     </div>
   );
 };
 
 const buttonStyle = {
   backgroundColor: "#254B5E",
-  padding: "5px",
+  padding: "8px",
   border: "none",
   borderRadius: "5px",
   color: "#fff",
   fontSize: "14px",
   cursor: "pointer",
+  width: "100px",
 };
 
 const customSelectStyles = {

@@ -27,6 +27,9 @@ const Modelos = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  const [mensajeAlerta, setMensajeAlerta] = useState("");
+  const [colorAlerta, setColorAlerta] = useState("");
+
   const [nuevoModelo, setNuevoModelo] = useState({
     nombreModelo: "",
     status: "ACTIVO",
@@ -105,6 +108,15 @@ const Modelos = () => {
       });
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
   const handleCrearModelo = () => {
     const token = sessionStorage.getItem("token");
     if (!token) return;
@@ -119,24 +131,41 @@ const Modelos = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        // Agregar el nuevo modelo al estado
         setModelos([...modelos, response.data]);
+
+        // Cerrar el modal y resetear el formulario
         setOpenModalCrear(false);
         setNuevoModelo({
           nombreModelo: "",
           status: "ACTIVO",
         });
-        window.location.reload();
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("Modelo creado correctamente");
+        setColorAlerta("#64C267"); // Color verde para éxito
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       })
       .catch((error) => {
         console.error("Hubo un error al crear el modelo:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se pudo crear el modelo");
+        setColorAlerta("#C26464"); // Color rojo para error
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       });
   };
 
   const handleEditarModelo = (modelo) => {
-    setModeloSeleccionado({
-      ...modelo,
-      modeloId: modelo.modeloId,
-    });
+    setModeloSeleccionado(modelo);
     setOpenModalEditar(true);
   };
 
@@ -154,11 +183,32 @@ const Modelos = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        // Actualizar el modelo en el estado
         setModelos(modelos.map((modelo) => (modelo.modeloId === modeloSeleccionado.modeloId ? response.data : modelo)));
+
+        // Cerrar el modal de edición
         setOpenModalEditar(false);
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("Modelo actualizado correctamente");
+        setColorAlerta("#64C267");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       })
       .catch((error) => {
         console.error("Hubo un error al actualizar el modelo:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se pudo actualizar el modelo");
+        setColorAlerta("#C26464");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       });
   };
 
@@ -177,29 +227,44 @@ const Modelos = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        setModelos(modelos.filter((modelo) => modelo.modeloId !== modeloSeleccionado.modeloId));
+        // Actualizar el estado del modelo a INACTIVO
+        setModelos(
+          modelos.map((modelo) =>
+            modelo.modeloId === modeloSeleccionado.modeloId ? { ...modelo, status: "INACTIVO" } : modelo
+          )
+        );
+
+        // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("El modelo se ha eliminado correctamente");
+        setColorAlerta("#64C267");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       })
       .catch((error) => {
         console.error("Hubo un error al eliminar el modelo:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se ha podido eliminar el modelo");
+        setColorAlerta("#C26464");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       });
-    window.location.reload();
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
   };
 
   const columns = [
     { id: "modeloId", label: "ID", minWidth: 50 },
     { id: "nombreModelo", label: "Nombre", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 100 },
-    { id: "crear", label: "Crear", minWidth: 50 },
+    { id: "acciones", label: "Acciones", minWidth: 50 },
   ];
 
   return (
@@ -212,8 +277,8 @@ const Modelos = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Crear Modelo
+          <Typography id="modal-modal-title" variant="h4" component="h2">
+            <strong>Registrar Modelo</strong>
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
@@ -224,41 +289,45 @@ const Modelos = () => {
             >
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Nombre del Modelo:</label>
+                  <label>
+                    <strong>Nombre del Modelo:</strong>
+                  </label>
                   <input
                     type="text"
+                    placeholder="Nombre del modelo"
                     value={nuevoModelo.nombreModelo}
                     onChange={(e) => setNuevoModelo({ ...nuevoModelo, nombreModelo: e.target.value })}
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>Estado:</label>
-                  <Select
-                    options={statusOptions}
-                    value={statusOptions.find((option) => option.value === nuevoModelo.status)}
-                    onChange={(selected) => setNuevoModelo({ ...nuevoModelo, status: selected.value })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
                 <button
-                  type="submit"
+                  onClick={() => setOpenModalCrear(false)}
                   style={{
                     padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
+                    backgroundColor: "#b7b7b7",
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
                     cursor: "pointer",
                   }}
                 >
-                  Crear
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#254B5E",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Registrar
                 </button>
               </div>
             </form>
@@ -274,8 +343,8 @@ const Modelos = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Editar Modelo
+          <Typography id="modal-modal-title" variant="h4" component="h2">
+            <strong>Editar Modelo</strong>
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
@@ -286,7 +355,9 @@ const Modelos = () => {
             >
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Nombre del Modelo:</label>
+                  <label>
+                    <strong>Nombre del Modelo:</strong>
+                  </label>
                   <input
                     type="text"
                     value={modeloSeleccionado?.nombreModelo || ""}
@@ -297,13 +368,15 @@ const Modelos = () => {
                       })
                     }
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
               </div>
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Estado:</label>
+                  <label>
+                    <strong>Estado:</strong>
+                  </label>
                   <Select
                     options={statusOptions}
                     value={statusOptions.find((option) => option.value === modeloSeleccionado?.status)}
@@ -314,16 +387,29 @@ const Modelos = () => {
                       })
                     }
                     required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
               </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
+                <button
+                  onClick={() => setOpenModalEditar(false)}
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#b7b7b7",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancelar
+                </button>
                 <button
                   type="submit"
                   style={{
                     padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
+                    backgroundColor: "#254B5E",
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
@@ -345,15 +431,75 @@ const Modelos = () => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 480,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: "10px",
+          }}
+        >
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Eliminar Modelo
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             ¿Estás seguro de que deseas eliminar este modelo?
-            <br />
-            <button onClick={confirmarEliminarModelo}>Confirmar</button>
-            <button onClick={() => setOpenModalEliminar(false)}>Cancelar</button>
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
+            <button
+              onClick={() => setOpenModalEliminar(false)}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#b7b7b7",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={confirmarEliminarModelo}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#254B5E",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Eliminar
+            </button>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Modal de alerta */}
+      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 3,
+            borderRadius: "10px",
+            textAlign: "center",
+            border: `3px solid ${colorAlerta}`,
+          }}
+        >
+          <Typography id="alerta-modal-title" sx={{ color: colorAlerta, fontWeight: "bold" }}>
+            {mensajeAlerta}
           </Typography>
         </Box>
       </Modal>
@@ -363,26 +509,14 @@ const Modelos = () => {
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
         <Paper sx={{ overflow: "hidden" }} className="col-md-9 col-lg-9 col-xl-9" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
-          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB" }}>
+          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Modelos Registrados</h3>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {/* Filtros */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  justifyContent: "center",
-                }}
-                className="col-sm-12 col-md-12 col-lg-12 col-xl-12"
-              >
-                <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
 
+            {/* Contenedor principal con distribución adecuada */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              {/* Filtros alineados a la izquierda */}
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
                 <Select
                   placeholder="Estado"
                   value={filtroStatus}
@@ -390,9 +524,26 @@ const Modelos = () => {
                   options={statusOptions}
                   styles={customSelectStyles}
                 />
+              </div>
 
+              {/* Botones alineados a la derecha en columna */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginLeft: "auto" }}>
                 <button onClick={resetFilters} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
                   Borrar
+                </button>
+                <button
+                  onClick={() => setOpenModalCrear(true)}
+                  style={{
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    backgroundColor: "#254B5E",
+                    padding: "8px",
+                  }}
+                >
+                  Crear
                 </button>
               </div>
             </div>
@@ -413,25 +564,7 @@ const Modelos = () => {
                         color: "#546EAB",
                       }}
                     >
-                      {column.id === "crear" ? (
-                        <button
-                          onClick={() => setOpenModalCrear(true)}
-                          style={{
-                            backgroundColor: "#254B5E",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                            fontSize: "14px",
-                            width: "100%",
-                            padding: "4px",
-                          }}
-                        >
-                          Crear
-                        </button>
-                      ) : (
-                        column.label
-                      )}{" "}
+                      {column.label}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -441,10 +574,10 @@ const Modelos = () => {
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={modelo.modeloId}>
                       {columns.map((column) => {
-                        if (column.id === "crear") {
+                        if (column.id === "acciones") {
                           return (
                             <TableCell key={column.id} align={column.align} style={{ textAlign: "center" }}>
-                              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                              <div style={{ display: "flex" }}>
                                 <img
                                   src={edit}
                                   alt="Editar"
@@ -498,6 +631,25 @@ const Modelos = () => {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Filas por página"
+            SelectProps={{
+              native: true,
+            }}
+            sx={{
+              "& .MuiTablePagination-selectLabel": {
+                fontSize: "14px",
+                color: "#546EAB",
+              },
+              "& .MuiTablePagination-displayedRows": {
+                fontSize: "14px",
+                color: "#546EAB",
+              },
+              "& .MuiTablePagination-select": {
+                fontSize: "14px",
+                color: "#546EAB",
+                textAlign: "center",
+              },
+            }}
           />
         </Paper>
       </div>
@@ -513,6 +665,7 @@ const buttonStyle = {
   color: "#fff",
   fontSize: "14px",
   cursor: "pointer",
+  width: "150px",
 };
 
 const customSelectStyles = {
@@ -574,6 +727,36 @@ const style = {
   borderRadius: "8px",
   boxShadow: 24,
   p: 4,
+};
+
+const SelectOptionsStyles = {
+  control: (base) => ({
+    ...base,
+    width: "100%",
+    height: "40px",
+    border: "solid 1px #c2c2c2",
+  }),
+  option: (base) => ({
+    ...base,
+    color: "#000",
+    textAlign: "start",
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: "#000",
+  }),
+  placeholder: (base) => ({
+    ...base,
+    color: "#757575",
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    color: "#000",
+  }),
+  indicatorSeparator: (base) => ({
+    ...base,
+    backgroundColor: "#c2c2c2",
+  }),
 };
 
 export default Modelos;

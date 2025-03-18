@@ -27,6 +27,9 @@ const Tipos = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  const [mensajeAlerta, setMensajeAlerta] = useState("");
+  const [colorAlerta, setColorAlerta] = useState("");
+
   const [nuevoTipoBien, setNuevoTipoBien] = useState({
     nombreTipoBien: "",
     status: "ACTIVO",
@@ -105,6 +108,15 @@ const Tipos = () => {
       });
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
   const handleCrearTipoBien = () => {
     const token = sessionStorage.getItem("token");
     if (!token) return;
@@ -119,17 +131,37 @@ const Tipos = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        // Agregar el nuevo tipo de bien al estado
         setTipoBienes([...tipoBienes, response.data]);
+
+        // Cerrar el modal y resetear el formulario
         setOpenModalCrear(false);
         setNuevoTipoBien({
           nombreTipoBien: "",
           status: "ACTIVO",
         });
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("Tipo de bien creado correctamente");
+        setColorAlerta("#64C267"); // Color verde para éxito
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       })
       .catch((error) => {
         console.error("Hubo un error al crear el tipo de bien:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se pudo crear el tipo de bien");
+        setColorAlerta("#C26464"); // Color rojo para error
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       });
-    window.location.reload();
   };
 
   const handleEditarTipoBien = (tipoBien) => {
@@ -151,13 +183,34 @@ const Tipos = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        // Actualizar el tipo de bien en el estado
         setTipoBienes(
           tipoBienes.map((tipo) => (tipo.tipoBienId === tipoBienSeleccionado.tipoBienId ? response.data : tipo))
         );
+
+        // Cerrar el modal de edición
         setOpenModalEditar(false);
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("Tipo de bien actualizado correctamente");
+        setColorAlerta("#64C267");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       })
       .catch((error) => {
         console.error("Hubo un error al actualizar el tipo de bien:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se pudo actualizar el tipo de bien");
+        setColorAlerta("#C26464");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       });
   };
 
@@ -176,29 +229,44 @@ const Tipos = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        setTipoBienes(tipoBienes.filter((tipo) => tipo.tipoBienId !== tipoBienSeleccionado.tipoBienId));
+        // Actualizar el estado del tipo de bien a INACTIVO
+        setTipoBienes(
+          tipoBienes.map((tipo) =>
+            tipo.tipoBienId === tipoBienSeleccionado.tipoBienId ? { ...tipo, status: "INACTIVO" } : tipo
+          )
+        );
+
+        // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("El tipo de bien se ha eliminado correctamente");
+        setColorAlerta("#64C267");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       })
       .catch((error) => {
         console.error("Hubo un error al eliminar el tipo de bien:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se ha podido eliminar el tipo de bien");
+        setColorAlerta("#C26464");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       });
-    window.location.reload();
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
   };
 
   const columns = [
-    { id: "tipoBienId", label: "ID", minWidth: 20 },
+    { id: "tipoBienId", label: "#", minWidth: 20 },
     { id: "nombreTipoBien", label: "Nombre", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 80 },
-    { id: "crear", label: "Crear", minWidth: 50 },
+    { id: "acciones", label: "Acciones", minWidth: 50 },
   ];
 
   return (
@@ -211,8 +279,8 @@ const Tipos = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Crear Tipo de Bien
+          <Typography id="modal-modal-title" variant="h4" component="h2">
+            <strong>Registrar Tipo de Bien</strong>
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
@@ -223,41 +291,45 @@ const Tipos = () => {
             >
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Nombre del Tipo de Bien:</label>
+                  <label>
+                    <strong>Nombre del Tipo de Bien:</strong>
+                  </label>
                   <input
                     type="text"
+                    placeholder="Nombre del tipo de bien"
                     value={nuevoTipoBien.nombreTipoBien}
                     onChange={(e) => setNuevoTipoBien({ ...nuevoTipoBien, nombreTipoBien: e.target.value })}
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>Estado:</label>
-                  <Select
-                    options={statusOptions}
-                    value={statusOptions.find((option) => option.value === nuevoTipoBien.status)}
-                    onChange={(selected) => setNuevoTipoBien({ ...nuevoTipoBien, status: selected.value })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
                 <button
-                  type="submit"
+                  onClick={() => setOpenModalCrear(false)}
                   style={{
                     padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
+                    backgroundColor: "#b7b7b7",
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
                     cursor: "pointer",
                   }}
                 >
-                  Crear
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#254B5E",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Registrar
                 </button>
               </div>
             </form>
@@ -273,8 +345,8 @@ const Tipos = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Editar Tipo de Bien
+          <Typography id="modal-modal-title" variant="h4" component="h2">
+            <strong>Editar Tipo de Bien</strong>
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
@@ -285,7 +357,9 @@ const Tipos = () => {
             >
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Nombre del Tipo de Bien:</label>
+                  <label>
+                    <strong>Nombre del Tipo de Bien:</strong>
+                  </label>
                   <input
                     type="text"
                     value={tipoBienSeleccionado?.nombreTipoBien || ""}
@@ -296,13 +370,15 @@ const Tipos = () => {
                       })
                     }
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
               </div>
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Estado:</label>
+                  <label>
+                    <strong>Estado:</strong>
+                  </label>
                   <Select
                     options={statusOptions}
                     value={statusOptions.find((option) => option.value === tipoBienSeleccionado?.status)}
@@ -313,16 +389,29 @@ const Tipos = () => {
                       })
                     }
                     required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
               </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
+                <button
+                  onClick={() => setOpenModalEditar(false)}
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#b7b7b7",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancelar
+                </button>
                 <button
                   type="submit"
                   style={{
                     padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
+                    backgroundColor: "#254B5E",
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
@@ -344,15 +433,75 @@ const Tipos = () => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 480,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: "10px",
+          }}
+        >
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Eliminar Tipo de Bien
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             ¿Estás seguro de que deseas eliminar este tipo de bien?
-            <br />
-            <button onClick={confirmarEliminarTipoBien}>Confirmar</button>
-            <button onClick={() => setOpenModalEliminar(false)}>Cancelar</button>
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
+            <button
+              onClick={() => setOpenModalEliminar(false)}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#b7b7b7",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={confirmarEliminarTipoBien}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#254B5E",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Eliminar
+            </button>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Modal de alerta */}
+      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 3,
+            borderRadius: "10px",
+            textAlign: "center",
+            border: `3px solid ${colorAlerta}`,
+          }}
+        >
+          <Typography id="alerta-modal-title" sx={{ color: colorAlerta, fontWeight: "bold" }}>
+            {mensajeAlerta}
           </Typography>
         </Box>
       </Modal>
@@ -361,27 +510,15 @@ const Tipos = () => {
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
         <Paper sx={{ overflow: "hidden" }} className="col-md-6 col-lg-6 col-xl-6" style={{ height: "fit-content" }}>
-          {/* Título */}
-          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB" }}>
+          {/* Título y filtros */}
+          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Tipos de Bien Registrados</h3>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {/* Filtros */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  justifyContent: "center",
-                }}
-                className="col-sm-12 col-md-12 col-lg-12 col-xl-12"
-              >
-                <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
 
+            {/* Contenedor principal con distribución adecuada */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              {/* Filtros alineados a la izquierda */}
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
                 <Select
                   placeholder="Estado"
                   value={filtroStatus}
@@ -389,8 +526,26 @@ const Tipos = () => {
                   options={statusOptions}
                   styles={customSelectStyles}
                 />
+              </div>
+
+              {/* Botones alineados a la derecha en columna */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginLeft: "auto" }}>
                 <button onClick={resetearFiltros} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
                   Borrar
+                </button>
+                <button
+                  onClick={() => setOpenModalCrear(true)}
+                  style={{
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    backgroundColor: "#254B5E",
+                    padding: "8px",
+                  }}
+                >
+                  Crear
                 </button>
               </div>
             </div>
@@ -411,25 +566,7 @@ const Tipos = () => {
                         color: "#546EAB",
                       }}
                     >
-                      {column.id === "crear" ? (
-                        <button
-                          onClick={() => setOpenModalCrear(true)}
-                          style={{
-                            backgroundColor: "#254B5E",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                            fontSize: "14px",
-                            width: "100%",
-                            padding: "4px",
-                          }}
-                        >
-                          Crear
-                        </button>
-                      ) : (
-                        column.label
-                      )}
+                      {column.label}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -439,7 +576,7 @@ const Tipos = () => {
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={tipo.tipoBienId}>
                       {columns.map((column) => {
-                        if (column.id === "crear") {
+                        if (column.id === "acciones") {
                           return (
                             <TableCell key={column.id} align={column.align} style={{ textAlign: "center" }}>
                               <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -496,6 +633,25 @@ const Tipos = () => {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Filas por página"
+            SelectProps={{
+              native: true,
+            }}
+            sx={{
+              "& .MuiTablePagination-selectLabel": {
+                fontSize: "14px",
+                color: "#546EAB",
+              },
+              "& .MuiTablePagination-displayedRows": {
+                fontSize: "14px",
+                color: "#546EAB",
+              },
+              "& .MuiTablePagination-select": {
+                fontSize: "14px",
+                color: "#546EAB",
+                textAlign: "center",
+              },
+            }}
           />
         </Paper>
       </div>
@@ -511,6 +667,7 @@ const buttonStyle = {
   color: "#fff",
   fontSize: "14px",
   cursor: "pointer",
+  width: "150px",
 };
 
 const customSelectStyles = {
@@ -576,6 +733,36 @@ const style = {
   borderRadius: "8px",
   boxShadow: 24,
   p: 4,
+};
+
+const SelectOptionsStyles = {
+  control: (base) => ({
+    ...base,
+    width: "100%",
+    height: "40px",
+    border: "solid 1px #c2c2c2",
+  }),
+  option: (base) => ({
+    ...base,
+    color: "#000",
+    textAlign: "start",
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: "#000",
+  }),
+  placeholder: (base) => ({
+    ...base,
+    color: "#757575",
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    color: "#000",
+  }),
+  indicatorSeparator: (base) => ({
+    ...base,
+    backgroundColor: "#c2c2c2",
+  }),
 };
 
 export default Tipos;

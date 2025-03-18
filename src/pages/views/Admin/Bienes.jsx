@@ -827,6 +827,7 @@ const Bienes = () => {
           </Typography>
         </Box>
       </Modal>
+
       {/* Modal para ver detalles de un bien */}
       <Modal
         open={openModalVer}
@@ -951,7 +952,7 @@ const Bienes = () => {
       <Sidebar />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}>
-        <Paper className="col-md-8 col-lg-6 col-xl-6" style={{ height: "fit-content" }}>
+        <Paper className="col-md-8 col-lg-8 col-xl-8" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Bienes existentes</h3>

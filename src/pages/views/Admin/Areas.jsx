@@ -26,6 +26,8 @@ const Areas = () => {
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalEliminar, setOpenModalEliminar] = useState(false);
   const [areaSeleccionada, setAreaSeleccionada] = useState(null);
+  const [mensajeAlerta, setMensajeAlerta] = useState("");
+  const [colorAlerta, setColorAlerta] = useState("");
 
   const [nuevaArea, setNuevaArea] = useState({
     nombreArea: "",
@@ -138,24 +140,41 @@ const Areas = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        // Agregar la nueva área al estado
         setAreas([...areas, response.data]);
+
+        // Cerrar el modal y resetear el formulario
         setOpenModalCrear(false);
         setNuevaArea({
           nombreArea: "",
           status: "ACTIVO",
         });
-        window.location.reload();
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("Área creada correctamente");
+        setColorAlerta("#64C267"); // Color verde para éxito
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       })
       .catch((error) => {
         console.error("Hubo un error al crear el área:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se pudo crear el área");
+        setColorAlerta("#C26464"); // Color rojo para error
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       });
   };
 
   const handleEditarArea = (area) => {
-    setAreaSeleccionada({
-      ...area,
-      areaId: area.areaId,
-    });
+    setAreaSeleccionada(area);
     setOpenModalEditar(true);
   };
 
@@ -173,11 +192,32 @@ const Areas = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        // Actualizar el área en el estado
         setAreas(areas.map((area) => (area.areaId === areaSeleccionada.areaId ? response.data : area)));
+
+        // Cerrar el modal de edición
         setOpenModalEditar(false);
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("Área actualizada correctamente");
+        setColorAlerta("#64C267");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       })
       .catch((error) => {
         console.error("Hubo un error al actualizar el área:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se pudo actualizar el área");
+        setColorAlerta("#C26464");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       });
   };
 
@@ -196,20 +236,40 @@ const Areas = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        setAreas(areas.filter((area) => area.areaId !== areaSeleccionada.areaId));
+        // Eliminar el área del estado
+        setAreas(areas.map((a) => (a.areaId === areaSeleccionada.areaId ? { ...a, status: "INACTIVO" } : a)));
+
+        // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
-        window.location.reload();
+
+        // Mostrar mensaje de éxito
+        setMensajeAlerta("El área se ha eliminado correctamente");
+        setColorAlerta("#64C267");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       })
       .catch((error) => {
         console.error("Hubo un error al eliminar el área:", error);
+
+        // Mostrar mensaje de error
+        setMensajeAlerta("No se ha podido eliminar el área");
+        setColorAlerta("#C26464");
+
+        // Cerrar el modal de alerta después de 2 segundos
+        setTimeout(() => {
+          setMensajeAlerta("");
+        }, 2000);
       });
   };
 
   const columns = [
-    { id: "areaId", label: "ID", minWidth: 50 },
+    { id: "areaId", label: "#", minWidth: 50 },
     { id: "nombreArea", label: "Nombre", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 100 },
-    { id: "crear", label: "Crear", minWidth: 50 },
+    { id: "acciones", label: "Acciones", minWidth: 50 },
   ];
 
   return (
@@ -222,8 +282,8 @@ const Areas = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Crear Área
+          <Typography id="modal-modal-title" variant="h4" component="h2">
+            <strong>Registrar Área</strong>
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
@@ -234,41 +294,46 @@ const Areas = () => {
             >
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Nombre del Área:</label>
+                  <label>
+                    <strong>Nombre del Área:</strong>
+                  </label>
                   <input
                     type="text"
+                    placeholder="Nombre del área"
                     value={nuevaArea.nombreArea}
                     onChange={(e) => setNuevaArea({ ...nuevaArea, nombreArea: e.target.value })}
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>Estado:</label>
-                  <Select
-                    options={statusOptions}
-                    value={statusOptions.find((option) => option.value === nuevaArea.status)}
-                    onChange={(selected) => setNuevaArea({ ...nuevaArea, status: selected.value })}
-                    required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
                 <button
-                  type="submit"
+                  onClick={() => setOpenModalCrear(false)}
                   style={{
                     padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
+                    backgroundColor: "#b7b7b7",
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
                     cursor: "pointer",
                   }}
                 >
-                  Crear
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#254B5E",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Registrar
                 </button>
               </div>
             </form>
@@ -284,8 +349,8 @@ const Areas = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Editar Área
+          <Typography id="modal-modal-title" variant="h4" component="h2">
+            <strong>Editar Área</strong>
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form
@@ -296,7 +361,9 @@ const Areas = () => {
             >
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Nombre del Área:</label>
+                  <label>
+                    <strong>Nombre del Área:</strong>
+                  </label>
                   <input
                     type="text"
                     value={areaSeleccionada?.nombreArea || ""}
@@ -307,13 +374,15 @@ const Areas = () => {
                       })
                     }
                     required
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
                   />
                 </div>
               </div>
               <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ flex: 1 }}>
-                  <label>Estado:</label>
+                  <label>
+                    <strong>Estado:</strong>
+                  </label>
                   <Select
                     options={statusOptions}
                     value={statusOptions.find((option) => option.value === areaSeleccionada?.status)}
@@ -324,16 +393,29 @@ const Areas = () => {
                       })
                     }
                     required
-                    styles={{ control: (base) => ({ ...base, width: "100%" }) }}
+                    styles={SelectOptionsStyles}
                   />
                 </div>
               </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
+                <button
+                  onClick={() => setOpenModalEditar(false)}
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#b7b7b7",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancelar
+                </button>
                 <button
                   type="submit"
                   style={{
                     padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
+                    backgroundColor: "#254B5E",
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
@@ -355,15 +437,75 @@ const Areas = () => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 480,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: "10px",
+          }}
+        >
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Eliminar Área
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             ¿Estás seguro de que deseas eliminar esta área?
-            <br />
-            <button onClick={confirmarEliminarArea}>Confirmar</button>
-            <button onClick={() => setOpenModalEliminar(false)}>Cancelar</button>
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
+            <button
+              onClick={() => setOpenModalEliminar(false)}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#b7b7b7",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={confirmarEliminarArea}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#254B5E",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Eliminar
+            </button>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Modal de alerta */}
+      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 3,
+            borderRadius: "10px",
+            textAlign: "center",
+            border: `3px solid ${colorAlerta}`,
+          }}
+        >
+          <Typography id="alerta-modal-title" sx={{ color: colorAlerta, fontWeight: "bold" }}>
+            {mensajeAlerta}
           </Typography>
         </Box>
       </Modal>
@@ -371,28 +513,16 @@ const Areas = () => {
       <Sidebar />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <Paper className="col-md-9 col-lg-9 col-xl-9" style={{ height: "fit-content" }}>
+        <Paper className="col-md-8 col-lg-6 col-xl-6" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
-          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB" }}>
+          <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Áreas Comunes</h3>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {/* Filtros */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  justifyContent: "center",
-                }}
-                className="col-sm-12 col-md-12 col-lg-12 col-xl-12"
-              >
-                <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
 
+            {/* Contenedor principal con distribución adecuada */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              {/* Filtros alineados a la izquierda */}
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
                 <Select
                   placeholder="Estado"
                   value={filtroStatus}
@@ -400,8 +530,26 @@ const Areas = () => {
                   options={statusOptions}
                   styles={customSelectStyles}
                 />
+              </div>
+
+              {/* Botones alineados a la derecha en columna */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginLeft: "auto" }}>
                 <button onClick={resetFilters} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
                   Borrar
+                </button>
+                <button
+                  onClick={() => setOpenModalCrear(true)}
+                  style={{
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    backgroundColor: "#254B5E",
+                    padding: "8px",
+                  }}
+                >
+                  Crear
                 </button>
               </div>
             </div>
@@ -422,25 +570,7 @@ const Areas = () => {
                         color: "#546EAB",
                       }}
                     >
-                      {column.id === "crear" ? (
-                        <button
-                          onClick={() => setOpenModalCrear(true)}
-                          style={{
-                            backgroundColor: "#254B5E",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                            fontSize: "14px",
-                            width: "100%",
-                            padding: "4px",
-                          }}
-                        >
-                          Crear
-                        </button>
-                      ) : (
-                        column.label
-                      )}
+                      {column.label}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -450,10 +580,10 @@ const Areas = () => {
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={area.areaId}>
                       {columns.map((column) => {
-                        if (column.id === "crear") {
+                        if (column.id === "acciones") {
                           return (
                             <TableCell key={column.id} align={column.align} style={{ textAlign: "center" }}>
-                              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                              <div style={{ display: "flex" }}>
                                 <img
                                   src={edit}
                                   alt="Editar"
@@ -507,6 +637,25 @@ const Areas = () => {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Filas por página"
+            SelectProps={{
+              native: true,
+            }}
+            sx={{
+              "& .MuiTablePagination-selectLabel": {
+                fontSize: "14px",
+                color: "#546EAB",
+              },
+              "& .MuiTablePagination-displayedRows": {
+                fontSize: "14px",
+                color: "#546EAB",
+              },
+              "& .MuiTablePagination-select": {
+                fontSize: "14px",
+                color: "#546EAB",
+                textAlign: "center",
+              },
+            }}
           />
         </Paper>
       </div>
@@ -522,6 +671,7 @@ const buttonStyle = {
   color: "#fff",
   fontSize: "14px",
   cursor: "pointer",
+  width: "150px",
 };
 
 const customSelectStyles = {
@@ -578,11 +728,41 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "800px",
+  width: "600px",
   backgroundColor: "#fff",
   borderRadius: "8px",
   boxShadow: 24,
   p: 4,
+};
+
+const SelectOptionsStyles = {
+  control: (base) => ({
+    ...base,
+    width: "100%",
+    height: "40px",
+    border: "solid 1px #c2c2c2",
+  }),
+  option: (base) => ({
+    ...base,
+    color: "#000",
+    textAlign: "start",
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: "#000",
+  }),
+  placeholder: (base) => ({
+    ...base,
+    color: "#757575",
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    color: "#000",
+  }),
+  indicatorSeparator: (base) => ({
+    ...base,
+    backgroundColor: "#c2c2c2",
+  }),
 };
 
 export default Areas;

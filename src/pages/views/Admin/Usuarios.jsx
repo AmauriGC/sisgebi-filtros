@@ -769,7 +769,7 @@ const Usuarios = () => {
                       {columns.map((column) => {
                         if (column.id === "acciones") {
                           return (
-                            <TableCell key={column.id} align={column.align} style={{ textAlign: "center" }}>
+                            <TableCell key={column.id} align={column.align}>
                               <div style={{ display: "flex" }}>
                                 <img
                                   src={edit}
