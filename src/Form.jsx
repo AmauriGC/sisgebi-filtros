@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { motion } from "framer-motion"; // Importamos Framer Motion
 import at from "./assets/img/at.svg";
 import lock from "./assets/img/lock-outline.svg";
 import closeEye from "./assets/img/eye-off-outline.svg";
@@ -31,7 +32,9 @@ export default function Form() {
     }
 
     try {
-      const response = await axios.post(`http://localhost:8080/auth/login?correo=${correo}&contrasena=${contrasena}`);
+      const response = await axios.post(
+        `http://localhost:8080/auth/login?correo=${correo}&contrasena=${contrasena}`
+      );
 
       const { token, rol } = response.data;
       sessionStorage.setItem("token", token);
@@ -49,11 +52,14 @@ export default function Form() {
   };
 
   return (
-    <div
+    <motion.div
       className="d-flex min-vh-100 align-items-center justify-content-center"
       style={{ background: "linear-gradient(135deg, #254b5e, #546eab, #4697b4, #a7d0d2)" }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
     >
-      <div
+      <motion.div
         className="container"
         style={{
           width: "500px",
@@ -65,9 +71,12 @@ export default function Form() {
           flexDirection: "column",
           alignItems: "center",
         }}
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 100, damping: 10 }}
       >
         {/* Encabezado */}
-        <div
+        <motion.div
           style={{
             backgroundColor: "#A7D0D2",
             height: "200px",
@@ -76,10 +85,13 @@ export default function Form() {
             padding: "40px",
           }}
           className="d-flex justify-content-between align-items-center"
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
         >
           {/* Izquierda: Imagen + Correo */}
           <div className="d-flex align-items-center">
-            <img
+            <motion.img
               src={logo}
               alt="LOGO"
               className="img-fluid"
@@ -89,9 +101,12 @@ export default function Form() {
                 marginRight: "30px",
                 marginLeft: "0px",
               }}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
             />
             <Link to="/">
-              <button
+              <motion.button
                 type="button"
                 className="btn btn-link"
                 style={{
@@ -99,20 +114,28 @@ export default function Form() {
                   textDecoration: "none",
                   fontSize: "20px",
                 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Regresar
-              </button>
+              </motion.button>
             </Link>
           </div>
 
           {/* Derecha: Iniciar sesión */}
-          <p className="mb-0" style={{ marginRight: "40px", fontSize: "20px", color: "#254B5E" }}>
+          <motion.p
+            className="mb-0"
+            style={{ marginRight: "40px", fontSize: "20px", color: "#254B5E" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+          >
             Iniciar sesión
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Contenido */}
-        <form
+        <motion.form
           onSubmit={handleLogin}
           style={{
             padding: "40px",
@@ -123,11 +146,24 @@ export default function Form() {
             width: "100%",
             height: "100%",
           }}
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
         >
-          <p className="mb-0" style={{ fontSize: "20px", marginTop: "20px", color: "#254B5E" }}>
+          <motion.p
+            className="mb-0"
+            style={{ fontSize: "20px", marginTop: "20px", color: "#254B5E" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+          >
             Correo
-          </p>
-          <div>
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.8, duration: 0.5 }}
+          >
             <img
               src={at}
               alt="at"
@@ -157,9 +193,13 @@ export default function Form() {
                 marginBottom: "20px",
               }}
             />
-          </div>
+          </motion.div>
 
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1, duration: 0.5 }}
+          >
             <div style={{ position: "relative" }}>
               <img
                 src={lock}
@@ -189,7 +229,7 @@ export default function Form() {
                   textAlign: "center",
                 }}
               />
-              <img
+              <motion.img
                 src={mostrarContrasena ? closeEye : eye}
                 alt="eye"
                 style={{
@@ -201,14 +241,25 @@ export default function Form() {
                   height: "20px",
                   cursor: "pointer",
                 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => setMostrarContrasena(!mostrarContrasena)}
               />
             </div>
 
-            {error && <p style={{ color: "red", fontSize: "14px", marginBottom: "-5px" }}>{error}</p>}
-          </div>
+            {error && (
+              <motion.p
+                style={{ color: "red", fontSize: "14px", marginBottom: "-5px" }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                {error}
+              </motion.p>
+            )}
+          </motion.div>
           <div className="d-flex justify-content-center align-items-center" style={{ width: "100%" }}>
-            <button
+            <motion.button
               type="submit"
               className="btn w-50 fw-bold"
               style={{
@@ -218,12 +269,14 @@ export default function Form() {
                 borderRadius: "5px",
                 marginTop: "20px",
               }}
+              whileHover={{ scale: 1.05, boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)" }}
+              whileTap={{ scale: 0.95 }}
             >
               Ingresar
-            </button>
+            </motion.button>
           </div>
-        </form>
-      </div>
-    </div>
+        </motion.form>
+      </motion.div>
+    </motion.div>
   );
 }

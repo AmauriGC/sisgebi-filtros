@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { motion, AnimatePresence } from "framer-motion"; // Importamos Framer Motion
 import menu from "../assets/img/menu.svg";
 import asignaciones from "../assets/img/clipboard-check.svg";
 import bienes from "../assets/img/package-variant.svg";
@@ -17,7 +17,7 @@ import arrow from "../assets/img/arrow-right.svg";
 const SidebarItem = ({ icon, label, isExpanded, isSelected, onClick, children }) => {
   return (
     <div>
-      <div
+      <motion.div
         className={`d-flex align-items-center p-1 cursor-pointer rounded transition-colors ${
           isSelected ? "bg-white fw-bold" : "hover:bg-light"
         }`}
@@ -29,7 +29,10 @@ const SidebarItem = ({ icon, label, isExpanded, isSelected, onClick, children })
           marginBottom: "25px",
           textAlign: "start",
           color: "#254B5E",
+          cursor: "pointer",
         }}
+        whileHover={{ scale: 1.05, backgroundColor: "#F1E6D2" }} // Efecto hover
+        whileTap={{ scale: 0.95 }} // Efecto al hacer clic
       >
         <img
           src={icon}
@@ -37,8 +40,17 @@ const SidebarItem = ({ icon, label, isExpanded, isSelected, onClick, children })
           style={{ width: "32px", height: "32px" }}
           className={`me-2 ${isExpanded ? "" : "p-1"}`}
         />
-        {isExpanded && <span className="flex-grow-1">{label}</span>}
-      </div>
+        {isExpanded && (
+          <motion.span
+            className="flex-grow-1"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {label}
+          </motion.span>
+        )}
+      </motion.div>
       {isExpanded && children}
     </div>
   );
@@ -73,17 +85,21 @@ const Sidebar = () => {
   }, []);
 
   return (
-    <div
-      className={`p-3 d-flex flex-column transition-all `}
+    <motion.div
+      className={`p-3 d-flex flex-column transition-all`}
       style={{
         backgroundColor: "#A7D0D2",
         minHeight: "100vh",
         width: isExpanded ? "250px" : "70px",
         overflow: "hidden",
         transition: "width 0.2s ease",
+        cursor: "pointer",
       }}
       onMouseEnter={expandSidebar}
       onMouseLeave={collapseSidebar}
+      initial={{ opacity: 0, x: -50 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5 }}
     >
       {/* Botón menú */}
       <SidebarItem
@@ -102,22 +118,30 @@ const Sidebar = () => {
         isSelected={selectedItem === "Perfil"}
         onClick={() => handleItemClick("Perfil")}
       >
-        {expandedItem === "Perfil" && (
-          <div className="ps-4" style={{ textAlign: "start", marginLeft: "20px" }}>
-            <div
-              onClick={() => navigate("/admin-dashboard")}
-              style={{
-                marginTop: "-20px",
-                marginBottom: "20px",
-                marginLeft: "-40px",
-              }}
+        <AnimatePresence>
+          {expandedItem === "Perfil" && (
+            <motion.div
+              className="ps-4"
+              style={{ textAlign: "start", marginLeft: "20px" }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
             >
-              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-              Ver mis datos
-            </div>
-            {/* Otras opciones de submenú */}
-          </div>
-        )}
+              <div
+                onClick={() => navigate("/admin-dashboard")}
+                style={{
+                  marginTop: "-20px",
+                  marginBottom: "20px",
+                  marginLeft: "-40px",
+                }}
+              >
+                <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
+                Ver mis datos
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </SidebarItem>
 
       <SidebarItem
@@ -127,22 +151,30 @@ const Sidebar = () => {
         isSelected={selectedItem === "Bienes"}
         onClick={() => handleItemClick("Bienes")}
       >
-        {expandedItem === "Bienes" && (
-          <div className="ps-4" style={{ textAlign: "start", marginLeft: "20px", marginRight: "15px" }}>
-            <div
-              onClick={() => navigate("/bienes")}
-              style={{
-                marginTop: "-20px",
-                marginBottom: "20px",
-                marginLeft: "-40px",
-              }}
+        <AnimatePresence>
+          {expandedItem === "Bienes" && (
+            <motion.div
+              className="ps-4"
+              style={{ textAlign: "start", marginLeft: "20px", marginRight: "15px" }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
             >
-              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-              Mostrar bienes
-            </div>
-            {/* Otras opciones de submenú */}
-          </div>
-        )}
+              <div
+                onClick={() => navigate("/bienes")}
+                style={{
+                  marginTop: "-20px",
+                  marginBottom: "20px",
+                  marginLeft: "-40px",
+                }}
+              >
+                <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
+                Mostrar bienes
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </SidebarItem>
 
       <SidebarItem
@@ -152,22 +184,30 @@ const Sidebar = () => {
         isSelected={selectedItem === "Usuarios"}
         onClick={() => handleItemClick("Usuarios")}
       >
-        {expandedItem === "Usuarios" && (
-          <div className="ps-4" style={{ textAlign: "start", marginLeft: "20px" }}>
-            <div
-              onClick={() => navigate("/usuarios")}
-              style={{
-                marginTop: "-20px",
-                marginBottom: "20px",
-                marginLeft: "-40px",
-              }}
+        <AnimatePresence>
+          {expandedItem === "Usuarios" && (
+            <motion.div
+              className="ps-4"
+              style={{ textAlign: "start", marginLeft: "20px" }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
             >
-              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-              Mostrar usuarios
-            </div>
-            {/* Otras opciones de submenú */}
-          </div>
-        )}
+              <div
+                onClick={() => navigate("/usuarios")}
+                style={{
+                  marginTop: "-20px",
+                  marginBottom: "20px",
+                  marginLeft: "-40px",
+                }}
+              >
+                <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
+                Mostrar usuarios
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </SidebarItem>
 
       <SidebarItem
@@ -177,55 +217,63 @@ const Sidebar = () => {
         isSelected={selectedItem === "Catálogos"}
         onClick={() => handleItemClick("Catálogos")}
       >
-        {expandedItem === "Catálogos" && (
-          <div className="ps-4" style={{ textAlign: "start", marginLeft: "20px" }}>
-            <div
-              onClick={() => navigate("/areas")}
-              style={{
-                marginTop: "-20px",
-                marginBottom: "30px",
-                marginLeft: "-40px",
-              }}
+        <AnimatePresence>
+          {expandedItem === "Catálogos" && (
+            <motion.div
+              className="ps-4"
+              style={{ textAlign: "start", marginLeft: "20px" }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
             >
-              <img src={areas} alt="areas" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-              Áreas comunes
-            </div>
-            <div
-              onClick={() => navigate("/tipos")}
-              style={{
-                marginTop: "-20px",
-                marginBottom: "30px",
-                marginLeft: "-40px",
-              }}
-            >
-              <img src={tipos} alt="tipos" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-              Tipos de bienes
-            </div>
-            <div
-              onClick={() => navigate("/marcas")}
-              style={{
-                marginTop: "-20px",
-                marginBottom: "30px",
-                marginLeft: "-40px",
-              }}
-            >
-              <img src={marcas} alt="marcas" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-              Marcas
-            </div>
-            <div
-              onClick={() => navigate("/modelos")}
-              style={{
-                marginTop: "-20px",
-                marginBottom: "30px",
-                marginLeft: "-40px",
-              }}
-            >
-              <img src={modelos} alt="modelos" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-              Modelos
-            </div>
-            {/* Otras opciones de submenú */}
-          </div>
-        )}
+              <div
+                onClick={() => navigate("/areas")}
+                style={{
+                  marginTop: "-20px",
+                  marginBottom: "30px",
+                  marginLeft: "-40px",
+                }}
+              >
+                <img src={areas} alt="areas" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
+                Áreas comunes
+              </div>
+              <div
+                onClick={() => navigate("/tipos")}
+                style={{
+                  marginTop: "-20px",
+                  marginBottom: "30px",
+                  marginLeft: "-40px",
+                }}
+              >
+                <img src={tipos} alt="tipos" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
+                Tipos de bienes
+              </div>
+              <div
+                onClick={() => navigate("/marcas")}
+                style={{
+                  marginTop: "-20px",
+                  marginBottom: "30px",
+                  marginLeft: "-40px",
+                }}
+              >
+                <img src={marcas} alt="marcas" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
+                Marcas
+              </div>
+              <div
+                onClick={() => navigate("/modelos")}
+                style={{
+                  marginTop: "-20px",
+                  marginBottom: "30px",
+                  marginLeft: "-40px",
+                }}
+              >
+                <img src={modelos} alt="modelos" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
+                Modelos
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </SidebarItem>
 
       <SidebarItem
@@ -235,22 +283,30 @@ const Sidebar = () => {
         isSelected={selectedItem === "Asignaciones"}
         onClick={() => handleItemClick("Asignaciones")}
       >
-        {expandedItem === "Asignaciones" && (
-          <div className="ps-4" style={{ textAlign: "start", marginLeft: "20px" }}>
-            <div
-              onClick={() => navigate("/asignaciones")}
-              style={{
-                marginTop: "-20px",
-                marginBottom: "20px",
-                marginLeft: "-40px",
-              }}
+        <AnimatePresence>
+          {expandedItem === "Asignaciones" && (
+            <motion.div
+              className="ps-4"
+              style={{ textAlign: "start", marginLeft: "20px" }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
             >
-              <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-              Mostrar asignaciones
-            </div>
-            {/* Otras opciones de submenú */}
-          </div>
-        )}
+              <div
+                onClick={() => navigate("/asignaciones")}
+                style={{
+                  marginTop: "-20px",
+                  marginBottom: "20px",
+                  marginLeft: "-40px",
+                }}
+              >
+                <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
+                Mostrar asignaciones
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </SidebarItem>
 
       {/* Botón salir al final */}
@@ -265,7 +321,7 @@ const Sidebar = () => {
           }}
         />
       </div>
-    </div>
+    </motion.div>
   );
 };
 

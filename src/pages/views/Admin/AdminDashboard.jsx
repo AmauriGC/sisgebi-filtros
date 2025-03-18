@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode"; // Importación correcta
+import { jwtDecode } from "jwt-decode";
+import { motion } from "framer-motion"; // Importa Framer Motion
 import Sidebar from "../../../components/Sidebar";
 
 const AdminDashboard = () => {
@@ -42,7 +43,10 @@ const AdminDashboard = () => {
         }}
       >
         {usuario ? (
-          <div
+          <motion.div
+            initial={{ opacity: 0, y: 50 }} // Estado inicial: invisible y desplazado hacia abajo
+            animate={{ opacity: 1, y: 0 }} // Estado final: visible y en su posición
+            transition={{ duration: 0.5 }} // Duración de la animación
             style={{
               backgroundColor: "#ffffff", // Fondo blanco
               borderRadius: "10px", // Bordes redondeados
@@ -52,7 +56,10 @@ const AdminDashboard = () => {
               width: "100%",
             }}
           >
-            <h1
+            <motion.h1
+              initial={{ opacity: 0, x: -50 }} // Título: invisible y desplazado a la izquierda
+              animate={{ opacity: 1, x: 0 }} // Título: visible y en su posición
+              transition={{ delay: 0.2, duration: 0.5 }} // Retraso y duración de la animación
               style={{
                 fontSize: "24px",
                 fontWeight: "bold",
@@ -62,10 +69,13 @@ const AdminDashboard = () => {
               }}
             >
               Perfil del Usuario
-            </h1>
+            </motion.h1>
 
             {/* Contenedor de dos columnas */}
-            <div
+            <motion.div
+              initial={{ opacity: 0 }} // Contenedor: invisible inicialmente
+              animate={{ opacity: 1 }} // Contenedor: visible
+              transition={{ delay: 0.4, duration: 0.5 }} // Retraso y duración de la animación
               style={{
                 display: "flex",
                 gap: "20px", // Espacio entre columnas
@@ -74,7 +84,10 @@ const AdminDashboard = () => {
               }}
             >
               {/* Columna 1: Textos (etiquetas) */}
-              <div
+              <motion.div
+                initial={{ opacity: 0, x: -50 }} // Columna 1: invisible y desplazada a la izquierda
+                animate={{ opacity: 1, x: 0 }} // Columna 1: visible y en su posición
+                transition={{ delay: 0.6, duration: 0.5 }} // Retraso y duración de la animación
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -88,10 +101,13 @@ const AdminDashboard = () => {
                 <strong style={{ color: "#254B5E" }}>Lugar:</strong>
                 <strong style={{ color: "#254B5E" }}>Rol:</strong>
                 <strong style={{ color: "#254B5E" }}>Estado:</strong>
-              </div>
+              </motion.div>
 
               {/* Columna 2: Datos obtenidos */}
-              <div
+              <motion.div
+                initial={{ opacity: 0, x: 50 }} // Columna 2: invisible y desplazada a la derecha
+                animate={{ opacity: 1, x: 0 }} // Columna 2: visible y en su posición
+                transition={{ delay: 0.8, duration: 0.5 }} // Retraso y duración de la animación
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -105,11 +121,18 @@ const AdminDashboard = () => {
                 <span style={{ color: "#333" }}>{usuario.lugar}</span>
                 <span style={{ color: "#333" }}>{usuario.rol}</span>
                 <span style={{ color: "#333" }}>{usuario.status}</span>
-              </div>
-            </div>
-          </div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
         ) : (
-          <p style={{ fontSize: "18px", color: "#254B5E" }}>Cargando datos del usuario...</p>
+          <motion.p
+            initial={{ opacity: 0 }} // Mensaje de carga: invisible inicialmente
+            animate={{ opacity: 1 }} // Mensaje de carga: visible
+            transition={{ duration: 0.5 }} // Duración de la animación
+            style={{ fontSize: "18px", color: "#254B5E" }}
+          >
+            Cargando datos del usuario...
+          </motion.p>
         )}
       </div>
     </div>
