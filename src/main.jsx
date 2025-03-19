@@ -11,6 +11,8 @@ import Form from "./Form";
 import Forgot from "./Forgot";
 
 import Admin from "./pages/views/Admin/AdminDashboard";
+import Responsable from "./pages/views/Responsable/ResponsablesDashboard";
+import Becario from "./pages/views/Becario/BecarioDashboard";
 
 import Bienes from "./pages/views/Admin/Bienes";
 import Usuarios from "./pages/views/Admin/Usuarios";
@@ -19,6 +21,9 @@ import Tipos from "./pages/views/Admin/Tipos";
 import Marcas from "./pages/views/Admin/Marcas";
 import Modelos from "./pages/views/Admin/Modelos";
 import Asignaciones from "./pages/views/Admin/Asignaciones";
+
+import BienesBecario from "./pages/views/Becario/BienesBecario";
+import MisAsignaciones from "./pages/views/Becario/MisAsignaciones";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -37,6 +42,12 @@ root.render(
       <Route path="/marcas" element={<Marcas />} />
       <Route path="/modelos" element={<Modelos />} />
       <Route path="/asignaciones" element={<Asignaciones />} />
+
+      <Route path="/responsable-dashboard" element={<Responsable />} />
+
+      <Route path="/becario-dashboard" element={<Becario />} />
+      <Route path="/bienesBecario" element={<BienesBecario />} />
+      <Route path="/misAsignaciones" element={<MisAsignaciones />} />
     </Routes>
   </Router>
 );

@@ -22,10 +22,6 @@ const Bienes = () => {
   const [bienes, setBienes] = React.useState([]);
   const [filtroStatus, setFiltroStatus] = React.useState(null);
   const [filtroDisponibilidad, setFiltroDisponibilidad] = React.useState(null);
-  const [filtroAreaComun, setFiltroAreaComun] = React.useState(null);
-  const [filtroTipoBien, setFiltroTipoBien] = React.useState(null);
-  const [filtroMarca, setFiltroMarca] = React.useState(null);
-  const [filtroModelo, setFiltroModelo] = React.useState(null);
 
   const [areaComunOptions, setAreaComunOptions] = React.useState([]);
   const [tipoBienOptions, setTipoBienOptions] = React.useState([]);
@@ -86,7 +82,7 @@ const Bienes = () => {
 
   React.useEffect(() => {
     aplicarFiltros();
-  }, [filtroStatus, filtroDisponibilidad, filtroAreaComun, filtroTipoBien, filtroMarca, filtroModelo]);
+  }, [filtroStatus, filtroDisponibilidad]);
 
   const obtenerBienes = () => {
     const token = sessionStorage.getItem("token");
@@ -185,11 +181,6 @@ const Bienes = () => {
     const params = {};
     if (filtroStatus) params.status = filtroStatus.value;
     if (filtroDisponibilidad) params.disponibilidad = filtroDisponibilidad.value;
-    if (filtroAreaComun) params.areaComunId = filtroAreaComun.value;
-    if (filtroTipoBien) params.tipoBienId = filtroTipoBien.value;
-    if (filtroMarca) params.marcaId = filtroMarca.value;
-    if (filtroModelo) params.modeloId = filtroModelo.value;
-
     const token = sessionStorage.getItem("token");
     if (!token) {
       return;

@@ -4,14 +4,8 @@ import { motion, AnimatePresence } from "framer-motion"; // Importamos Framer Mo
 import menu from "../assets/img/menu.svg";
 import asignaciones from "../assets/img/clipboard-check.svg";
 import bienes from "../assets/img/package-variant.svg";
-import catalogos from "../assets/img/book.svg";
 import usuario from "../assets/img/account.svg";
-import usuarios from "../assets/img/account-group.svg";
 import salir from "../assets/img/logout.svg";
-import areas from "../assets/img/office-building-marker.svg";
-import modelos from "../assets/img/laptop.svg";
-import marcas from "../assets/img/text-box-outline.svg";
-import tipos from "../assets/img/packages.png";
 import arrow from "../assets/img/arrow-right.svg";
 
 const SidebarItem = ({ icon, label, isExpanded, isSelected, onClick, children }) => {
@@ -88,7 +82,7 @@ const Sidebar = () => {
     <motion.div
       className={`p-3 d-flex flex-column transition-all`}
       style={{
-        backgroundColor: "#A7D0D2",
+        backgroundColor: "#F1E6D2",
         minHeight: "100vh",
         width: isExpanded ? "250px" : "70px",
         overflow: "hidden",
@@ -129,7 +123,7 @@ const Sidebar = () => {
               transition={{ duration: 0.3 }}
             >
               <div
-                onClick={() => navigate("/admin-dashboard")}
+                onClick={() => navigate("/responsable-dashboard")}
                 style={{
                   marginTop: "-20px",
                   marginBottom: "20px",
@@ -162,7 +156,7 @@ const Sidebar = () => {
               transition={{ duration: 0.3 }}
             >
               <div
-                onClick={() => navigate("/bienes")}
+                onClick={() => navigate("/bienesResponsable")}
                 style={{
                   marginTop: "-20px",
                   marginBottom: "20px",
@@ -171,105 +165,6 @@ const Sidebar = () => {
               >
                 <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
                 Mostrar bienes
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </SidebarItem>
-
-      <SidebarItem
-        icon={usuarios}
-        label="Usuarios"
-        isExpanded={isExpanded}
-        isSelected={selectedItem === "Usuarios"}
-        onClick={() => handleItemClick("Usuarios")}
-      >
-        <AnimatePresence>
-          {expandedItem === "Usuarios" && (
-            <motion.div
-              className="ps-4"
-              style={{ textAlign: "start", marginLeft: "20px" }}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div
-                onClick={() => navigate("/usuarios")}
-                style={{
-                  marginTop: "-20px",
-                  marginBottom: "20px",
-                  marginLeft: "-40px",
-                }}
-              >
-                <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-                Mostrar usuarios
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </SidebarItem>
-
-      <SidebarItem
-        icon={catalogos}
-        label="Catálogos"
-        isExpanded={isExpanded}
-        isSelected={selectedItem === "Catálogos"}
-        onClick={() => handleItemClick("Catálogos")}
-      >
-        <AnimatePresence>
-          {expandedItem === "Catálogos" && (
-            <motion.div
-              className="ps-4"
-              style={{ textAlign: "start", marginLeft: "20px" }}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div
-                onClick={() => navigate("/areas")}
-                style={{
-                  marginTop: "-20px",
-                  marginBottom: "30px",
-                  marginLeft: "-40px",
-                }}
-              >
-                <img src={areas} alt="areas" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-                Áreas comunes
-              </div>
-              <div
-                onClick={() => navigate("/tipos")}
-                style={{
-                  marginTop: "-20px",
-                  marginBottom: "30px",
-                  marginLeft: "-40px",
-                }}
-              >
-                <img src={tipos} alt="tipos" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-                Tipos de bienes
-              </div>
-              <div
-                onClick={() => navigate("/marcas")}
-                style={{
-                  marginTop: "-20px",
-                  marginBottom: "30px",
-                  marginLeft: "-40px",
-                }}
-              >
-                <img src={marcas} alt="marcas" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-                Marcas
-              </div>
-              <div
-                onClick={() => navigate("/modelos")}
-                style={{
-                  marginTop: "-20px",
-                  marginBottom: "30px",
-                  marginLeft: "-40px",
-                }}
-              >
-                <img src={modelos} alt="modelos" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-                Modelos
               </div>
             </motion.div>
           )}
@@ -294,7 +189,7 @@ const Sidebar = () => {
               transition={{ duration: 0.3 }}
             >
               <div
-                onClick={() => navigate("/asignaciones")}
+                onClick={() => navigate("/misAsignaciones")}
                 style={{
                   marginTop: "-20px",
                   marginBottom: "20px",
@@ -302,7 +197,7 @@ const Sidebar = () => {
                 }}
               >
                 <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-                Mostrar asignaciones
+                Mis asignaciones
               </div>
             </motion.div>
           )}
