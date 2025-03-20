@@ -261,7 +261,7 @@ const Modelos = () => {
   };
 
   const columns = [
-    { id: "modeloId", label: "ID", minWidth: 50 },
+    { id: "modeloId", label: "#", minWidth: 50 },
     { id: "nombreModelo", label: "Nombre", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 100 },
     { id: "acciones", label: "Acciones", minWidth: 50 },
@@ -507,7 +507,7 @@ const Modelos = () => {
       <Sidebar />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <Paper sx={{ overflow: "hidden" }} className="col-md-9 col-lg-9 col-xl-9" style={{ height: "fit-content" }}>
+        <Paper sx={{ overflow: "hidden" }} className="col-md-8 col-lg-6 col-xl-6" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Modelos Registrados</h3>

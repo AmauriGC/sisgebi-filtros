@@ -10,12 +10,12 @@ import Login from "./Login";
 import Form from "./Form";
 import Forgot from "./Forgot";
 
-import Admin from "./pages/views/Admin/AdminDashboard";
+import Admin from "./pages/views/Admin/Perfil/AdminDashboard";
 import Responsable from "./pages/views/Responsable/ResponsablesDashboard";
 import Becario from "./pages/views/Becario/BecarioDashboard";
 
-import Bienes from "./pages/views/Admin/Bienes";
-import Usuarios from "./pages/views/Admin/Usuarios";
+import Bienes from "./pages/views/Admin/Bienes/Bienes";
+import Usuarios from "./pages/views/Admin/Usuarios/Usuarios";
 import Areas from "./pages/views/Admin/Areas";
 import Tipos from "./pages/views/Admin/Tipos";
 import Marcas from "./pages/views/Admin/Marcas";
