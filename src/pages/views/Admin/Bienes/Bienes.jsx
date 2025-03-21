@@ -87,8 +87,19 @@ const Bienes = () => {
 
   const obtenerBienes = () => {
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
 
     axios
@@ -105,8 +116,19 @@ const Bienes = () => {
 
   const cargarOpcionesFiltros = () => {
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
 
     // Cargar áreas comunes
@@ -183,8 +205,19 @@ const Bienes = () => {
     if (filtroStatus) params.status = filtroStatus.value;
     if (filtroDisponibilidad) params.disponibilidad = filtroDisponibilidad.value;
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
 
     axios
@@ -221,7 +254,20 @@ const Bienes = () => {
 
   const handleCrear = () => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
 
     const bienParaEnviar = {
       codigo: nuevoBien.codigo,
@@ -289,7 +335,21 @@ const Bienes = () => {
 
   const handleActualizar = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !bienSeleccionado) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!bienSeleccionado) return;
 
     const bienParaActualizar = {
       ...bienSeleccionado,
@@ -337,7 +397,21 @@ const Bienes = () => {
 
   const confirmarEliminar = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !bienSeleccionado || !motivoEliminar) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!bienSeleccionado || !motivoEliminar) return;
 
     axios
       .put(

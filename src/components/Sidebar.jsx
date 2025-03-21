@@ -316,8 +316,8 @@ const Sidebar = () => {
           label="Salir"
           isExpanded={isExpanded}
           onClick={() => {
-            handleItemClick("Salir");
-            navigate("/");
+            sessionStorage.removeItem("token"); // Elimina el token
+            navigate("/"); // Redirige al usuario a la página principal
           }}
         />
       </div>

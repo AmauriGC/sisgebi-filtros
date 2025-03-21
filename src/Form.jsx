@@ -32,9 +32,7 @@ export default function Form() {
     }
 
     try {
-      const response = await axios.post(
-        `http://localhost:8080/auth/login?correo=${correo}&contrasena=${contrasena}`
-      );
+      const response = await axios.post(`http://localhost:8080/auth/login?correo=${correo}&contrasena=${contrasena}`);
 
       const { token, rol } = response.data;
       sessionStorage.setItem("token", token);

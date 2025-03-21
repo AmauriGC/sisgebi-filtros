@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Importa useNavigate
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -41,7 +41,7 @@ const Usuarios = () => {
     lugar: "",
   });
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Usa useNavigate para redirecciones
 
   const statusOptions = [
     { value: "ACTIVO", label: "Activo" },
@@ -56,11 +56,26 @@ const Usuarios = () => {
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      window.location.href = "/";
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!token) {
+      navigate("/"); // Redirige al usuario a la página de inicio de sesión
       return;
     }
 
+    // Obtener la lista de usuarios
     axios
       .get("http://localhost:8080/api/usuarios", {
         headers: { Authorization: `Bearer ${token}` },
@@ -70,9 +85,10 @@ const Usuarios = () => {
       })
       .catch((error) => {
         console.error("Hubo un error al obtener los usuarios:", error);
-        window.location.href = "/";
+        navigate("/"); // Redirige al usuario a la página de inicio de sesión
       });
 
+    // Obtener la lista de lugares
     axios
       .get("http://localhost:8080/api/usuarios/lugares", {
         headers: { Authorization: `Bearer ${token}` },
@@ -86,9 +102,9 @@ const Usuarios = () => {
       })
       .catch((error) => {
         console.error("Hubo un error al obtener los lugares:", error);
-        window.location.href = "/";
+        navigate("/"); // Redirige al usuario a la página de inicio de sesión
       });
-  }, []);
+  }, [navigate]); // Añade navigate como dependencia
 
   useEffect(() => {
     applyFilters();
@@ -103,8 +119,21 @@ const Usuarios = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      console.error("No se encontró un token válido.");
-      window.location.href = "/";
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
+    if (!token) {
+      navigate("/"); // Redirige al usuario a la página de inicio de sesión
       return;
     }
 
@@ -120,10 +149,7 @@ const Usuarios = () => {
       })
       .catch((error) => {
         console.error("Hubo un error al filtrar los usuarios:", error);
-        if (error.response && error.response.status === 403) {
-          console.error("Token no válido, redirigiendo al login.");
-          window.location.href = "/";
-        }
+        navigate("/"); // Redirige al usuario a la página de inicio de sesión
       });
   };
 
@@ -131,11 +157,27 @@ const Usuarios = () => {
     setFiltroStatus(null);
     setFiltroRol(null);
     setFiltroLugar(null);
+
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      window.location.href = "/";
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!token) {
+      navigate("/"); // Redirige al usuario a la página de inicio de sesión
       return;
     }
+
     axios
       .get("http://localhost:8080/api/usuarios", {
         headers: { Authorization: `Bearer ${token}` },
@@ -145,7 +187,7 @@ const Usuarios = () => {
       })
       .catch((error) => {
         console.error("Hubo un error al obtener los usuarios:", error);
-        window.location.href = "/";
+        navigate("/"); // Redirige al usuario a la página de inicio de sesión
       });
   };
 
@@ -160,17 +202,31 @@ const Usuarios = () => {
 
   const handleCrearUsuario = () => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!token) {
+      navigate("/"); // Redirige al usuario a la página de inicio de sesión
+      return;
+    }
 
     axios
       .post("http://localhost:8080/api/usuarios", nuevoUsuario, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Agregar el nuevo usuario al estado
         setUsuarios([...usuarios, response.data]);
-
-        // Cerrar el modal y resetear el formulario
         setOpenModalCrear(false);
         setNuevoUsuario({
           nombres: "",
@@ -182,19 +238,16 @@ const Usuarios = () => {
           lugar: "",
         });
 
-        // Mostrar alerta de éxito
         Swal.fire({
           icon: "success",
           title: "¡Éxito!",
           text: "Usuario creado correctamente",
           showConfirmButton: false,
-          timer: 2000, // Cierra automáticamente después de 2 segundos
+          timer: 2000,
         });
       })
       .catch((error) => {
         console.error("Hubo un error al crear el usuario:", error);
-
-        // Mostrar alerta de error
         Swal.fire({
           icon: "error",
           title: "Oops...",
@@ -211,12 +264,28 @@ const Usuarios = () => {
 
   const handleActualizarUsuario = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !usuarioSeleccionado) return;
 
-    // Crear un objeto para enviar al backend, excluyendo la contraseña hasheada
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!token || !usuarioSeleccionado) {
+      navigate("/"); // Redirige al usuario a la página de inicio de sesión
+      return;
+    }
+
     const usuarioActualizado = {
       ...usuarioSeleccionado,
-      contrasena: usuarioSeleccionado.nuevaContrasena || null, // Envía la nueva contraseña solo si existe
+      contrasena: usuarioSeleccionado.nuevaContrasena || null,
     };
 
     axios
@@ -224,25 +293,19 @@ const Usuarios = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Actualizar el usuario en el estado
         setUsuarios(usuarios.map((u) => (u.id === usuarioSeleccionado.id ? response.data : u)));
-
-        // Cerrar el modal de edición
         setOpenModalEditar(false);
 
-        // Mostrar alerta de éxito
         Swal.fire({
           icon: "success",
           title: "¡Éxito!",
           text: "Usuario actualizado correctamente",
           showConfirmButton: false,
-          timer: 2000, // Cierra automáticamente después de 2 segundos
+          timer: 2000,
         });
       })
       .catch((error) => {
         console.error("Hubo un error al actualizar el usuario:", error);
-
-        // Mostrar alerta de error
         Swal.fire({
           icon: "error",
           title: "Oops...",
@@ -260,9 +323,25 @@ const Usuarios = () => {
 
   const confirmarEliminarUsuario = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !usuarioSeleccionado) return;
 
-    // Cerrar el modal de eliminación
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!token || !usuarioSeleccionado) {
+      navigate("/"); // Redirige al usuario a la página de inicio de sesión
+      return;
+    }
+
     setOpenModalEliminar(false);
 
     axios
@@ -270,23 +349,18 @@ const Usuarios = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        // Actualizar el estado del usuario a INACTIVO
         setUsuarios(usuarios.map((u) => (u.id === usuarioSeleccionado.id ? { ...u, status: "INACTIVO" } : u)));
-
-        // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
 
-        // Mostrar alerta de éxito
         Swal.fire({
           icon: "success",
           title: "¡Eliminado!",
           text: "El usuario ha sido eliminado",
           showConfirmButton: false,
-          timer: 2000, // Cierra automáticamente después de 2 segundos
+          timer: 2000,
         });
       })
       .catch(() => {
-        // Mostrar alerta de error
         Swal.fire({
           icon: "error",
           title: "Oops...",

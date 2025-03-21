@@ -2,96 +2,66 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom"; // Importa useNavigate
 import Swal from "sweetalert2";
 import Sidebar from "../../../../components/Sidebar";
 
 const AdminDashboard = () => {
   const [usuario, setUsuario] = useState(null);
+  const navigate = useNavigate(); // Usa useNavigate para redirecciones
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
 
-    // Verificar si es la primera visita
-    const isFirstVisit = localStorage.getItem("firstVisit") === null;
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
 
-    if (token) {
-      if (isFirstVisit) {
-        // Mostrar alerta de carga solo la primera vez
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const userId = decodedToken.userId;
+
+    // Muestra una alerta de carga
+    Swal.fire({
+      title: "Cargando datos...",
+      text: "Por favor, espera un momento.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    axios
+      .get(`http://localhost:8080/api/usuarios/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setUsuario(response.data);
+        Swal.close(); // Cierra la alerta de carga
+      })
+      .catch((error) => {
+        console.error("Error al obtener los datos del usuario:", error);
         Swal.fire({
-          title: "Cargando datos...",
-          text: "Por favor, espera un momento.",
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          },
-        });
-      }
-
-      const decodedToken = jwtDecode(token);
-      const userId = decodedToken.userId;
-
-      axios
-        .get(`http://localhost:8080/api/usuarios/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((response) => {
-          setUsuario(response.data);
-
-          if (isFirstVisit) {
-            // Cerrar la alerta de carga
-            Swal.close();
-
-            // Mostrar alerta de éxito solo la primera vez
-            Swal.fire({
-              icon: "success",
-              title: "¡Bienvenido!",
-              text: "Datos del usuario cargados correctamente.",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-
-            // Marcar que ya no es la primera visita
-            localStorage.setItem("firstVisit", "false");
-          }
-        })
-        .catch((error) => {
-          console.error("Error al obtener los datos del usuario:", error);
-
-          if (isFirstVisit) {
-            // Cerrar la alerta de carga y mostrar alerta de error solo la primera vez
-            Swal.fire({
-              icon: "error",
-              title: "Error",
-              text: "No se pudieron cargar los datos del usuario. Inténtalo de nuevo más tarde.",
-              showConfirmButton: false,
-              timer: 3000,
-            });
-
-            // Marcar que ya no es la primera visita
-            localStorage.setItem("firstVisit", "false");
-          }
-
-          window.location.href = "/";
-        });
-    } else {
-      if (isFirstVisit) {
-        // Mostrar alerta si no hay token solo la primera vez
-        Swal.fire({
-          icon: "warning",
-          title: "Acceso no autorizado",
-          text: "Debes iniciar sesión para acceder a esta página.",
+          icon: "error",
+          title: "Error",
+          text: "No se pudieron cargar los datos del usuario. Inténtalo de nuevo más tarde.",
           showConfirmButton: false,
           timer: 3000,
         }).then(() => {
-          // Redirigir al usuario a la página de inicio de sesión
-          window.location.href = "/";
+          navigate("/"); // Redirige al usuario a la página de inicio de sesión
         });
-
-        // Marcar que ya no es la primera visita
-        localStorage.setItem("firstVisit", "false");
-      }
-    }
-  }, []);
+      });
+  }, [navigate]); // Añade navigate como dependencia
 
   return (
     <div style={{ display: "flex" }}>
@@ -134,7 +104,6 @@ const AdminDashboard = () => {
             >
               Perfil del Usuario
             </motion.h1>
-            {/* Contenedor de dos columnas */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -146,7 +115,6 @@ const AdminDashboard = () => {
                 justifyContent: "space-around",
               }}
             >
-              {/* Columna 1: Textos (etiquetas) */}
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -165,8 +133,6 @@ const AdminDashboard = () => {
                 <strong style={{ color: "#254B5E" }}>Rol:</strong>
                 <strong style={{ color: "#254B5E" }}>Estado:</strong>
               </motion.div>
-
-              {/* Columna 2: Datos obtenidos */}
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -185,7 +151,7 @@ const AdminDashboard = () => {
                 <span style={{ color: "#333" }}>{usuario.rol}</span>
                 <span style={{ color: "#333" }}>{usuario.status}</span>
               </motion.div>
-            </motion.div>{" "}
+            </motion.div>
           </motion.div>
         ) : (
           <motion.p

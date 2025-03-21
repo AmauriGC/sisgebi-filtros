@@ -15,6 +15,7 @@ import Sidebar from "../../../components/Sidebar";
 import eye from "../../../assets/img/eye-outline.svg";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
+import Swal from "sweetalert2";
 
 const Asignaciones = () => {
   const [asignaciones, setAsignaciones] = React.useState([]);
@@ -160,12 +161,19 @@ const Asignaciones = () => {
     const token = sessionStorage.getItem("token");
     if (!token) return;
 
-    axios
-      .get(`http://localhost:8080/api/bienes/${bien.bienId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setBienSeleccionado(response.data); // Guardar los detalles del bien
+    axios.get(`http://localhost:8080/api/bienes/${bien.bienId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    // Mostrar alerta antes de abrir el modal
+    Swal.fire({
+      icon: "info",
+      title: "Detalles del Bien",
+      text: "Mostrando detalles del bien seleccionado",
+      showConfirmButton: false,
+      timer: 1000, // Cierra automáticamente después de 1.5 segundos
+    })
+      .then(() => {
+        setBienSeleccionado(bien); // Guardar los detalles del bien
         setOpenModalBien(true); // Abrir el modal
       })
       .catch((error) => {
