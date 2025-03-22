@@ -216,10 +216,6 @@ const Usuarios = () => {
       });
       return; // Detiene la ejecución del efecto
     }
-    if (!token) {
-      navigate("/"); // Redirige al usuario a la página de inicio de sesión
-      return;
-    }
 
     axios
       .post("http://localhost:8080/api/usuarios", nuevoUsuario, {
@@ -252,7 +248,6 @@ const Usuarios = () => {
           icon: "error",
           title: "Oops...",
           text: "No se pudo crear el usuario",
-          footer: '<a href="#">¿Por qué tengo este problema?</a>',
         });
       });
   };
@@ -310,7 +305,6 @@ const Usuarios = () => {
           icon: "error",
           title: "Oops...",
           text: "No se pudo actualizar el usuario",
-          footer: '<a href="#">¿Por qué tengo este problema?</a>',
         });
       });
   };
@@ -365,7 +359,6 @@ const Usuarios = () => {
           icon: "error",
           title: "Oops...",
           text: "No se ha podido eliminar el usuario",
-          footer: '<a href="#">¿Por qué tengo este problema?</a>',
         });
       });
   };

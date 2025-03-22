@@ -10,12 +10,14 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import edit from "../../../assets/img/pencil.svg";
-import drop from "../../../assets/img/delete.svg";
-import Sidebar from "../../../components/Sidebar";
+import edit from "../../../../assets/img/pencil.svg";
+import drop from "../../../../assets/img/delete.svg";
+import Sidebar from "../../../../components/Sidebar";
+import AreaModalCrear from "./Components/AreaModalCrear";
+import AreaModalEditar from "./Components/AreaModalEditar";
+import AreaModalEliminar from "./Components/AreaModalEliimnar";
+import Swal from "sweetalert2";
 
 const Areas = () => {
   const [areas, setAreas] = useState([]);
@@ -26,8 +28,6 @@ const Areas = () => {
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalEliminar, setOpenModalEliminar] = useState(false);
   const [areaSeleccionada, setAreaSeleccionada] = useState(null);
-  const [mensajeAlerta, setMensajeAlerta] = useState("");
-  const [colorAlerta, setColorAlerta] = useState("");
 
   const [nuevaArea, setNuevaArea] = useState({
     nombreArea: "",
@@ -43,9 +43,19 @@ const Areas = () => {
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      window.location.href = "/";
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
 
     // Obtener todas las áreas comunes
@@ -73,9 +83,17 @@ const Areas = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      console.error("No se encontró un token válido.");
-      window.location.href = "/";
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
 
     axios
@@ -100,9 +118,19 @@ const Areas = () => {
   const resetFilters = () => {
     setFiltroStatus(null);
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      window.location.href = "/";
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
     axios
       .get("http://localhost:8080/api/areas", {
@@ -128,7 +156,20 @@ const Areas = () => {
 
   const handleCrearArea = () => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
 
     const areaParaEnviar = {
       nombreArea: nuevaArea.nombreArea,
@@ -150,26 +191,21 @@ const Areas = () => {
           status: "ACTIVO",
         });
 
-        // Mostrar mensaje de éxito
-        setMensajeAlerta("Área creada correctamente");
-        setColorAlerta("#64C267"); // Color verde para éxito
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "Área creada correctamente",
+          showConfirmButton: false,
+          timer: 2000,
+        });
       })
       .catch((error) => {
         console.error("Hubo un error al crear el área:", error);
-
-        // Mostrar mensaje de error
-        setMensajeAlerta("No se pudo crear el área");
-        setColorAlerta("#C26464"); // Color rojo para error
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No se pudo crear la area",
+        });
       });
   };
 
@@ -180,7 +216,21 @@ const Areas = () => {
 
   const handleActualizarArea = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !areaSeleccionada) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!areaSeleccionada) return;
 
     const areaParaEnviar = {
       nombreArea: areaSeleccionada.nombreArea,
@@ -197,27 +247,21 @@ const Areas = () => {
 
         // Cerrar el modal de edición
         setOpenModalEditar(false);
-
-        // Mostrar mensaje de éxito
-        setMensajeAlerta("Área actualizada correctamente");
-        setColorAlerta("#64C267");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "Área actualizada correctamente",
+          showConfirmButton: false,
+          timer: 2000,
+        });
       })
       .catch((error) => {
         console.error("Hubo un error al actualizar el área:", error);
-
-        // Mostrar mensaje de error
-        setMensajeAlerta("No se pudo actualizar el área");
-        setColorAlerta("#C26464");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No se pudo actualizar el área",
+        });
       });
   };
 
@@ -229,7 +273,21 @@ const Areas = () => {
 
   const confirmarEliminarArea = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !areaSeleccionada) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!areaSeleccionada) return;
 
     axios
       .delete(`http://localhost:8080/api/areas/${areaSeleccionada.areaId}`, {
@@ -241,27 +299,20 @@ const Areas = () => {
 
         // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
-
-        // Mostrar mensaje de éxito
-        setMensajeAlerta("El área se ha eliminado correctamente");
-        setColorAlerta("#64C267");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "success",
+          title: "¡Eliminado!",
+          text: "El área ha sido eliminada",
+          showConfirmButton: false,
+          timer: 2000,
+        });
       })
       .catch((error) => {
-        console.error("Hubo un error al eliminar el área:", error);
-
-        // Mostrar mensaje de error
-        setMensajeAlerta("No se ha podido eliminar el área");
-        setColorAlerta("#C26464");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No se ha podido eliminar el área",
+        });
       });
   };
 
@@ -275,240 +326,31 @@ const Areas = () => {
   return (
     <div style={{ display: "flex", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
       {/* Modal para crear área */}
-      <Modal
-        open={openModalCrear}
-        onClose={() => setOpenModalCrear(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h4" component="h2">
-            <strong>Registrar Área</strong>
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleCrearArea();
-              }}
-            >
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Nombre del Área:</strong>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Nombre del área"
-                    value={nuevaArea.nombreArea}
-                    onChange={(e) => setNuevaArea({ ...nuevaArea, nombreArea: e.target.value })}
-                    required
-                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
-                <button
-                  onClick={() => setOpenModalCrear(false)}
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#b7b7b7",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#254B5E",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Registrar
-                </button>
-              </div>
-            </form>
-          </Typography>
-        </Box>
-      </Modal>
+      <AreaModalCrear
+        openModalCrear={openModalCrear}
+        setOpenModalCrear={setOpenModalCrear}
+        nuevaArea={nuevaArea}
+        setNuevaArea={setNuevaArea}
+        handleCrearArea={handleCrearArea}
+      />
 
       {/* Modal para editar área */}
-      <Modal
-        open={openModalEditar}
-        onClose={() => setOpenModalEditar(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h4" component="h2">
-            <strong>Editar Área</strong>
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleActualizarArea();
-              }}
-            >
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Nombre del Área:</strong>
-                  </label>
-                  <input
-                    type="text"
-                    value={areaSeleccionada?.nombreArea || ""}
-                    onChange={(e) =>
-                      setAreaSeleccionada({
-                        ...areaSeleccionada,
-                        nombreArea: e.target.value,
-                      })
-                    }
-                    required
-                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Estado:</strong>
-                  </label>
-                  <Select
-                    options={statusOptions}
-                    value={statusOptions.find((option) => option.value === areaSeleccionada?.status)}
-                    onChange={(selected) =>
-                      setAreaSeleccionada({
-                        ...areaSeleccionada,
-                        status: selected.value,
-                      })
-                    }
-                    required
-                    styles={SelectOptionsStyles}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
-                <button
-                  onClick={() => setOpenModalEditar(false)}
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#b7b7b7",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#254B5E",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Guardar cambios
-                </button>
-              </div>
-            </form>
-          </Typography>
-        </Box>
-      </Modal>
+      <AreaModalEditar
+        openModalEditar={openModalEditar}
+        setOpenModalEditar={setOpenModalEditar}
+        areaSeleccionada={areaSeleccionada}
+        setAreaSeleccionada={setAreaSeleccionada}
+        statusOptions={statusOptions}
+        handleActualizarArea={handleActualizarArea}
+      />
 
       {/* Modal para eliminar área */}
-      <Modal
-        open={openModalEliminar}
-        onClose={() => setOpenModalEliminar(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 480,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: "10px",
-          }}
-        >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Eliminar Área
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            ¿Estás seguro de que deseas eliminar esta área?
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
-            <button
-              onClick={() => setOpenModalEliminar(false)}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#b7b7b7",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={confirmarEliminarArea}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#254B5E",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Eliminar
-            </button>
-          </Box>
-        </Box>
-      </Modal>
 
-      {/* Modal de alerta */}
-      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 3,
-            borderRadius: "10px",
-            textAlign: "center",
-            border: `3px solid ${colorAlerta}`,
-          }}
-        >
-          <Typography id="alerta-modal-title" sx={{ color: colorAlerta, fontWeight: "bold" }}>
-            {mensajeAlerta}
-          </Typography>
-        </Box>
-      </Modal>
+      <AreaModalEliminar
+        openModalEliminar={openModalEliminar}
+        setOpenModalEliminar={setOpenModalEliminar}
+        confirmarEliminarArea={confirmarEliminarArea}
+      />
 
       <Sidebar />
 
@@ -720,48 +562,6 @@ const customSelectStyles = {
   indicatorSeparator: (base) => ({
     ...base,
     backgroundColor: "#000",
-  }),
-};
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "600px",
-  backgroundColor: "#fff",
-  borderRadius: "8px",
-  boxShadow: 24,
-  p: 4,
-};
-
-const SelectOptionsStyles = {
-  control: (base) => ({
-    ...base,
-    width: "100%",
-    height: "40px",
-    border: "solid 1px #c2c2c2",
-  }),
-  option: (base) => ({
-    ...base,
-    color: "#000",
-    textAlign: "start",
-  }),
-  singleValue: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  placeholder: (base) => ({
-    ...base,
-    color: "#757575",
-  }),
-  dropdownIndicator: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  indicatorSeparator: (base) => ({
-    ...base,
-    backgroundColor: "#c2c2c2",
   }),
 };
 
