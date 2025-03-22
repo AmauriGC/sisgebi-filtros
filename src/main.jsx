@@ -17,7 +17,7 @@ import Becario from "./pages/views/Becario/BecarioDashboard";
 import Bienes from "./pages/views/Admin/Bienes/Bienes";
 import Usuarios from "./pages/views/Admin/Usuarios/Usuarios";
 import Areas from "./pages/views/Admin/Areas/Areas";
-import Tipos from "./pages/views/Admin/Tipos";
+import Tipos from "./pages/views/Admin/Tipos/Tipos";
 import Marcas from "./pages/views/Admin/Marcas";
 import Modelos from "./pages/views/Admin/Modelos";
 import Asignaciones from "./pages/views/Admin/Asignaciones";

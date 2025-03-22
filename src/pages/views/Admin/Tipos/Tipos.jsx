@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -13,9 +11,13 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "react-select";
-import edit from "../../../assets/img/pencil.svg";
-import drop from "../../../assets/img/delete.svg";
-import Sidebar from "../../../components/Sidebar";
+import edit from "../../../../assets/img/pencil.svg";
+import drop from "../../../../assets/img/delete.svg";
+import Sidebar from "../../../../components/Sidebar";
+import TipoModalCrear from "./Components/TipoModalCrear";
+import TipoModalEditar from "./Components/TipoModalEditar";
+import TipoModalEliminar from "./Components/TipoModalEliminar";
+import Swal from "sweetalert2";
 
 const Tipos = () => {
   const [tipoBienes, setTipoBienes] = useState([]);
@@ -26,9 +28,6 @@ const Tipos = () => {
   const [tipoBienSeleccionado, setTipoBienSeleccionado] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const [mensajeAlerta, setMensajeAlerta] = useState("");
-  const [colorAlerta, setColorAlerta] = useState("");
 
   const [nuevoTipoBien, setNuevoTipoBien] = useState({
     nombreTipoBien: "",
@@ -44,9 +43,19 @@ const Tipos = () => {
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      navigate("/");
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
 
     // Obtener tipos de bien
@@ -71,9 +80,19 @@ const Tipos = () => {
     if (filtroStatus) params.status = filtroStatus.value;
 
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      navigate("/");
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
 
     axios
@@ -92,9 +111,19 @@ const Tipos = () => {
   const resetearFiltros = () => {
     setFiltroStatus(null);
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      navigate("/");
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
     axios
       .get("http://localhost:8080/api/tipo-bien", {
@@ -119,7 +148,20 @@ const Tipos = () => {
 
   const handleCrearTipoBien = () => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
 
     const tipoBienParaEnviar = {
       nombreTipoBien: nuevoTipoBien.nombreTipoBien,
@@ -140,27 +182,21 @@ const Tipos = () => {
           nombreTipoBien: "",
           status: "ACTIVO",
         });
-
-        // Mostrar mensaje de éxito
-        setMensajeAlerta("Tipo de bien creado correctamente");
-        setColorAlerta("#64C267"); // Color verde para éxito
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "Tipo de bien creado correctamente",
+          showConfirmButton: false,
+          timer: 2000,
+        });
       })
       .catch((error) => {
         console.error("Hubo un error al crear el tipo de bien:", error);
-
-        // Mostrar mensaje de error
-        setMensajeAlerta("No se pudo crear el tipo de bien");
-        setColorAlerta("#C26464"); // Color rojo para error
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No se pudo crear el tipo de bien",
+        });
       });
   };
 
@@ -171,7 +207,21 @@ const Tipos = () => {
 
   const handleActualizarTipoBien = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !tipoBienSeleccionado) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!tipoBienSeleccionado) return;
 
     const tipoBienParaEnviar = {
       nombreTipoBien: tipoBienSeleccionado.nombreTipoBien,
@@ -190,27 +240,21 @@ const Tipos = () => {
 
         // Cerrar el modal de edición
         setOpenModalEditar(false);
-
-        // Mostrar mensaje de éxito
-        setMensajeAlerta("Tipo de bien actualizado correctamente");
-        setColorAlerta("#64C267");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "Tipo de bien actualizado correctamente",
+          showConfirmButton: false,
+          timer: 2000,
+        });
       })
       .catch((error) => {
         console.error("Hubo un error al actualizar el tipo de bien:", error);
-
-        // Mostrar mensaje de error
-        setMensajeAlerta("No se pudo actualizar el tipo de bien");
-        setColorAlerta("#C26464");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No se pudo actualizar el tipo de bien",
+        });
       });
   };
 
@@ -222,7 +266,21 @@ const Tipos = () => {
 
   const confirmarEliminarTipoBien = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !tipoBienSeleccionado) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!tipoBienSeleccionado) return;
 
     axios
       .delete(`http://localhost:8080/api/tipo-bien/${tipoBienSeleccionado.tipoBienId}`, {
@@ -238,27 +296,21 @@ const Tipos = () => {
 
         // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
-
-        // Mostrar mensaje de éxito
-        setMensajeAlerta("El tipo de bien se ha eliminado correctamente");
-        setColorAlerta("#64C267");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "success",
+          title: "¡Eliminado!",
+          text: "El tipo de bien ha sido eliminado",
+          showConfirmButton: false,
+          timer: 2000,
+        });
       })
       .catch((error) => {
         console.error("Hubo un error al eliminar el tipo de bien:", error);
-
-        // Mostrar mensaje de error
-        setMensajeAlerta("No se ha podido eliminar el tipo de bien");
-        setColorAlerta("#C26464");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No se ha podido eliminar el tipo de bien",
+        });
       });
   };
 
@@ -272,239 +324,30 @@ const Tipos = () => {
   return (
     <div style={{ display: "flex", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
       {/* Modal para crear tipo de bien */}
-      <Modal
-        open={openModalCrear}
-        onClose={() => setOpenModalCrear(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h4" component="h2">
-            <strong>Registrar Tipo de Bien</strong>
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleCrearTipoBien();
-              }}
-            >
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Nombre del Tipo de Bien:</strong>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Nombre del tipo de bien"
-                    value={nuevoTipoBien.nombreTipoBien}
-                    onChange={(e) => setNuevoTipoBien({ ...nuevoTipoBien, nombreTipoBien: e.target.value })}
-                    required
-                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
-                <button
-                  onClick={() => setOpenModalCrear(false)}
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#b7b7b7",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#254B5E",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Registrar
-                </button>
-              </div>
-            </form>
-          </Typography>
-        </Box>
-      </Modal>
+      <TipoModalCrear
+        openModalCrear={openModalCrear}
+        setOpenModalCrear={setOpenModalCrear}
+        nuevoTipoBien={nuevoTipoBien}
+        setNuevoTipoBien={setNuevoTipoBien}
+        handleCrearTipoBien={handleCrearTipoBien}
+      />
 
       {/* Modal para editar tipo de bien */}
-      <Modal
-        open={openModalEditar}
-        onClose={() => setOpenModalEditar(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h4" component="h2">
-            <strong>Editar Tipo de Bien</strong>
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleActualizarTipoBien();
-              }}
-            >
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Nombre del Tipo de Bien:</strong>
-                  </label>
-                  <input
-                    type="text"
-                    value={tipoBienSeleccionado?.nombreTipoBien || ""}
-                    onChange={(e) =>
-                      setTipoBienSeleccionado({
-                        ...tipoBienSeleccionado,
-                        nombreTipoBien: e.target.value,
-                      })
-                    }
-                    required
-                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Estado:</strong>
-                  </label>
-                  <Select
-                    options={statusOptions}
-                    value={statusOptions.find((option) => option.value === tipoBienSeleccionado?.status)}
-                    onChange={(selected) =>
-                      setTipoBienSeleccionado({
-                        ...tipoBienSeleccionado,
-                        status: selected.value,
-                      })
-                    }
-                    required
-                    styles={SelectOptionsStyles}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
-                <button
-                  onClick={() => setOpenModalEditar(false)}
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#b7b7b7",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#254B5E",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Guardar cambios
-                </button>
-              </div>
-            </form>
-          </Typography>
-        </Box>
-      </Modal>
+      <TipoModalEditar
+        openModalEditar={openModalEditar}
+        setOpenModalEditar={setOpenModalEditar}
+        tipoBienSeleccionado={tipoBienSeleccionado}
+        setTipoBienSeleccionado={setTipoBienSeleccionado}
+        statusOptions={statusOptions}
+        handleActualizarTipoBien={handleActualizarTipoBien}
+      />
 
       {/* Modal para eliminar tipo de bien */}
-      <Modal
-        open={openModalEliminar}
-        onClose={() => setOpenModalEliminar(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 480,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: "10px",
-          }}
-        >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Eliminar Tipo de Bien
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            ¿Estás seguro de que deseas eliminar este tipo de bien?
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
-            <button
-              onClick={() => setOpenModalEliminar(false)}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#b7b7b7",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={confirmarEliminarTipoBien}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#254B5E",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Eliminar
-            </button>
-          </Box>
-        </Box>
-      </Modal>
-
-      {/* Modal de alerta */}
-      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 3,
-            borderRadius: "10px",
-            textAlign: "center",
-            border: `3px solid ${colorAlerta}`,
-          }}
-        >
-          <Typography id="alerta-modal-title" sx={{ color: colorAlerta, fontWeight: "bold" }}>
-            {mensajeAlerta}
-          </Typography>
-        </Box>
-      </Modal>
+      <TipoModalEliminar
+        openModalEliminar={openModalEliminar}
+        setOpenModalEliminar={setOpenModalEliminar}
+        confirmarEliminarTipoBien={confirmarEliminarTipoBien}
+      />
 
       <Sidebar />
 
