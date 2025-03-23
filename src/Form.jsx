@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { motion } from "framer-motion"; // Importamos Framer Motion
+import { motion } from "framer-motion";
+import Swal from "sweetalert2"; // Importar SweetAlert2
 import at from "./assets/img/at.svg";
 import lock from "./assets/img/lock-outline.svg";
 import closeEye from "./assets/img/eye-off-outline.svg";
@@ -21,13 +22,25 @@ export default function Form() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (!correoValido.test(correo) || !correo.includes("@")) {
-      setError("Correo inválido. Solo se permiten caracteres alfanuméricos.");
+    // Validación del correo
+    if (!correoValido.test(correo)) {
+      Swal.fire({
+        icon: "error",
+        title: "Correo inválido",
+        text: "Por favor, ingresa un correo electrónico válido.",
+        showConfirmButton: true,
+      });
       return;
     }
 
+    // Validación de la contraseña
     if (!contrasenaValida.test(contrasena)) {
-      setError("Contraseña inválida. Solo se permiten caracteres alfanuméricos.");
+      Swal.fire({
+        icon: "error",
+        title: "Contraseña inválida",
+        text: "La contraseña solo puede contener caracteres alfanuméricos.",
+        showConfirmButton: true,
+      });
       return;
     }
 
@@ -37,15 +50,31 @@ export default function Form() {
       const { token, rol } = response.data;
       sessionStorage.setItem("token", token);
 
-      if (rol === "ADMINISTRADOR") {
-        navigate("/admin-dashboard");
-      } else if (rol === "BECARIO") {
-        navigate("/becario-dashboard");
-      } else if (rol === "RESPONSABLE") {
-        navigate("/responsable-dashboard");
-      }
+      // Mostrar alerta de éxito antes de redirigir
+      Swal.fire({
+        icon: "success",
+        title: "Inicio de sesión exitoso",
+        text: `Bienvenido, ${rol.toLowerCase()}.`,
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        // Redirigir según el rol
+        if (rol === "ADMINISTRADOR") {
+          navigate("/admin-dashboard");
+        } else if (rol === "BECARIO") {
+          navigate("/becario-dashboard");
+        } else if (rol === "RESPONSABLE") {
+          navigate("/responsable-dashboard");
+        }
+      });
     } catch (err) {
-      setError("Credenciales incorrectas");
+      // Mostrar alerta de error si las credenciales son incorrectas
+      Swal.fire({
+        icon: "error",
+        title: "Error de autenticación",
+        text: "Correo o contraseña incorrectos. Por favor, inténtalo de nuevo.",
+        showConfirmButton: true,
+      });
     }
   };
 

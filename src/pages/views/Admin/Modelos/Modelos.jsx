@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
-import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -32,9 +30,6 @@ const Modelos = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [mensajeAlerta, setMensajeAlerta] = useState("");
-  const [colorAlerta, setColorAlerta] = useState("");
-
   const [nuevoModelo, setNuevoModelo] = useState({
     nombreModelo: "",
     status: "ACTIVO",
@@ -51,7 +46,6 @@ const Modelos = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -59,17 +53,15 @@ const Modelos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -77,12 +69,11 @@ const Modelos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Obtener modelos
     axios
       .get("http://localhost:8080/api/modelo", {
         headers: { Authorization: `Bearer ${token}` },
@@ -91,7 +82,12 @@ const Modelos = () => {
         setModelos(response.data);
       })
       .catch((error) => {
-        console.error("Error al obtener los modelos:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar los modelos",
+          text: "Hubo un problema al intentar obtener los modelos. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   }, [navigate]);
 
@@ -106,7 +102,6 @@ const Modelos = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -114,17 +109,15 @@ const Modelos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -132,9 +125,9 @@ const Modelos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     axios
@@ -146,7 +139,12 @@ const Modelos = () => {
         setModelos(response.data);
       })
       .catch((error) => {
-        console.error("Error al filtrar los modelos:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al filtrar los modelos",
+          text: "Hubo un problema al intentar filtrar los modelos. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   };
 
@@ -155,7 +153,6 @@ const Modelos = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -163,17 +160,15 @@ const Modelos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -181,9 +176,9 @@ const Modelos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     axios
@@ -194,7 +189,12 @@ const Modelos = () => {
         setModelos(response.data);
       })
       .catch((error) => {
-        console.error("Error al obtener los modelos:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al filtrar los modelos",
+          text: "Hubo un problema al intentar filtrar los modelos. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   };
 
@@ -211,7 +211,6 @@ const Modelos = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -219,17 +218,15 @@ const Modelos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -237,9 +234,9 @@ const Modelos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     const modeloParaEnviar = {
@@ -252,10 +249,8 @@ const Modelos = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Agregar el nuevo modelo al estado
         setModelos([...modelos, response.data]);
 
-        // Cerrar el modal y resetear el formulario
         setOpenModalCrear(false);
         setNuevoModelo({
           nombreModelo: "",
@@ -266,7 +261,7 @@ const Modelos = () => {
           icon: "success",
           title: "¡Éxito!",
           text: "Modelo creado correctamente",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
@@ -275,7 +270,8 @@ const Modelos = () => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo crear el modelo",
+          text: "No se pudo crear el modelo. Por favor, verifica los datos e inténtalo de nuevo.",
+          showConfirmButton: true,
         });
       });
   };
@@ -289,7 +285,6 @@ const Modelos = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -297,17 +292,15 @@ const Modelos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -315,9 +308,9 @@ const Modelos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!modeloSeleccionado) return;
@@ -332,25 +325,23 @@ const Modelos = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Actualizar el modelo en el estado
         setModelos(modelos.map((modelo) => (modelo.modeloId === modeloSeleccionado.modeloId ? response.data : modelo)));
 
-        // Cerrar el modal de edición
         setOpenModalEditar(false);
         Swal.fire({
           icon: "success",
           title: "¡Éxito!",
           text: "Modelo actualizado correctamente",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
       .catch((error) => {
-        console.error("Hubo un error al actualizar el modelo:", error);
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo actualizar el modelo",
+          text: "No se pudo actualizar el modelo. Por favor, verifica los datos e inténtalo de nuevo.",
+          showConfirmButton: true,
         });
       });
   };
@@ -365,7 +356,6 @@ const Modelos = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -373,17 +363,15 @@ const Modelos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -391,9 +379,9 @@ const Modelos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!modeloSeleccionado) return;
@@ -403,21 +391,19 @@ const Modelos = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        // Actualizar el estado del modelo a INACTIVO
         setModelos(
           modelos.map((modelo) =>
             modelo.modeloId === modeloSeleccionado.modeloId ? { ...modelo, status: "INACTIVO" } : modelo
           )
         );
 
-        // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
 
         Swal.fire({
           icon: "success",
           title: "¡Eliminado!",
           text: "Modelo eliminado correctamente",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
@@ -426,9 +412,8 @@ const Modelos = () => {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "Hubo un error al eliminar el modelo",
-          showConfirmButton: false,
-          timer: 3000,
+          text: "Hubo un error al eliminar el modelo. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
         });
       });
   };

@@ -90,7 +90,6 @@ const Bienes = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -98,17 +97,15 @@ const Bienes = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -116,9 +113,9 @@ const Bienes = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     axios
@@ -129,7 +126,12 @@ const Bienes = () => {
         setBienes(response.data);
       })
       .catch((error) => {
-        console.error("Error al obtener los bienes:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar los bienes",
+          text: "Hubo un problema al intentar obtener los bienes. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   };
 
@@ -137,7 +139,6 @@ const Bienes = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -145,17 +146,15 @@ const Bienes = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -163,12 +162,11 @@ const Bienes = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Cargar áreas comunes
     axios
       .get("http://localhost:8080/api/areas", {
         headers: { Authorization: `Bearer ${token}` },
@@ -182,10 +180,14 @@ const Bienes = () => {
         );
       })
       .catch((error) => {
-        console.error("Error al cargar áreas comunes:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar áreas comunes",
+          text: "Hubo un problema al intentar cargar las áreas comunes. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
 
-    // Cargar tipos de bien
     axios
       .get("http://localhost:8080/api/tipo-bien", {
         headers: { Authorization: `Bearer ${token}` },
@@ -199,10 +201,14 @@ const Bienes = () => {
         );
       })
       .catch((error) => {
-        console.error("Error al cargar tipos de bien:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar tipos de bien",
+          text: "Hubo un problema al intentar cargar los tipos de bien. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
 
-    // Cargar marcas
     axios
       .get("http://localhost:8080/api/marca", {
         headers: { Authorization: `Bearer ${token}` },
@@ -216,10 +222,14 @@ const Bienes = () => {
         );
       })
       .catch((error) => {
-        console.error("Error al cargar marcas:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar marcas",
+          text: "Hubo un problema al intentar cargar las marcas. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
 
-    // Cargar modelos
     axios
       .get("http://localhost:8080/api/modelo", {
         headers: { Authorization: `Bearer ${token}` },
@@ -233,7 +243,12 @@ const Bienes = () => {
         );
       })
       .catch((error) => {
-        console.error("Error al cargar modelos:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar modelos",
+          text: "Hubo un problema al intentar cargar los modelos. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   };
 
@@ -244,7 +259,6 @@ const Bienes = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -252,17 +266,15 @@ const Bienes = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -270,9 +282,9 @@ const Bienes = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     axios
@@ -284,7 +296,12 @@ const Bienes = () => {
         setBienes(response.data);
       })
       .catch((error) => {
-        console.error("Error al filtrar los bienes:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al filtrar los bienes",
+          text: "Hubo un problema al intentar filtrar los bienes. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   };
 
@@ -311,7 +328,6 @@ const Bienes = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -319,17 +335,15 @@ const Bienes = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -337,9 +351,9 @@ const Bienes = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     const bienParaEnviar = {
@@ -359,10 +373,8 @@ const Bienes = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Agregar el nuevo bien al estado
         setBienes([...bienes, response.data]);
 
-        // Cerrar el modal y resetear el formulario
         setOpenModalCrear(false);
         setNuevoBien({
           codigo: "",
@@ -376,24 +388,22 @@ const Bienes = () => {
           motivo: "",
         });
 
-        // Mostrar alerta de éxito
         Swal.fire({
           icon: "success",
           title: "¡Éxito!",
           text: "Bien creado correctamente",
-          showConfirmButton: false,
-          timer: 3000, // Cierra automáticamente después de 2 segundos
+          showConfirmButton: true,
+          timer: 3000,
         });
       })
       .catch((error) => {
         console.error("Hubo un error al crear el bien:", error.response?.data || error.message);
 
-        // Mostrar alerta de error
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo crear el bien",
-          footer: '<a href="#">¿Por qué tengo este problema?</a>',
+          text: "No se pudo crear el bien. Por favor, verifica los datos e inténtalo de nuevo.",
+          showConfirmButton: true,
         });
       });
   };
@@ -401,7 +411,7 @@ const Bienes = () => {
   const handleEditarBien = (bien) => {
     setBienSeleccionado({
       ...bien,
-      motivo: bien.motivo || "", // Asegúrate de que 'motivo' tenga un valor predeterminado vacío
+      motivo: bien.motivo || "",
     });
     setOpenModalEditar(true);
   };
@@ -410,7 +420,6 @@ const Bienes = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -418,17 +427,15 @@ const Bienes = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -436,16 +443,16 @@ const Bienes = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!bienSeleccionado) return;
 
     const bienParaActualizar = {
       ...bienSeleccionado,
-      motivo: bienSeleccionado.motivo || "", // Si 'motivo' no existe, asignamos ""
+      motivo: bienSeleccionado.motivo || "",
     };
 
     axios
@@ -453,30 +460,26 @@ const Bienes = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Actualizar el bien en el estado
         setBienes(bienes.map((bien) => (bien.bienId === bienSeleccionado.bienId ? response.data : bien)));
 
-        // Cerrar el modal de edición
         setOpenModalEditar(false);
 
-        // Mostrar alerta de éxito
         Swal.fire({
           icon: "success",
           title: "¡Éxito!",
           text: "Bien actualizado correctamente",
-          showConfirmButton: false,
-          timer: 3000, // Cierra automáticamente después de 2 segundos
+          showConfirmButton: true,
+          timer: 3000,
         });
       })
       .catch((error) => {
         console.error("Hubo un error al actualizar el bien:", error);
 
-        // Mostrar alerta de error
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo actualizar el bien",
-          footer: '<a href="#">¿Por qué tengo este problema?</a>',
+          text: "No se pudo actualizar el bien. Por favor, verifica los datos e inténtalo de nuevo.",
+          showConfirmButton: true,
         });
       });
   };
@@ -491,7 +494,6 @@ const Bienes = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -499,17 +501,15 @@ const Bienes = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -517,9 +517,9 @@ const Bienes = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!bienSeleccionado || !motivoEliminar) return;
@@ -527,51 +527,46 @@ const Bienes = () => {
     axios
       .put(
         `http://localhost:8080/api/bienes/${bienSeleccionado.bienId}`,
-        { ...bienSeleccionado, status: "INACTIVO", motivo: motivoEliminar }, // Envía el motivo y el nuevo estado
+        { ...bienSeleccionado, status: "INACTIVO", motivo: motivoEliminar },
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then((response) => {
-        // Reemplazar el bien en el estado con la nueva versión (INACTIVO)
         const bienActualizado = response.data;
         setBienes(bienes.map((bien) => (bien.bienId === bienActualizado.bienId ? bienActualizado : bien)));
 
-        // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
 
-        // Mostrar alerta de éxito
         Swal.fire({
           icon: "success",
           title: "¡Eliminado!",
           text: "El bien ha sido eliminado",
-          showConfirmButton: false,
-          timer: 3000, // Cierra automáticamente después de 2 segundos
+          showConfirmButton: true,
+          timer: 3000,
         });
       })
       .catch((error) => {
         console.error("Error al eliminar el bien:", error);
 
-        // Mostrar alerta de error
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se ha podido eliminar el bien",
-          footer: '<a href="#">¿Por qué tengo este problema?</a>',
+          text: "No se ha podido eliminar el bien. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
         });
       });
   };
 
   const handleVerBien = (bien) => {
-    // Mostrar alerta antes de abrir el modal
     Swal.fire({
       icon: "info",
       title: "Detalles del Bien",
       text: "Mostrando detalles del bien seleccionado",
+      timer: 1000,
       showConfirmButton: false,
-      timer: 1500, // Cierra automáticamente después de 1.5 segundos
     }).then(() => {
-      setBienSeleccionado(bien); // Establece el bien seleccionado
+      setBienSeleccionado(bien);
 
-      setOpenModalVer(true); // Abre el modal de detalles
+      setOpenModalVer(true);
     });
   };
 
@@ -867,45 +862,4 @@ const customSelectStyles = {
   }),
 };
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "800px",
-  backgroundColor: "#fff",
-  borderRadius: "8px",
-  boxShadow: 24,
-  p: 4,
-};
-
-const SelectOptionsStyles = {
-  control: (base) => ({
-    ...base,
-    width: "100%",
-    height: "40px",
-    border: "solid 1px #c2c2c2",
-  }),
-  option: (base) => ({
-    ...base,
-    color: "#000",
-    textAlign: "start",
-  }),
-  singleValue: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  placeholder: (base) => ({
-    ...base,
-    color: "#757575",
-  }),
-  dropdownIndicator: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  indicatorSeparator: (base) => ({
-    ...base,
-    backgroundColor: "#c2c2c2",
-  }),
-};
 export default Bienes;

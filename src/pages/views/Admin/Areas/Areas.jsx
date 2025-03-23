@@ -46,7 +46,6 @@ const Areas = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -54,17 +53,15 @@ const Areas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -72,12 +69,11 @@ const Areas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Obtener todas las áreas comunes
     axios
       .get("http://localhost:8080/api/areas", {
         headers: { Authorization: `Bearer ${token}` },
@@ -86,8 +82,15 @@ const Areas = () => {
         setAreas(response.data);
       })
       .catch((error) => {
-        console.error("Error al obtener las áreas comunes:", error);
-        window.location.href = "/";
+        Swal.fire({
+          icon: "error",
+          title: "Error al obtener las áreas",
+          text: "Hubo un problema al intentar obtener las áreas. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: false,
+          timer: 3000,
+        }).then(() => {
+          navigate("/");
+        });
       });
   }, []);
 
@@ -102,7 +105,6 @@ const Areas = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -110,17 +112,15 @@ const Areas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -128,9 +128,9 @@ const Areas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     axios
@@ -144,11 +144,15 @@ const Areas = () => {
         setAreas(response.data);
       })
       .catch((error) => {
-        console.error("Error al filtrar las áreas comunes:", error);
-        if (error.response && error.response.status === 403) {
-          console.error("Token no válido, redirigiendo al login.");
-          window.location.href = "/";
-        }
+        Swal.fire({
+          icon: "error",
+          title: "Error al filtrar las áreas comunes",
+          text: "Hubo un problema al intentar filtrar las áreas. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: false,
+          timer: 3000,
+        }).then(() => {
+          navigate("/");
+        });
       });
   };
 
@@ -157,7 +161,6 @@ const Areas = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -165,17 +168,15 @@ const Areas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -183,9 +184,9 @@ const Areas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     axios
@@ -196,8 +197,15 @@ const Areas = () => {
         setAreas(response.data);
       })
       .catch((error) => {
-        console.error("Error al obtener las áreas comunes:", error);
-        window.location.href = "/";
+        Swal.fire({
+          icon: "error",
+          title: "Error al obtener las areas",
+          text: "No se pudieron obtener las areas. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: false,
+          timer: 3000,
+        }).then(() => {
+          navigate("/");
+        });
       });
   };
 
@@ -214,7 +222,6 @@ const Areas = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -222,17 +229,15 @@ const Areas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -240,9 +245,9 @@ const Areas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     const areaParaEnviar = {
@@ -255,10 +260,8 @@ const Areas = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Agregar la nueva área al estado
         setAreas([...areas, response.data]);
 
-        // Cerrar el modal y resetear el formulario
         setOpenModalCrear(false);
         setNuevaArea({
           nombreArea: "",
@@ -269,16 +272,16 @@ const Areas = () => {
           icon: "success",
           title: "¡Éxito!",
           text: "Área creada correctamente",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
       .catch((error) => {
-        console.error("Hubo un error al crear el área:", error);
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo crear la area",
+          text: "No se pudo crear el área. Por favor, verifica los datos e inténtalo de nuevo.",
+          showConfirmButton: true,
         });
       });
   };
@@ -292,7 +295,6 @@ const Areas = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -300,17 +302,15 @@ const Areas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -318,9 +318,9 @@ const Areas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!areaSeleccionada) return;
@@ -335,25 +335,25 @@ const Areas = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Actualizar el área en el estado
         setAreas(areas.map((area) => (area.areaId === areaSeleccionada.areaId ? response.data : area)));
 
-        // Cerrar el modal de edición
         setOpenModalEditar(false);
         Swal.fire({
           icon: "success",
           title: "¡Éxito!",
           text: "Área actualizada correctamente",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
-      .catch((error) => {
-        console.error("Hubo un error al actualizar el área:", error);
+      .catch(() => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo actualizar el área",
+          text: "No se pudo actualizar el área. Por favor, verifica los datos e inténtalo de nuevo.",
+          showConfirmButton: true,
+        }).then(() => {
+          navigate("/");
         });
       });
   };
@@ -368,7 +368,6 @@ const Areas = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -376,17 +375,15 @@ const Areas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -394,9 +391,9 @@ const Areas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!areaSeleccionada) return;
@@ -406,16 +403,14 @@ const Areas = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        // Eliminar el área del estado
         setAreas(areas.map((a) => (a.areaId === areaSeleccionada.areaId ? { ...a, status: "INACTIVO" } : a)));
 
-        // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
         Swal.fire({
           icon: "success",
           title: "¡Eliminado!",
           text: "El área ha sido eliminada",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
@@ -423,7 +418,8 @@ const Areas = () => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se ha podido eliminar el área",
+          text: "No se ha podido eliminar el área. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
         });
       });
   };
@@ -457,7 +453,6 @@ const Areas = () => {
       />
 
       {/* Modal para eliminar área */}
-
       <AreaModalEliminar
         openModalEliminar={openModalEliminar}
         setOpenModalEliminar={setOpenModalEliminar}

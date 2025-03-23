@@ -2,19 +2,18 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom"; // Importa useNavigate
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Sidebar from "../../../../components/Sidebar";
 
 const AdminDashboard = () => {
   const [usuario, setUsuario] = useState(null);
-  const navigate = useNavigate(); // Usa useNavigate para redirecciones
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -22,18 +21,16 @@ const AdminDashboard = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const userId = decodedToken.userId;
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -41,12 +38,11 @@ const AdminDashboard = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Muestra una alerta de carga
     Swal.fire({
       title: "Cargando datos...",
       text: "Por favor, espera un momento.",
@@ -62,7 +58,7 @@ const AdminDashboard = () => {
       })
       .then((response) => {
         setUsuario(response.data);
-        Swal.close(); // Cierra la alerta de carga
+        Swal.close();
       })
       .catch((error) => {
         console.error("Error al obtener los datos del usuario:", error);
@@ -73,10 +69,10 @@ const AdminDashboard = () => {
           showConfirmButton: false,
           timer: 3000,
         }).then(() => {
-          navigate("/"); // Redirige al usuario a la página de inicio de sesión
+          navigate("/");
         });
       });
-  }, [navigate]); // Añade navigate como dependencia
+  }, [navigate]);
 
   return (
     <div style={{ display: "flex" }}>

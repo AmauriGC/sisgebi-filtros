@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -48,7 +46,6 @@ const Marcas = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -56,17 +53,15 @@ const Marcas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -74,12 +69,11 @@ const Marcas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Obtener marcas
     axios
       .get("http://localhost:8080/api/marca", {
         headers: { Authorization: `Bearer ${token}` },
@@ -88,7 +82,12 @@ const Marcas = () => {
         setMarcas(response.data);
       })
       .catch((error) => {
-        console.error("Error al obtener las marcas:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar las marcas",
+          text: "Hubo un problema al intentar obtener las marcas. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   }, [navigate]);
 
@@ -103,7 +102,6 @@ const Marcas = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -111,17 +109,15 @@ const Marcas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -129,9 +125,9 @@ const Marcas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     axios
@@ -143,7 +139,12 @@ const Marcas = () => {
         setMarcas(response.data);
       })
       .catch((error) => {
-        console.error("Error al filtrar las marcas:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al filtrar las marcas",
+          text: "Hubo un problema al intentar filtrar las marcas. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   };
 
@@ -152,7 +153,6 @@ const Marcas = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -160,17 +160,15 @@ const Marcas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -178,9 +176,9 @@ const Marcas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     axios
@@ -191,7 +189,15 @@ const Marcas = () => {
         setMarcas(response.data);
       })
       .catch((error) => {
-        console.error("Error al obtener las marcas:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al obtener las marcas",
+          text: "No se pudieron obtener las marcas. Por favor, reintenta de nuevo.",
+          showConfirmButton: false,
+          timer: 3000,
+        }).then(() => {
+          navigate("/");
+        });
       });
   };
 
@@ -208,7 +214,6 @@ const Marcas = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -216,17 +221,15 @@ const Marcas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -234,9 +237,9 @@ const Marcas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     const marcaParaEnviar = {
@@ -249,10 +252,8 @@ const Marcas = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Agregar la nueva marca al estado
         setMarcas([...marcas, response.data]);
 
-        // Cerrar el modal y resetear el formulario
         setOpenModalCrear(false);
         setNuevaMarca({
           nombreMarca: "",
@@ -263,7 +264,7 @@ const Marcas = () => {
           icon: "success",
           title: "¡Éxito!",
           text: "Marca creada correctamente",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
@@ -272,7 +273,8 @@ const Marcas = () => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo crear la area",
+          text: "No se pudo crear la marca. Por favor, verifica los datos e inténtalo de nuevo.",
+          showConfirmButton: true,
         });
       });
   };
@@ -286,7 +288,6 @@ const Marcas = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -294,17 +295,15 @@ const Marcas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -312,9 +311,9 @@ const Marcas = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!marcaSeleccionada) return;
@@ -329,17 +328,15 @@ const Marcas = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Actualizar la marca en el estado
         setMarcas(marcas.map((marca) => (marca.marcaId === marcaSeleccionada.marcaId ? response.data : marca)));
 
-        // Cerrar el modal de edición
         setOpenModalEditar(false);
 
         Swal.fire({
           icon: "success",
           title: "¡Éxito!",
           text: "Marca actualizada correctamente",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
@@ -348,7 +345,8 @@ const Marcas = () => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo actualizar la marca",
+          text: "No se pudo actualizar la marca. Por favor, verifica los datos e inténtalo de nuevo.",
+          showConfirmButton: true,
         });
       });
   };
@@ -368,20 +366,18 @@ const Marcas = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        // Actualizar el estado de la marca a INACTIVO
         setMarcas(
           marcas.map((marca) =>
             marca.marcaId === marcaSeleccionada.marcaId ? { ...marca, status: "INACTIVO" } : marca
           )
         );
 
-        // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
         Swal.fire({
           icon: "success",
           title: "¡Eliminado!",
           text: "Marca eliminada correctamente",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
@@ -390,7 +386,8 @@ const Marcas = () => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo eliminar la marca",
+          text: "No se pudo eliminar la marca. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
         });
       });
   };

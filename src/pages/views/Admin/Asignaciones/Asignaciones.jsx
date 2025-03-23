@@ -27,7 +27,6 @@ const Asignaciones = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(8);
 
-  // Estado para controlar el modal y los detalles del bien
   const [openModalBien, setOpenModalBien] = React.useState(false);
   const [bienSeleccionado, setBienSeleccionado] = React.useState(null);
 
@@ -59,7 +58,6 @@ const Asignaciones = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -67,17 +65,15 @@ const Asignaciones = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -85,9 +81,9 @@ const Asignaciones = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     axios
@@ -105,7 +101,6 @@ const Asignaciones = () => {
   const cargarOpcionesFiltros = () => {
     const token = sessionStorage.getItem("token");
 
-    // Obtener las asignaciones para extraer los IDs de los usuarios con asignaciones
     axios
       .get("http://localhost:8080/api/asignaciones", {
         headers: { Authorization: `Bearer ${token}` },
@@ -113,7 +108,6 @@ const Asignaciones = () => {
       .then((response) => {
         const usuariosConAsignaciones = response.data.map((asignacion) => asignacion.usuario.id);
 
-        // Obtener solo los becarios que tienen asignaciones
         axios
           .get("http://localhost:8080/api/usuarios/becarios", {
             headers: { Authorization: `Bearer ${token}` },
@@ -131,11 +125,21 @@ const Asignaciones = () => {
             );
           })
           .catch((error) => {
-            console.error("Error al cargar becarios:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Error al cargar los becarios",
+              text: "Hubo un problema al intentar cargar la lista de becarios. Por favor, inténtalo de nuevo más tarde.",
+              showConfirmButton: true,
+            });
           });
       })
       .catch((error) => {
-        console.error("Error al obtener las asignaciones:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar las asignaciones",
+          text: "Hubo un problema al intentar obtener las asignaciones. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   };
 
@@ -147,26 +151,27 @@ const Asignaciones = () => {
       if (filtroStatus) paramsAsignaciones.status = filtroStatus.value;
       if (filtroUsuario) paramsAsignaciones.id = filtroUsuario.value;
 
-      // Obtener asignaciones filtradas por status y usuario
       const responseAsignaciones = await axios.get("http://localhost:8080/api/asignaciones/filter", {
         headers: { Authorization: `Bearer ${token}` },
         params: paramsAsignaciones,
       });
 
-      // Obtener bienes filtrados por disponibilidad
       const responseBienes = await axios.get("http://localhost:8080/api/bienes/filter", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Filtrar asignaciones que coincidan con los bienes disponibles
       const asignacionesFiltradas = responseAsignaciones.data.filter((asignacion) =>
         responseBienes.data.some((bien) => bien.bienId === asignacion.bien.bienId)
       );
 
-      // Actualizar el estado de las asignaciones
       setAsignaciones(asignacionesFiltradas);
     } catch (error) {
-      console.error("Error al aplicar filtros:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error al aplicar filtros",
+        text: "Hubo un problema al intentar aplicar los filtros. Por favor, verifica los datos e inténtalo de nuevo.",
+        showConfirmButton: true,
+      });
     }
   };
 
@@ -185,31 +190,29 @@ const Asignaciones = () => {
     setPage(0);
   };
 
-  // Función para abrir el modal y obtener los detalles del bien
   const handleVerBien = (bien) => {
     const token = sessionStorage.getItem("token");
 
     axios.get(`http://localhost:8080/api/bienes/${bien.bienId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    // Mostrar alerta antes de abrir el modal
     Swal.fire({
       icon: "info",
       title: "Detalles del Bien",
-      text: "Mostrando detalles del bien seleccionado",
+      text: `Mostrando detalles del bien: ${bien.codigo}`,
       showConfirmButton: false,
-      timer: 1000, // Cierra automáticamente después de 1.5 segundos
+      timer: 1500,
     })
       .then(() => {
-        setBienSeleccionado(bien); // Guardar los detalles del bien
-        setOpenModalBien(true); // Abrir el modal
+        setBienSeleccionado(bien);
+        setOpenModalBien(true);
       })
       .catch((error) => {
-        console.error("Error al obtener los detalles del bien:", error);
         Swal.fire({
           icon: "error",
-          title: "Oops...",
-          text: "No se han podido visualizar los detalles del bien",
+          title: "Error al cargar los detalles",
+          text: "No se pudieron cargar los detalles del bien. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
         });
       });
   };

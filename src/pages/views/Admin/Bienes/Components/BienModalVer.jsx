@@ -67,7 +67,7 @@ export default function BienModalVer({ openModalVer, setOpenModalVer, bienSelecc
                       label: "Fecha de eliminación:",
                       value: bienSeleccionado?.deleteAt
                         ? new Date(bienSeleccionado?.deleteAt).toLocaleString()
-                        : "No eliminado",
+                        : "No ha sido eliminado",
                     },
                   ].map((item, index) => (
                     <motion.div
@@ -99,7 +99,7 @@ export default function BienModalVer({ openModalVer, setOpenModalVer, bienSelecc
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5, duration: 0.3 }}
                 >
-                  <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+                  {/* <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
                     <button
                       onClick={() => setOpenModalVer(false)}
                       style={{
@@ -114,7 +114,7 @@ export default function BienModalVer({ openModalVer, setOpenModalVer, bienSelecc
                     >
                       Cerrar
                     </button>
-                  </Box>
+                  </Box> */}
                 </motion.div>
               </Typography>
             </motion.div>

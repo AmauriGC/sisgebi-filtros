@@ -46,7 +46,6 @@ const Tipos = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -54,17 +53,15 @@ const Tipos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -72,12 +69,11 @@ const Tipos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Obtener tipos de bien
     axios
       .get("http://localhost:8080/api/tipo-bien", {
         headers: { Authorization: `Bearer ${token}` },
@@ -86,7 +82,12 @@ const Tipos = () => {
         setTipoBienes(response.data);
       })
       .catch((error) => {
-        console.error("Error al obtener los tipos de bien:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar los tipos de bien",
+          text: "Hubo un problema al intentar obtener los tipos de bien. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   }, [navigate]);
 
@@ -101,7 +102,6 @@ const Tipos = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -109,17 +109,15 @@ const Tipos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -127,9 +125,9 @@ const Tipos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     axios
@@ -141,7 +139,12 @@ const Tipos = () => {
         setTipoBienes(response.data);
       })
       .catch((error) => {
-        console.error("Error al filtrar los tipos de bien:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al filtrar los tipos de bien",
+          text: "Hubo un problema al intentar filtrar los tipos de bien. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   };
 
@@ -150,7 +153,6 @@ const Tipos = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -158,17 +160,15 @@ const Tipos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -176,9 +176,9 @@ const Tipos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     axios
@@ -189,7 +189,12 @@ const Tipos = () => {
         setTipoBienes(response.data);
       })
       .catch((error) => {
-        console.error("Error al obtener los tipos de bien:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar los tipos de bien",
+          text: "Hubo un problema al intentar obtener los tipos de bien. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   };
 
@@ -206,7 +211,6 @@ const Tipos = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -214,17 +218,15 @@ const Tipos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -232,9 +234,9 @@ const Tipos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     const tipoBienParaEnviar = {
@@ -247,10 +249,8 @@ const Tipos = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Agregar el nuevo tipo de bien al estado
         setTipoBienes([...tipoBienes, response.data]);
 
-        // Cerrar el modal y resetear el formulario
         setOpenModalCrear(false);
         setNuevoTipoBien({
           nombreTipoBien: "",
@@ -260,16 +260,16 @@ const Tipos = () => {
           icon: "success",
           title: "¡Éxito!",
           text: "Tipo de bien creado correctamente",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
       .catch((error) => {
-        console.error("Hubo un error al crear el tipo de bien:", error);
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo crear el tipo de bien",
+          text: "No se pudo crear el tipo de bien. Por favor, verifica los datos e inténtalo de nuevo.",
+          showConfirmButton: true,
         });
       });
   };
@@ -283,7 +283,6 @@ const Tipos = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -291,17 +290,15 @@ const Tipos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -309,9 +306,9 @@ const Tipos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!tipoBienSeleccionado) return;
@@ -326,27 +323,25 @@ const Tipos = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Actualizar el tipo de bien en el estado
         setTipoBienes(
           tipoBienes.map((tipo) => (tipo.tipoBienId === tipoBienSeleccionado.tipoBienId ? response.data : tipo))
         );
 
-        // Cerrar el modal de edición
         setOpenModalEditar(false);
         Swal.fire({
           icon: "success",
           title: "¡Éxito!",
           text: "Tipo de bien actualizado correctamente",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
       .catch((error) => {
-        console.error("Hubo un error al actualizar el tipo de bien:", error);
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo actualizar el tipo de bien",
+          text: "No se pudo actualizar el tipo de bien. Por favor, verifica los datos e inténtalo de nuevo.",
+          showConfirmButton: true,
         });
       });
   };
@@ -361,7 +356,6 @@ const Tipos = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -369,17 +363,15 @@ const Tipos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -387,9 +379,9 @@ const Tipos = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!tipoBienSeleccionado) return;
@@ -399,29 +391,27 @@ const Tipos = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        // Actualizar el estado del tipo de bien a INACTIVO
         setTipoBienes(
           tipoBienes.map((tipo) =>
             tipo.tipoBienId === tipoBienSeleccionado.tipoBienId ? { ...tipo, status: "INACTIVO" } : tipo
           )
         );
 
-        // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
         Swal.fire({
           icon: "success",
           title: "¡Eliminado!",
           text: "El tipo de bien ha sido eliminado",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
       .catch((error) => {
-        console.error("Hubo un error al eliminar el tipo de bien:", error);
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se ha podido eliminar el tipo de bien",
+          text: "No se ha podido eliminar el tipo de bien. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
         });
       });
   };
@@ -675,48 +665,6 @@ const customSelectStyles = {
   indicatorSeparator: (base) => ({
     ...base,
     backgroundColor: "#000",
-  }),
-};
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "800px",
-  backgroundColor: "#fff",
-  borderRadius: "8px",
-  boxShadow: 24,
-  p: 4,
-};
-
-const SelectOptionsStyles = {
-  control: (base) => ({
-    ...base,
-    width: "100%",
-    height: "40px",
-    border: "solid 1px #c2c2c2",
-  }),
-  option: (base) => ({
-    ...base,
-    color: "#000",
-    textAlign: "start",
-  }),
-  singleValue: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  placeholder: (base) => ({
-    ...base,
-    color: "#757575",
-  }),
-  dropdownIndicator: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  indicatorSeparator: (base) => ({
-    ...base,
-    backgroundColor: "#c2c2c2",
   }),
 };
 

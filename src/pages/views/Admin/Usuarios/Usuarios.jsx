@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
-import { useNavigate } from "react-router-dom"; // Importa useNavigate
+import { useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -42,7 +42,7 @@ const Usuarios = () => {
     lugar: "",
   });
 
-  const navigate = useNavigate(); // Usa useNavigate para redirecciones
+  const navigate = useNavigate();
 
   const statusOptions = [
     { value: "ACTIVO", label: "Activo" },
@@ -59,7 +59,6 @@ const Usuarios = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -67,17 +66,15 @@ const Usuarios = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -85,17 +82,16 @@ const Usuarios = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
-    }
-
-    if (!token) {
-      navigate("/"); // Redirige al usuario a la página de inicio de sesión
       return;
     }
 
-    // Obtener la lista de usuarios
+    if (!token) {
+      navigate("/");
+      return;
+    }
+
     axios
       .get("http://localhost:8080/api/usuarios", {
         headers: { Authorization: `Bearer ${token}` },
@@ -104,11 +100,16 @@ const Usuarios = () => {
         setUsuarios(response.data);
       })
       .catch((error) => {
-        console.error("Hubo un error al obtener los usuarios:", error);
-        navigate("/"); // Redirige al usuario a la página de inicio de sesión
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar los usuarios",
+          text: "Hubo un problema al intentar obtener los usuarios. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        }).then(() => {
+          navigate("/");
+        });
       });
 
-    // Obtener la lista de lugares
     axios
       .get("http://localhost:8080/api/usuarios/lugares", {
         headers: { Authorization: `Bearer ${token}` },
@@ -121,10 +122,16 @@ const Usuarios = () => {
         setLugarOptions(lugares);
       })
       .catch((error) => {
-        console.error("Hubo un error al obtener los lugares:", error);
-        navigate("/"); // Redirige al usuario a la página de inicio de sesión
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar los lugares",
+          text: "Hubo un problema al intentar obtener los lugares. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        }).then(() => {
+          navigate("/");
+        });
       });
-  }, [navigate]); // Añade navigate como dependencia
+  }, [navigate]);
 
   useEffect(() => {
     applyFilters();
@@ -139,7 +146,6 @@ const Usuarios = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -147,17 +153,15 @@ const Usuarios = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -165,13 +169,13 @@ const Usuarios = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!token) {
-      navigate("/"); // Redirige al usuario a la página de inicio de sesión
+      navigate("/");
       return;
     }
 
@@ -186,8 +190,14 @@ const Usuarios = () => {
         setUsuarios(response.data);
       })
       .catch((error) => {
-        console.error("Hubo un error al filtrar los usuarios:", error);
-        navigate("/"); // Redirige al usuario a la página de inicio de sesión
+        Swal.fire({
+          icon: "error",
+          title: "Error al filtrar los usuarios",
+          text: "Hubo un problema al intentar filtrar los usuarios. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        }).then(() => {
+          navigate("/");
+        });
       });
   };
 
@@ -199,7 +209,6 @@ const Usuarios = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -207,17 +216,15 @@ const Usuarios = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -225,13 +232,13 @@ const Usuarios = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!token) {
-      navigate("/"); // Redirige al usuario a la página de inicio de sesión
+      navigate("/");
       return;
     }
 
@@ -243,8 +250,12 @@ const Usuarios = () => {
         setUsuarios(response.data);
       })
       .catch((error) => {
-        console.error("Hubo un error al obtener los usuarios:", error);
-        navigate("/"); // Redirige al usuario a la página de inicio de sesión
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar los usuarios",
+          text: "Hubo un problema al intentar obtener los usuarios. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
       });
   };
 
@@ -261,7 +272,6 @@ const Usuarios = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -269,17 +279,15 @@ const Usuarios = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -287,9 +295,9 @@ const Usuarios = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     axios
@@ -313,16 +321,16 @@ const Usuarios = () => {
           icon: "success",
           title: "¡Éxito!",
           text: "Usuario creado correctamente",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
       .catch((error) => {
-        console.error("Hubo un error al crear el usuario:", error);
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo crear el usuario",
+          text: "No se pudo crear el usuario. Por favor, verifica los datos e inténtalo de nuevo.",
+          showConfirmButton: true,
         });
       });
   };
@@ -336,7 +344,6 @@ const Usuarios = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -344,17 +351,15 @@ const Usuarios = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -362,13 +367,13 @@ const Usuarios = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!token || !usuarioSeleccionado) {
-      navigate("/"); // Redirige al usuario a la página de inicio de sesión
+      navigate("/");
       return;
     }
 
@@ -389,16 +394,16 @@ const Usuarios = () => {
           icon: "success",
           title: "¡Éxito!",
           text: "Usuario actualizado correctamente",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
       .catch((error) => {
-        console.error("Hubo un error al actualizar el usuario:", error);
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo actualizar el usuario",
+          text: "No se pudo actualizar el usuario. Por favor, verifica los datos e inténtalo de nuevo.",
+          showConfirmButton: true,
         });
       });
   };
@@ -413,7 +418,6 @@ const Usuarios = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      // Si no hay token, redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -421,17 +425,15 @@ const Usuarios = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
-    // Si hay token, decodifícalo y obtén los datos del usuario
     const decodedToken = jwtDecode(token);
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
-      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
       Swal.fire({
         icon: "warning",
         title: "Acceso no autorizado",
@@ -439,13 +441,13 @@ const Usuarios = () => {
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
-        navigate("/"); // Redirige sin recargar la página
+        navigate("/");
       });
-      return; // Detiene la ejecución del efecto
+      return;
     }
 
     if (!token || !usuarioSeleccionado) {
-      navigate("/"); // Redirige al usuario a la página de inicio de sesión
+      navigate("/");
       return;
     }
 
@@ -463,7 +465,7 @@ const Usuarios = () => {
           icon: "success",
           title: "¡Eliminado!",
           text: "El usuario ha sido eliminado",
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 3000,
         });
       })
@@ -471,7 +473,8 @@ const Usuarios = () => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se ha podido eliminar el usuario",
+          text: "No se ha podido eliminar el usuario. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
         });
       });
   };
