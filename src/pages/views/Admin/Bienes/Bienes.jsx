@@ -309,7 +309,7 @@ const Bienes = () => {
           title: "¡Éxito!",
           text: "Bien creado correctamente",
           showConfirmButton: false,
-          timer: 2000, // Cierra automáticamente después de 2 segundos
+          timer: 3000, // Cierra automáticamente después de 2 segundos
         });
       })
       .catch((error) => {
@@ -373,7 +373,7 @@ const Bienes = () => {
           title: "¡Éxito!",
           text: "Bien actualizado correctamente",
           showConfirmButton: false,
-          timer: 2000, // Cierra automáticamente después de 2 segundos
+          timer: 3000, // Cierra automáticamente después de 2 segundos
         });
       })
       .catch((error) => {
@@ -433,7 +433,7 @@ const Bienes = () => {
           title: "¡Eliminado!",
           text: "El bien ha sido eliminado",
           showConfirmButton: false,
-          timer: 2000, // Cierra automáticamente después de 2 segundos
+          timer: 3000, // Cierra automáticamente después de 2 segundos
         });
       })
       .catch((error) => {

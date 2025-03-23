@@ -13,9 +13,13 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "react-select";
-import edit from "../../../assets/img/pencil.svg";
-import drop from "../../../assets/img/delete.svg";
-import Sidebar from "../../../components/Sidebar";
+import edit from "../../../../assets/img/pencil.svg";
+import drop from "../../../../assets/img/delete.svg";
+import Sidebar from "../../../../components/Sidebar";
+import MarcaModalCrear from "./Components/MarcaModalCrear";
+import MarcaModalEditar from "./Components/MarcaModalEditar";
+import MarcaModalEliimnar from "./Components/MarcaModalEliminar";
+import Swal from "sweetalert2";
 
 const Marcas = () => {
   const [marcas, setMarcas] = useState([]);
@@ -26,9 +30,6 @@ const Marcas = () => {
   const [marcaSeleccionada, setMarcaSeleccionada] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const [mensajeAlerta, setMensajeAlerta] = useState("");
-  const [colorAlerta, setColorAlerta] = useState("");
 
   const [nuevaMarca, setNuevaMarca] = useState({
     nombreMarca: "",
@@ -44,9 +45,19 @@ const Marcas = () => {
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      navigate("/");
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
 
     // Obtener marcas
@@ -71,9 +82,19 @@ const Marcas = () => {
     if (filtroStatus) params.status = filtroStatus.value;
 
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      navigate("/");
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
 
     axios
@@ -92,10 +113,21 @@ const Marcas = () => {
   const resetFilters = () => {
     setFiltroStatus(null);
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      navigate("/");
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
+
     axios
       .get("http://localhost:8080/api/marca", {
         headers: { Authorization: `Bearer ${token}` },
@@ -119,7 +151,20 @@ const Marcas = () => {
 
   const handleCrearMarca = () => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
 
     const marcaParaEnviar = {
       nombreMarca: nuevaMarca.nombreMarca,
@@ -141,26 +186,21 @@ const Marcas = () => {
           status: "ACTIVO",
         });
 
-        // Mostrar mensaje de éxito
-        setMensajeAlerta("Marca creada correctamente");
-        setColorAlerta("#64C267"); // Color verde para éxito
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "Marca creada correctamente",
+          showConfirmButton: false,
+          timer: 3000,
+        });
       })
       .catch((error) => {
         console.error("Hubo un error al crear la marca:", error);
-
-        // Mostrar mensaje de error
-        setMensajeAlerta("No se pudo crear la marca");
-        setColorAlerta("#C26464"); // Color rojo para error
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No se pudo crear la area",
+        });
       });
   };
 
@@ -171,7 +211,21 @@ const Marcas = () => {
 
   const handleActualizarMarca = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !marcaSeleccionada) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!marcaSeleccionada) return;
 
     const marcaParaEnviar = {
       nombreMarca: marcaSeleccionada.nombreMarca,
@@ -189,26 +243,21 @@ const Marcas = () => {
         // Cerrar el modal de edición
         setOpenModalEditar(false);
 
-        // Mostrar mensaje de éxito
-        setMensajeAlerta("Marca actualizada correctamente");
-        setColorAlerta("#64C267");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "Marca actualizada correctamente",
+          showConfirmButton: false,
+          timer: 3000,
+        });
       })
       .catch((error) => {
         console.error("Hubo un error al actualizar la marca:", error);
-
-        // Mostrar mensaje de error
-        setMensajeAlerta("No se pudo actualizar la marca");
-        setColorAlerta("#C26464");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No se pudo actualizar la marca",
+        });
       });
   };
 
@@ -220,7 +269,7 @@ const Marcas = () => {
 
   const confirmarEliminarMarca = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !marcaSeleccionada) return;
+    if (!marcaSeleccionada) return;
 
     axios
       .delete(`http://localhost:8080/api/marca/${marcaSeleccionada.marcaId}`, {
@@ -236,32 +285,26 @@ const Marcas = () => {
 
         // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
-
-        // Mostrar mensaje de éxito
-        setMensajeAlerta("La marca se ha eliminado correctamente");
-        setColorAlerta("#64C267");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "success",
+          title: "¡Eliminado!",
+          text: "Marca eliminada correctamente",
+          showConfirmButton: false,
+          timer: 3000,
+        });
       })
       .catch((error) => {
         console.error("Hubo un error al eliminar la marca:", error);
-
-        // Mostrar mensaje de error
-        setMensajeAlerta("No se ha podido eliminar la marca");
-        setColorAlerta("#C26464");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No se pudo eliminar la marca",
+        });
       });
   };
 
   const columns = [
-    { id: "marcaId", label: "ID", minWidth: 50 },
+    { id: "marcaId", label: "#", minWidth: 50 },
     { id: "nombreMarca", label: "Nombre", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 100 },
     { id: "acciones", label: "Acciones", minWidth: 50 },
@@ -270,239 +313,30 @@ const Marcas = () => {
   return (
     <div style={{ display: "flex", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
       {/* Modal para crear marca */}
-      <Modal
-        open={openModalCrear}
-        onClose={() => setOpenModalCrear(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h4" component="h2">
-            <strong>Registrar Marca</strong>
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleCrearMarca();
-              }}
-            >
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Nombre de la Marca:</strong>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Nombre de la marca"
-                    value={nuevaMarca.nombreMarca}
-                    onChange={(e) => setNuevaMarca({ ...nuevaMarca, nombreMarca: e.target.value })}
-                    required
-                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
-                <button
-                  onClick={() => setOpenModalCrear(false)}
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#b7b7b7",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#254B5E",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Registrar
-                </button>
-              </div>
-            </form>
-          </Typography>
-        </Box>
-      </Modal>
+      <MarcaModalCrear
+        openModalCrear={openModalCrear}
+        setOpenModalCrear={setOpenModalCrear}
+        nuevaMarca={nuevaMarca}
+        setNuevaMarca={setNuevaMarca}
+        handleCrearMarca={handleCrearMarca}
+      />
 
       {/* Modal para editar marca */}
-      <Modal
-        open={openModalEditar}
-        onClose={() => setOpenModalEditar(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h4" component="h2">
-            <strong>Editar Marca</strong>
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleActualizarMarca();
-              }}
-            >
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Nombre de la Marca:</strong>
-                  </label>
-                  <input
-                    type="text"
-                    value={marcaSeleccionada?.nombreMarca || ""}
-                    onChange={(e) =>
-                      setMarcaSeleccionada({
-                        ...marcaSeleccionada,
-                        nombreMarca: e.target.value,
-                      })
-                    }
-                    required
-                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Estado:</strong>
-                  </label>
-                  <Select
-                    options={statusOptions}
-                    value={statusOptions.find((option) => option.value === marcaSeleccionada?.status)}
-                    onChange={(selected) =>
-                      setMarcaSeleccionada({
-                        ...marcaSeleccionada,
-                        status: selected.value,
-                      })
-                    }
-                    required
-                    styles={SelectOptionsStyles}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
-                <button
-                  onClick={() => setOpenModalEditar(false)}
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#b7b7b7",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#254B5E",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Guardar cambios
-                </button>
-              </div>
-            </form>
-          </Typography>
-        </Box>
-      </Modal>
+      <MarcaModalEditar
+        openModalEditar={openModalEditar}
+        setOpenModalEditar={setOpenModalEditar}
+        marcaSeleccionada={marcaSeleccionada}
+        setMarcaSeleccionada={setMarcaSeleccionada}
+        statusOptions={statusOptions}
+        handleActualizarMarca={handleActualizarMarca}
+      />
 
       {/* Modal para eliminar marca */}
-      <Modal
-        open={openModalEliminar}
-        onClose={() => setOpenModalEliminar(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 480,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: "10px",
-          }}
-        >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Eliminar Marca
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            ¿Estás seguro de que deseas eliminar esta marca?
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
-            <button
-              onClick={() => setOpenModalEliminar(false)}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#b7b7b7",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={confirmarEliminarMarca}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#254B5E",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Eliminar
-            </button>
-          </Box>
-        </Box>
-      </Modal>
-
-      {/* Modal de alerta */}
-      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 3,
-            borderRadius: "10px",
-            textAlign: "center",
-            border: `3px solid ${colorAlerta}`,
-          }}
-        >
-          <Typography id="alerta-modal-title" sx={{ color: colorAlerta, fontWeight: "bold" }}>
-            {mensajeAlerta}
-          </Typography>
-        </Box>
-      </Modal>
+      <MarcaModalEliimnar
+        openModalEliminar={openModalEliminar}
+        setOpenModalEliminar={setOpenModalEliminar}
+        confirmarEliminarMarca={confirmarEliminarMarca}
+      />
 
       <Sidebar />
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -718,46 +552,4 @@ const customSelectStyles = {
     backgroundColor: "#000",
   }),
 };
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "400px",
-  backgroundColor: "#fff",
-  borderRadius: "8px",
-  boxShadow: 24,
-  p: 4,
-};
-
-const SelectOptionsStyles = {
-  control: (base) => ({
-    ...base,
-    width: "100%",
-    height: "40px",
-    border: "solid 1px #c2c2c2",
-  }),
-  option: (base) => ({
-    ...base,
-    color: "#000",
-    textAlign: "start",
-  }),
-  singleValue: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  placeholder: (base) => ({
-    ...base,
-    color: "#757575",
-  }),
-  dropdownIndicator: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  indicatorSeparator: (base) => ({
-    ...base,
-    backgroundColor: "#c2c2c2",
-  }),
-};
-
 export default Marcas;

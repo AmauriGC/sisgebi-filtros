@@ -239,7 +239,7 @@ const Usuarios = () => {
           title: "¡Éxito!",
           text: "Usuario creado correctamente",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 3000,
         });
       })
       .catch((error) => {
@@ -296,7 +296,7 @@ const Usuarios = () => {
           title: "¡Éxito!",
           text: "Usuario actualizado correctamente",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 3000,
         });
       })
       .catch((error) => {
@@ -351,7 +351,7 @@ const Usuarios = () => {
           title: "¡Eliminado!",
           text: "El usuario ha sido eliminado",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 3000,
         });
       })
       .catch(() => {

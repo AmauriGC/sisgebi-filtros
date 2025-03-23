@@ -196,7 +196,7 @@ const Areas = () => {
           title: "¡Éxito!",
           text: "Área creada correctamente",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 3000,
         });
       })
       .catch((error) => {
@@ -252,7 +252,7 @@ const Areas = () => {
           title: "¡Éxito!",
           text: "Área actualizada correctamente",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 3000,
         });
       })
       .catch((error) => {
@@ -304,7 +304,7 @@ const Areas = () => {
           title: "¡Eliminado!",
           text: "El área ha sido eliminada",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 3000,
         });
       })
       .catch((error) => {

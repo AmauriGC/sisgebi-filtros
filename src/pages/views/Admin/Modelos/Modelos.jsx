@@ -13,9 +13,13 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TablePagination from "@mui/material/TablePagination";
-import edit from "../../../assets/img/pencil.svg";
-import drop from "../../../assets/img/delete.svg";
-import Sidebar from "../../../components/Sidebar";
+import edit from "../../../../assets/img/pencil.svg";
+import drop from "../../../../assets/img/delete.svg";
+import Sidebar from "../../../../components/Sidebar";
+import Swal from "sweetalert2";
+import ModeloModalCrear from "./Components/ModeloModalCrear";
+import ModeloModalEditar from "./Components/ModeloModalEditar";
+import ModeloModalEliminar from "./Components/ModeloModalEliminar";
 
 const Modelos = () => {
   const [modelos, setModelos] = useState([]);
@@ -44,9 +48,19 @@ const Modelos = () => {
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      navigate("/");
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
 
     // Obtener modelos
@@ -71,9 +85,19 @@ const Modelos = () => {
     if (filtroStatus) params.status = filtroStatus.value;
 
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      navigate("/");
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
 
     axios
@@ -92,10 +116,21 @@ const Modelos = () => {
   const resetFilters = () => {
     setFiltroStatus(null);
     const token = sessionStorage.getItem("token");
+
     if (!token) {
-      navigate("/");
-      return;
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
     }
+
     axios
       .get("http://localhost:8080/api/modelo", {
         headers: { Authorization: `Bearer ${token}` },
@@ -119,7 +154,20 @@ const Modelos = () => {
 
   const handleCrearModelo = () => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
 
     const modeloParaEnviar = {
       nombreModelo: nuevoModelo.nombreModelo,
@@ -141,26 +189,21 @@ const Modelos = () => {
           status: "ACTIVO",
         });
 
-        // Mostrar mensaje de éxito
-        setMensajeAlerta("Modelo creado correctamente");
-        setColorAlerta("#64C267"); // Color verde para éxito
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "Modelo creado correctamente",
+          showConfirmButton: false,
+          timer: 3000,
+        });
       })
       .catch((error) => {
         console.error("Hubo un error al crear el modelo:", error);
-
-        // Mostrar mensaje de error
-        setMensajeAlerta("No se pudo crear el modelo");
-        setColorAlerta("#C26464"); // Color rojo para error
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No se pudo crear el modelo",
+        });
       });
   };
 
@@ -171,7 +214,21 @@ const Modelos = () => {
 
   const handleActualizarModelo = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !modeloSeleccionado) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!modeloSeleccionado) return;
 
     const modeloParaEnviar = {
       nombreModelo: modeloSeleccionado.nombreModelo,
@@ -188,27 +245,21 @@ const Modelos = () => {
 
         // Cerrar el modal de edición
         setOpenModalEditar(false);
-
-        // Mostrar mensaje de éxito
-        setMensajeAlerta("Modelo actualizado correctamente");
-        setColorAlerta("#64C267");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "Modelo actualizado correctamente",
+          showConfirmButton: false,
+          timer: 3000,
+        });
       })
       .catch((error) => {
         console.error("Hubo un error al actualizar el modelo:", error);
-
-        // Mostrar mensaje de error
-        setMensajeAlerta("No se pudo actualizar el modelo");
-        setColorAlerta("#C26464");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No se pudo actualizar el modelo",
+        });
       });
   };
 
@@ -220,7 +271,21 @@ const Modelos = () => {
 
   const confirmarEliminarModelo = () => {
     const token = sessionStorage.getItem("token");
-    if (!token || !modeloSeleccionado) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+    if (!modeloSeleccionado) return;
 
     axios
       .delete(`http://localhost:8080/api/modelo/${modeloSeleccionado.modeloId}`, {
@@ -237,26 +302,23 @@ const Modelos = () => {
         // Cerrar el modal de eliminación
         setOpenModalEliminar(false);
 
-        // Mostrar mensaje de éxito
-        setMensajeAlerta("El modelo se ha eliminado correctamente");
-        setColorAlerta("#64C267");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "success",
+          title: "¡Eliminado!",
+          text: "Modelo eliminado correctamente",
+          showConfirmButton: false,
+          timer: 3000,
+        });
       })
       .catch((error) => {
         console.error("Hubo un error al eliminar el modelo:", error);
-
-        // Mostrar mensaje de error
-        setMensajeAlerta("No se ha podido eliminar el modelo");
-        setColorAlerta("#C26464");
-
-        // Cerrar el modal de alerta después de 2 segundos
-        setTimeout(() => {
-          setMensajeAlerta("");
-        }, 2000);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Hubo un error al eliminar el modelo",
+          showConfirmButton: false,
+          timer: 3000,
+        });
       });
   };
 
@@ -270,239 +332,30 @@ const Modelos = () => {
   return (
     <div style={{ display: "flex", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
       {/* Modal para crear modelo */}
-      <Modal
-        open={openModalCrear}
-        onClose={() => setOpenModalCrear(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h4" component="h2">
-            <strong>Registrar Modelo</strong>
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleCrearModelo();
-              }}
-            >
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Nombre del Modelo:</strong>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Nombre del modelo"
-                    value={nuevoModelo.nombreModelo}
-                    onChange={(e) => setNuevoModelo({ ...nuevoModelo, nombreModelo: e.target.value })}
-                    required
-                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
-                <button
-                  onClick={() => setOpenModalCrear(false)}
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#b7b7b7",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#254B5E",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Registrar
-                </button>
-              </div>
-            </form>
-          </Typography>
-        </Box>
-      </Modal>
+      <ModeloModalCrear
+        openModalCrear={openModalCrear}
+        setOpenModalCrear={setOpenModalCrear}
+        nuevoModelo={nuevoModelo}
+        setNuevoModelo={setNuevoModelo}
+        handleCrearModelo={handleCrearModelo}
+      />
 
       {/* Modal para editar modelo */}
-      <Modal
-        open={openModalEditar}
-        onClose={() => setOpenModalEditar(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h4" component="h2">
-            <strong>Editar Modelo</strong>
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleActualizarModelo();
-              }}
-            >
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Nombre del Modelo:</strong>
-                  </label>
-                  <input
-                    type="text"
-                    value={modeloSeleccionado?.nombreModelo || ""}
-                    onChange={(e) =>
-                      setModeloSeleccionado({
-                        ...modeloSeleccionado,
-                        nombreModelo: e.target.value,
-                      })
-                    }
-                    required
-                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Estado:</strong>
-                  </label>
-                  <Select
-                    options={statusOptions}
-                    value={statusOptions.find((option) => option.value === modeloSeleccionado?.status)}
-                    onChange={(selected) =>
-                      setModeloSeleccionado({
-                        ...modeloSeleccionado,
-                        status: selected.value,
-                      })
-                    }
-                    required
-                    styles={SelectOptionsStyles}
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
-                <button
-                  onClick={() => setOpenModalEditar(false)}
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#b7b7b7",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#254B5E",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Guardar cambios
-                </button>
-              </div>
-            </form>
-          </Typography>
-        </Box>
-      </Modal>
+      <ModeloModalEditar
+        openModalEditar={openModalEditar}
+        setOpenModalEditar={setOpenModalEditar}
+        modeloSeleccionado={modeloSeleccionado}
+        setModeloSeleccionado={setModeloSeleccionado}
+        statusOptions={statusOptions}
+        handleActualizarModelo={handleActualizarModelo}
+      />
 
       {/* Modal para eliminar modelo */}
-      <Modal
-        open={openModalEliminar}
-        onClose={() => setOpenModalEliminar(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 480,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: "10px",
-          }}
-        >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Eliminar Modelo
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            ¿Estás seguro de que deseas eliminar este modelo?
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
-            <button
-              onClick={() => setOpenModalEliminar(false)}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#b7b7b7",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={confirmarEliminarModelo}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#254B5E",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Eliminar
-            </button>
-          </Box>
-        </Box>
-      </Modal>
-
-      {/* Modal de alerta */}
-      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 3,
-            borderRadius: "10px",
-            textAlign: "center",
-            border: `3px solid ${colorAlerta}`,
-          }}
-        >
-          <Typography id="alerta-modal-title" sx={{ color: colorAlerta, fontWeight: "bold" }}>
-            {mensajeAlerta}
-          </Typography>
-        </Box>
-      </Modal>
+      <ModeloModalEliminar
+        openModalEliminar={openModalEliminar}
+        setOpenModalEliminar={setOpenModalEliminar}
+        confirmarEliminarModelo={confirmarEliminarModelo}
+      />
 
       <Sidebar />
 
@@ -714,48 +567,6 @@ const customSelectStyles = {
   indicatorSeparator: (base) => ({
     ...base,
     backgroundColor: "#000",
-  }),
-};
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "800px",
-  backgroundColor: "#fff",
-  borderRadius: "8px",
-  boxShadow: 24,
-  p: 4,
-};
-
-const SelectOptionsStyles = {
-  control: (base) => ({
-    ...base,
-    width: "100%",
-    height: "40px",
-    border: "solid 1px #c2c2c2",
-  }),
-  option: (base) => ({
-    ...base,
-    color: "#000",
-    textAlign: "start",
-  }),
-  singleValue: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  placeholder: (base) => ({
-    ...base,
-    color: "#757575",
-  }),
-  dropdownIndicator: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  indicatorSeparator: (base) => ({
-    ...base,
-    backgroundColor: "#c2c2c2",
   }),
 };
 

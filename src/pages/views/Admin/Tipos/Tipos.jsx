@@ -187,7 +187,7 @@ const Tipos = () => {
           title: "¡Éxito!",
           text: "Tipo de bien creado correctamente",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 3000,
         });
       })
       .catch((error) => {
@@ -245,7 +245,7 @@ const Tipos = () => {
           title: "¡Éxito!",
           text: "Tipo de bien actualizado correctamente",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 3000,
         });
       })
       .catch((error) => {
@@ -301,7 +301,7 @@ const Tipos = () => {
           title: "¡Eliminado!",
           text: "El tipo de bien ha sido eliminado",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 3000,
         });
       })
       .catch((error) => {

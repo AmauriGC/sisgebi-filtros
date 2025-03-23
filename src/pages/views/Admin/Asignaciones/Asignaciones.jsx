@@ -11,11 +11,12 @@ import axios from "axios";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
-import Sidebar from "../../../components/Sidebar";
-import eye from "../../../assets/img/eye-outline.svg";
+import Sidebar from "../../../../components/Sidebar";
+import eye from "../../../../assets/img/eye-outline.svg";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import Swal from "sweetalert2";
+import AsignacionModalVer from "./Components/AsignacionModalVer";
 
 const Asignaciones = () => {
   const [asignaciones, setAsignaciones] = React.useState([]);
@@ -57,7 +58,20 @@ const Asignaciones = () => {
 
   const obtenerAsignaciones = () => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
 
     axios
       .get("http://localhost:8080/api/asignaciones", {
@@ -73,7 +87,20 @@ const Asignaciones = () => {
 
   const cargarOpcionesFiltros = () => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
 
     // Obtener las asignaciones para extraer los IDs de los usuarios con asignaciones
     axios
@@ -111,7 +138,20 @@ const Asignaciones = () => {
 
   const aplicarFiltros = async () => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
 
     try {
       const paramsAsignaciones = {};
@@ -159,7 +199,20 @@ const Asignaciones = () => {
   // Función para abrir el modal y obtener los detalles del bien
   const handleVerBien = (bien) => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      // Si no hay token, redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
 
     axios.get(`http://localhost:8080/api/bienes/${bien.bienId}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -178,167 +231,27 @@ const Asignaciones = () => {
       })
       .catch((error) => {
         console.error("Error al obtener los detalles del bien:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No se han podido visualizar los detalles del bien",
+        });
       });
   };
 
   return (
     <div style={{ display: "flex", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
       {/* Modal para mostrar los detalles del bien */}
-      <Modal
-        open={openModalBien}
-        onClose={() => setOpenModalBien(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 500,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: "10px",
-          }}
-        >
-          <Typography id="modal-modal-title" variant="h5" component="h2" sx={{ fontWeight: "bold", color: "#254B5E" }}>
-            Detalles del Bien
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {/* Lista de detalles del bien */}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "10px",
-                backgroundColor: "#f9f9f9",
-                p: 3,
-                borderRadius: "8px",
-                border: "1px solid #e0e0e0",
-              }}
-            >
-              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
-                  Código:
-                </Typography>
-                <Typography variant="body1">{bienSeleccionado?.codigo}</Typography>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
-                  Número de Serie:
-                </Typography>
-                <Typography variant="body1">{bienSeleccionado?.numeroSerie}</Typography>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
-                  Marca:
-                </Typography>
-                <Typography variant="body1">{bienSeleccionado?.marca?.nombreMarca}</Typography>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
-                  Modelo:
-                </Typography>
-                <Typography variant="body1">{bienSeleccionado?.modelo?.nombreModelo}</Typography>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
-                  Tipo de Bien:
-                </Typography>
-                <Typography variant="body1">{bienSeleccionado?.tipoBien?.nombreTipoBien}</Typography>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
-                  Área Común:
-                </Typography>
-                <Typography variant="body1">{bienSeleccionado?.areaComun?.nombreArea}</Typography>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
-                  Estado:
-                </Typography>
-                <Typography variant="body1">{bienSeleccionado?.status}</Typography>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
-                  Disponibilidad:
-                </Typography>
-                <Typography variant="body1">{bienSeleccionado?.disponibilidad}</Typography>
-              </Box>
-            </Box>
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-            <button
-              onClick={() => setOpenModalBien(false)}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#254B5E",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Cerrar
-            </button>
-          </Box>
-        </Box>
-      </Modal>
-
-      {/* Modal de alerta */}
-      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: "10px",
-            textAlign: "center",
-            border: `3px solid ${colorAlerta}`,
-          }}
-        >
-          <Typography
-            id="alerta-modal-title"
-            variant="h6"
-            component="h2"
-            sx={{
-              color: colorAlerta,
-              fontWeight: "bold",
-              mb: 2,
-            }}
-          >
-            {mensajeAlerta}
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-            <button
-              onClick={() => setMensajeAlerta("")}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#254B5E",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-            >
-              Cerrar
-            </button>
-          </Box>
-        </Box>
-      </Modal>
+      <AsignacionModalVer
+        openModalBien={openModalBien}
+        setOpenModalBien={setOpenModalBien}
+        bienSeleccionado={bienSeleccionado}
+      />
 
       <Sidebar />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}>
-        <Paper className="col-md-8 col-lg-8 col-xl-6" style={{ height: "fit-content" }}>
+        <Paper className="col-md-8 col-lg-8 col-xl-7" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Asignaciones realizadas</h3>
@@ -538,15 +451,4 @@ const customSelectStyles = {
   }),
 };
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "800px",
-  backgroundColor: "#fff",
-  borderRadius: "8px",
-  boxShadow: 24,
-  p: 4,
-};
 export default Asignaciones;
