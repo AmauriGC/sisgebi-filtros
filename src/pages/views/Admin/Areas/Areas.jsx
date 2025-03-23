@@ -18,6 +18,7 @@ import AreaModalCrear from "./Components/AreaModalCrear";
 import AreaModalEditar from "./Components/AreaModalEditar";
 import AreaModalEliminar from "./Components/AreaModalEliimnar";
 import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode";
 
 const Areas = () => {
   const [areas, setAreas] = useState([]);
@@ -50,6 +51,24 @@ const Areas = () => {
         icon: "warning",
         title: "Acceso no autorizado",
         text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
@@ -96,6 +115,24 @@ const Areas = () => {
       return; // Detiene la ejecución del efecto
     }
 
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     axios
       .get("http://localhost:8080/api/areas/filter", {
         headers: {
@@ -132,6 +169,25 @@ const Areas = () => {
       });
       return; // Detiene la ejecución del efecto
     }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     axios
       .get("http://localhost:8080/api/areas", {
         headers: { Authorization: `Bearer ${token}` },
@@ -163,6 +219,24 @@ const Areas = () => {
         icon: "warning",
         title: "Acceso no autorizado",
         text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
@@ -230,6 +304,25 @@ const Areas = () => {
       });
       return; // Detiene la ejecución del efecto
     }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     if (!areaSeleccionada) return;
 
     const areaParaEnviar = {
@@ -287,6 +380,25 @@ const Areas = () => {
       });
       return; // Detiene la ejecución del efecto
     }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     if (!areaSeleccionada) return;
 
     axios

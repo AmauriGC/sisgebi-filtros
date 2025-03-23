@@ -18,6 +18,7 @@ import TipoModalCrear from "./Components/TipoModalCrear";
 import TipoModalEditar from "./Components/TipoModalEditar";
 import TipoModalEliminar from "./Components/TipoModalEliminar";
 import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode";
 
 const Tipos = () => {
   const [tipoBienes, setTipoBienes] = useState([]);
@@ -50,6 +51,24 @@ const Tipos = () => {
         icon: "warning",
         title: "Acceso no autorizado",
         text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
@@ -95,6 +114,24 @@ const Tipos = () => {
       return; // Detiene la ejecución del efecto
     }
 
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     axios
       .get("http://localhost:8080/api/tipo-bien/filter", {
         headers: { Authorization: `Bearer ${token}` },
@@ -125,6 +162,25 @@ const Tipos = () => {
       });
       return; // Detiene la ejecución del efecto
     }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     axios
       .get("http://localhost:8080/api/tipo-bien", {
         headers: { Authorization: `Bearer ${token}` },
@@ -155,6 +211,24 @@ const Tipos = () => {
         icon: "warning",
         title: "Acceso no autorizado",
         text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
@@ -221,6 +295,25 @@ const Tipos = () => {
       });
       return; // Detiene la ejecución del efecto
     }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     if (!tipoBienSeleccionado) return;
 
     const tipoBienParaEnviar = {
@@ -280,6 +373,25 @@ const Tipos = () => {
       });
       return; // Detiene la ejecución del efecto
     }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     if (!tipoBienSeleccionado) return;
 
     axios

@@ -20,6 +20,7 @@ import MarcaModalCrear from "./Components/MarcaModalCrear";
 import MarcaModalEditar from "./Components/MarcaModalEditar";
 import MarcaModalEliimnar from "./Components/MarcaModalEliminar";
 import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode";
 
 const Marcas = () => {
   const [marcas, setMarcas] = useState([]);
@@ -52,6 +53,24 @@ const Marcas = () => {
         icon: "warning",
         title: "Acceso no autorizado",
         text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
@@ -97,6 +116,24 @@ const Marcas = () => {
       return; // Detiene la ejecución del efecto
     }
 
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     axios
       .get("http://localhost:8080/api/marca/filter", {
         headers: { Authorization: `Bearer ${token}` },
@@ -120,6 +157,24 @@ const Marcas = () => {
         icon: "warning",
         title: "Acceso no autorizado",
         text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
@@ -158,6 +213,24 @@ const Marcas = () => {
         icon: "warning",
         title: "Acceso no autorizado",
         text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
@@ -225,6 +298,25 @@ const Marcas = () => {
       });
       return; // Detiene la ejecución del efecto
     }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     if (!marcaSeleccionada) return;
 
     const marcaParaEnviar = {

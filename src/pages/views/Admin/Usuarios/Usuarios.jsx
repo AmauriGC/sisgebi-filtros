@@ -18,6 +18,7 @@ import UsuarioModalCrear from "./Components/UsuarioModalCrear";
 import UsuarioModalEditar from "./Components/UsuarioModalEditar";
 import UsuarioModalEliminar from "./Components/UsuarioModalEliminar";
 import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode";
 
 const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -70,6 +71,25 @@ const Usuarios = () => {
       });
       return; // Detiene la ejecución del efecto
     }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     if (!token) {
       navigate("/"); // Redirige al usuario a la página de inicio de sesión
       return;
@@ -132,6 +152,24 @@ const Usuarios = () => {
       return; // Detiene la ejecución del efecto
     }
 
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     if (!token) {
       navigate("/"); // Redirige al usuario a la página de inicio de sesión
       return;
@@ -173,6 +211,25 @@ const Usuarios = () => {
       });
       return; // Detiene la ejecución del efecto
     }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     if (!token) {
       navigate("/"); // Redirige al usuario a la página de inicio de sesión
       return;
@@ -209,6 +266,24 @@ const Usuarios = () => {
         icon: "warning",
         title: "Acceso no autorizado",
         text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
         showConfirmButton: false,
         timer: 3000,
       }).then(() => {
@@ -273,6 +348,25 @@ const Usuarios = () => {
       });
       return; // Detiene la ejecución del efecto
     }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     if (!token || !usuarioSeleccionado) {
       navigate("/"); // Redirige al usuario a la página de inicio de sesión
       return;
@@ -331,6 +425,25 @@ const Usuarios = () => {
       });
       return; // Detiene la ejecución del efecto
     }
+
+    // Si hay token, decodifícalo y obtén los datos del usuario
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "ADMINISTRADOR") {
+      // Si el rol no es "admin", redirige al usuario a la página de inicio de sesión
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/"); // Redirige sin recargar la página
+      });
+      return; // Detiene la ejecución del efecto
+    }
+
     if (!token || !usuarioSeleccionado) {
       navigate("/"); // Redirige al usuario a la página de inicio de sesión
       return;
