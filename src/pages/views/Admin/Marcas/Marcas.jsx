@@ -424,6 +424,7 @@ const Marcas = () => {
       <MarcaModalEliimnar
         openModalEliminar={openModalEliminar}
         setOpenModalEliminar={setOpenModalEliminar}
+        handleEliminarMarca={handleEliminarMarca}
         confirmarEliminarMarca={confirmarEliminarMarca}
       />
 

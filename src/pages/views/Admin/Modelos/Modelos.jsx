@@ -450,6 +450,7 @@ const Modelos = () => {
       <ModeloModalEliminar
         openModalEliminar={openModalEliminar}
         setOpenModalEliminar={setOpenModalEliminar}
+        handleEliminarModelo={handleEliminarModelo}
         confirmarEliminarModelo={confirmarEliminarModelo}
       />
 

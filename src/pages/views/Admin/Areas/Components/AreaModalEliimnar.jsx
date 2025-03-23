@@ -6,104 +6,76 @@ import Box from "@mui/material/Box";
 
 export default function AreaModalEliminar({ openModalEliminar, setOpenModalEliminar, confirmarEliminarArea }) {
   return (
-    <div>
-      <Modal
-        open={openModalEliminar}
-        onClose={() => setOpenModalEliminar(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 480,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: "10px",
-          }}
+    <AnimatePresence>
+      {openModalEliminar && (
+        <Modal
+          open={openModalEliminar}
+          onClose={() => setOpenModalEliminar(false)}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
         >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Eliminar Área
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            ¿Estás seguro de que deseas eliminar esta área?
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
-            <button
-              onClick={() => setOpenModalEliminar(false)}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#b7b7b7",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 480,
+              bgcolor: "background.paper",
+              boxShadow: 24,
+              p: 4,
+              borderRadius: "10px",
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: -50 }} // Animación inicial: invisible y desplazado hacia arriba
+              animate={{ opacity: 1, y: 0 }} // Animación al abrir: visible y en su posición
+              transition={{ duration: 0.3, ease: "easeInOut" }} // Duración y tipo de animación
             >
-              Cancelar
-            </button>
-            <button
-              onClick={confirmarEliminarArea}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#254B5E",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Eliminar
-            </button>
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                Eliminar Área
+              </Typography>
+              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                ¿Estás seguro de que deseas eliminar esta área?
+              </Typography>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }} // Animación inicial: invisible y desplazado hacia abajo
+                animate={{ opacity: 1, y: 0 }} // Animación al abrir: visible y en su posición
+                transition={{ delay: 0.1, duration: 0.3 }} // Duración y tipo de animación
+              >
+                <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
+                  <button
+                    onClick={() => setOpenModalEliminar(false)}
+                    style={{
+                      padding: "10px 20px",
+                      backgroundColor: "#b7b7b7",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={confirmarEliminarArea}
+                    style={{
+                      padding: "10px 20px",
+                      backgroundColor: "#254B5E",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </Box>
+              </motion.div>
+            </motion.div>
           </Box>
-        </Box>
-      </Modal>
-    </div>
+        </Modal>
+      )}
+    </AnimatePresence>
   );
 }
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "600px",
-  backgroundColor: "#fff",
-  borderRadius: "8px",
-  boxShadow: 24,
-  p: 4,
-};
-
-const SelectOptionsStyles = {
-  control: (base) => ({
-    ...base,
-    width: "100%",
-    height: "40px",
-    border: "solid 1px #c2c2c2",
-  }),
-  option: (base) => ({
-    ...base,
-    color: "#000",
-    textAlign: "start",
-  }),
-  singleValue: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  placeholder: (base) => ({
-    ...base,
-    color: "#757575",
-  }),
-  dropdownIndicator: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  indicatorSeparator: (base) => ({
-    ...base,
-    backgroundColor: "#c2c2c2",
-  }),
-};

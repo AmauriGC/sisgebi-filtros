@@ -12,73 +12,95 @@ export default function AreaModalCrear({
   handleCrearArea,
 }) {
   return (
-    <div>
-      <Modal
-        open={openModalCrear}
-        onClose={() => setOpenModalCrear(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h4" component="h2">
-            <strong>Registrar Área</strong>
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleCrearArea();
-              }}
+    <AnimatePresence>
+      {openModalCrear && (
+        <Modal
+          open={openModalCrear}
+          onClose={() => setOpenModalCrear(false)}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <motion.div
+              initial={{ opacity: 0, y: -50 }} // Animación inicial: invisible y desplazado hacia arriba
+              animate={{ opacity: 1, y: 0 }} // Animación al abrir: visible y en su posición
+              transition={{ duration: 0.3, ease: "easeInOut" }} // Duración y tipo de animación
             >
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label>
-                    <strong>Nombre del Área:</strong>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Nombre del área"
-                    value={nuevaArea.nombreArea}
-                    onChange={(e) => setNuevaArea({ ...nuevaArea, nombreArea: e.target.value })}
-                    required
-                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
-                  />
-                </div>
-              </div>
+              <Typography id="modal-modal-title" variant="h4" component="h2">
+                <strong>Registrar Área</strong>
+              </Typography>
+              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleCrearArea();
+                  }}
+                >
+                  {/* Animación para el input del nombre del área */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1, duration: 0.3 }}
+                  >
+                    <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+                      <div style={{ flex: 1 }}>
+                        <label>
+                          <strong>Nombre del Área:</strong>
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Nombre del área"
+                          value={nuevaArea.nombreArea}
+                          onChange={(e) => setNuevaArea({ ...nuevaArea, nombreArea: e.target.value })}
+                          required
+                          style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
-                <button
-                  onClick={() => setOpenModalCrear(false)}
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#b7b7b7",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#254B5E",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Registrar
-                </button>
-              </div>
-            </form>
-          </Typography>
-        </Box>
-      </Modal>
-    </div>
+                  {/* Animación para los botones */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.3 }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
+                      <button
+                        onClick={() => setOpenModalCrear(false)}
+                        style={{
+                          padding: "10px 20px",
+                          backgroundColor: "#b7b7b7",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "5px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        style={{
+                          padding: "10px 20px",
+                          backgroundColor: "#254B5E",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "5px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Registrar
+                      </button>
+                    </div>
+                  </motion.div>
+                </form>
+              </Typography>
+            </motion.div>
+          </Box>
+        </Modal>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -92,34 +114,4 @@ const style = {
   borderRadius: "8px",
   boxShadow: 24,
   p: 4,
-};
-
-const SelectOptionsStyles = {
-  control: (base) => ({
-    ...base,
-    width: "100%",
-    height: "40px",
-    border: "solid 1px #c2c2c2",
-  }),
-  option: (base) => ({
-    ...base,
-    color: "#000",
-    textAlign: "start",
-  }),
-  singleValue: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  placeholder: (base) => ({
-    ...base,
-    color: "#757575",
-  }),
-  dropdownIndicator: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  indicatorSeparator: (base) => ({
-    ...base,
-    backgroundColor: "#c2c2c2",
-  }),
 };

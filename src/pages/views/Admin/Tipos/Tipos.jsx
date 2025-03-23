@@ -448,6 +448,7 @@ const Tipos = () => {
       <TipoModalEliminar
         openModalEliminar={openModalEliminar}
         setOpenModalEliminar={setOpenModalEliminar}
+        handleEliminarTipoBien={handleEliminarTipoBien}
         confirmarEliminarTipoBien={confirmarEliminarTipoBien}
       />
 
