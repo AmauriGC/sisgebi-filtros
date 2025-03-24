@@ -42,6 +42,16 @@ const Marcas = () => {
     { value: "INACTIVO", label: "Inactivo" },
   ];
 
+  const statusActivoOptions = [{ value: "ACTIVO", label: "Activo" }];
+
+  const isFormValid = () => {
+    return nuevaMarca.nombreMarca.trim() !== "";
+  };
+
+  const isUpdateFormValid = () => {
+    return marcaSeleccionada.nombreMarca.trim() !== "";
+  };
+
   useEffect(() => {
     const token = sessionStorage.getItem("token");
 
@@ -408,6 +418,7 @@ const Marcas = () => {
         nuevaMarca={nuevaMarca}
         setNuevaMarca={setNuevaMarca}
         handleCrearMarca={handleCrearMarca}
+        isFormValid={isFormValid}
       />
 
       {/* Modal para editar marca */}
@@ -416,8 +427,9 @@ const Marcas = () => {
         setOpenModalEditar={setOpenModalEditar}
         marcaSeleccionada={marcaSeleccionada}
         setMarcaSeleccionada={setMarcaSeleccionada}
-        statusOptions={statusOptions}
+        statusActivoOptions={statusActivoOptions}
         handleActualizarMarca={handleActualizarMarca}
+        isUpdateFormValid={isUpdateFormValid}
       />
 
       {/* Modal para eliminar marca */}

@@ -10,8 +10,9 @@ export default function UsuarioModalEditar({
   setOpenModalEditar,
   usuarioSeleccionado,
   setUsuarioSeleccionado,
-  statusOptions,
+  statusActivoOptions,
   handleActualizarUsuario,
+  isUpdateFormValid,
 }) {
   return (
     <AnimatePresence>
@@ -149,14 +150,22 @@ export default function UsuarioModalEditar({
                           <strong>Estado:</strong>
                         </label>
                         <Select
-                          options={statusOptions}
-                          value={statusOptions.find((option) => option.value === usuarioSeleccionado?.status)}
-                          onChange={(selected) =>
-                            setUsuarioSeleccionado({
-                              ...usuarioSeleccionado,
-                              status: selected.value,
-                            })
+                          options={statusActivoOptions} // Solo "ACTIVO"
+                          value={
+                            statusActivoOptions.find((option) => option.value === usuarioSeleccionado?.status) || {
+                              value: usuarioSeleccionado?.status,
+                              label: usuarioSeleccionado?.status,
+                            } // Muestra el status actual
                           }
+                          onChange={(selected) => {
+                            if (selected.value === "ACTIVO") {
+                              setUsuarioSeleccionado({
+                                ...usuarioSeleccionado,
+                                status: selected.value, // Cambia a "ACTIVO"
+                              });
+                            }
+                            // Si no se selecciona "ACTIVO", no se hace nada (el status permanece igual)
+                          }}
                           required
                           styles={SelectOptionsStyles}
                         />
@@ -206,12 +215,13 @@ export default function UsuarioModalEditar({
                         type="submit"
                         style={{
                           padding: "10px 20px",
-                          backgroundColor: "#254B5E",
+                          backgroundColor: isUpdateFormValid() ? "#254B5E" : "#b7b7b7",
                           color: "white",
                           border: "none",
                           borderRadius: "5px",
-                          cursor: "pointer",
+                          cursor: isUpdateFormValid() ? "pointer" : "not-allowed",
                         }}
+                        disabled={!isUpdateFormValid()}
                       >
                         Guardar cambios
                       </button>

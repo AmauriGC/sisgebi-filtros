@@ -63,6 +63,8 @@ const Bienes = () => {
     { value: "INACTIVO", label: "Inactivo" },
   ];
 
+  const statusActivoOptions = [{ value: "ACTIVO", label: "Activo" }];
+
   const disponibilidadOptions = [
     { value: "DISPONIBLE", label: "Disponible" },
     { value: "OCUPADO", label: "Ocupado" },
@@ -172,8 +174,9 @@ const Bienes = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        const areasActivas = response.data.filter((area) => area.status === "ACTIVO");
         setAreaComunOptions(
-          response.data.map((area) => ({
+          areasActivas.map((area) => ({
             value: area.areaId,
             label: area.nombreArea,
           }))
@@ -193,8 +196,9 @@ const Bienes = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        const tiposActivos = response.data.filter((tipo) => tipo.status === "ACTIVO");
         setTipoBienOptions(
-          response.data.map((tipo) => ({
+          tiposActivos.map((tipo) => ({
             value: tipo.tipoBienId,
             label: tipo.nombreTipoBien,
           }))
@@ -214,8 +218,9 @@ const Bienes = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        const marcasActivas = response.data.filter((marca) => marca.status === "ACTIVO");
         setMarcaOptions(
-          response.data.map((marca) => ({
+          marcasActivas.map((marca) => ({
             value: marca.marcaId,
             label: marca.nombreMarca,
           }))
@@ -235,8 +240,9 @@ const Bienes = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        const modelosActivos = response.data.filter((modelo) => modelo.status === "ACTIVO");
         setModeloOptions(
-          response.data.map((modelo) => ({
+          modelosActivos.map((modelo) => ({
             value: modelo.modeloId,
             label: modelo.nombreModelo,
           }))
@@ -397,7 +403,19 @@ const Bienes = () => {
         });
       })
       .catch((error) => {
-        console.error("Hubo un error al crear el bien:", error.response?.data || error.message);
+        console.error("Error al crear el bien:", error);
+        setOpenModalCrear(false);
+        setNuevoBien({
+          codigo: "",
+          numeroSerie: "",
+          tipoBien: null,
+          marca: null,
+          modelo: null,
+          areaComun: null,
+          status: "ACTIVO",
+          disponibilidad: "DISPONIBLE",
+          motivo: "",
+        });
 
         Swal.fire({
           icon: "error",
@@ -474,6 +492,7 @@ const Bienes = () => {
       })
       .catch((error) => {
         console.error("Hubo un error al actualizar el bien:", error);
+        setOpenModalEditar(false);
 
         Swal.fire({
           icon: "error",
@@ -570,6 +589,32 @@ const Bienes = () => {
     });
   };
 
+  const isFormValid = () => {
+    return (
+      nuevoBien.codigo.trim() !== "" &&
+      nuevoBien.numeroSerie.trim() !== "" &&
+      nuevoBien.tipoBien !== null &&
+      nuevoBien.marca !== null &&
+      nuevoBien.modelo !== null &&
+      nuevoBien.areaComun !== null &&
+      nuevoBien.status.trim() !== "" &&
+      nuevoBien.disponibilidad.trim() !== ""
+    );
+  };
+
+  const isUpdateFormValid = () => {
+    return (
+      bienSeleccionado.codigo.trim() !== "" &&
+      bienSeleccionado.numeroSerie.trim() !== "" &&
+      bienSeleccionado.tipoBien !== null &&
+      bienSeleccionado.marca !== null &&
+      bienSeleccionado.modelo !== null &&
+      bienSeleccionado.areaComun !== null &&
+      bienSeleccionado.status.trim() !== "" &&
+      bienSeleccionado.disponibilidad.trim() !== ""
+    );
+  };
+
   return (
     <div
       style={{
@@ -593,6 +638,7 @@ const Bienes = () => {
         statusOptions={statusOptions}
         disponibilidadOptions={disponibilidadOptions}
         handleCrear={handleCrear}
+        isFormValid={isFormValid}
       />
 
       {/* Modal para editar bien */}
@@ -605,9 +651,10 @@ const Bienes = () => {
         marcaOptions={marcaOptions}
         modeloOptions={modeloOptions}
         areaComunOptions={areaComunOptions}
-        statusOptions={statusOptions}
+        statusActivoOptions={statusActivoOptions}
         disponibilidadOptions={disponibilidadOptions}
         handleActualizar={handleActualizar}
+        isUpdateFormValid={isUpdateFormValid}
       />
 
       {/* Modal para eliminar bien */}

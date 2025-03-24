@@ -43,25 +43,14 @@ const AdminDashboard = () => {
       return;
     }
 
-    Swal.fire({
-      title: "Cargando datos...",
-      text: "Por favor, espera un momento.",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
     axios
       .get(`http://localhost:8080/api/usuarios/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
         setUsuario(response.data);
-        Swal.close();
       })
       .catch((error) => {
-        console.error("Error al obtener los datos del usuario:", error);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -77,6 +66,7 @@ const AdminDashboard = () => {
   return (
     <div style={{ display: "flex" }}>
       <Sidebar />
+
       <div
         style={{
           flex: 1,
@@ -87,7 +77,7 @@ const AdminDashboard = () => {
           backgroundColor: "#f5f5f5",
         }}
       >
-        {usuario ? (
+        {usuario ? ( // Verifica si usuario no es null
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -165,14 +155,7 @@ const AdminDashboard = () => {
             </motion.div>
           </motion.div>
         ) : (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            style={{ fontSize: "18px", color: "#254B5E" }}
-          >
-            Cargando datos del usuario...
-          </motion.p>
+          <motion.p></motion.p>
         )}
       </div>
     </div>

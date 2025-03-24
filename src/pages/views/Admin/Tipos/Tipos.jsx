@@ -42,6 +42,16 @@ const Tipos = () => {
     { value: "INACTIVO", label: "Inactivo" },
   ];
 
+  const statusActivoOptions = [{ value: "ACTIVO", label: "Activo" }];
+
+  const isFormValid = () => {
+    return nuevoTipoBien.nombreTipoBien.trim() !== "";
+  };
+
+  const isUpdateFormValid = () => {
+    return tipoBienSeleccionado.nombreTipoBien.trim() !== "";
+  };
+
   useEffect(() => {
     const token = sessionStorage.getItem("token");
 
@@ -432,6 +442,7 @@ const Tipos = () => {
         nuevoTipoBien={nuevoTipoBien}
         setNuevoTipoBien={setNuevoTipoBien}
         handleCrearTipoBien={handleCrearTipoBien}
+        isFormValid={isFormValid}
       />
 
       {/* Modal para editar tipo de bien */}
@@ -440,8 +451,9 @@ const Tipos = () => {
         setOpenModalEditar={setOpenModalEditar}
         tipoBienSeleccionado={tipoBienSeleccionado}
         setTipoBienSeleccionado={setTipoBienSeleccionado}
-        statusOptions={statusOptions}
+        statusActivoOptions={statusActivoOptions}
         handleActualizarTipoBien={handleActualizarTipoBien}
+        isUpdateFormValid={isUpdateFormValid}
       />
 
       {/* Modal para eliminar tipo de bien */}

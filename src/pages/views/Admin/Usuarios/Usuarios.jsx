@@ -49,6 +49,8 @@ const Usuarios = () => {
     { value: "INACTIVO", label: "Inactivo" },
   ];
 
+  const statusActivoOptions = [{ value: "ACTIVO", label: "Activo" }];
+
   const rolOptions = [
     { value: "ADMINISTRADOR", label: "Administrador" },
     { value: "RESPONSABLE", label: "Responsable" },
@@ -479,6 +481,29 @@ const Usuarios = () => {
       });
   };
 
+  const isFormValid = () => {
+    return (
+      nuevoUsuario.nombres.trim() !== "" &&
+      nuevoUsuario.apellidos.trim() !== "" &&
+      nuevoUsuario.correo.trim() !== "" &&
+      nuevoUsuario.contrasena.trim() !== "" &&
+      nuevoUsuario.rol.trim() !== "" &&
+      nuevoUsuario.lugar.trim() !== "" &&
+      nuevoUsuario.status.trim() !== ""
+    );
+  };
+
+  const isUpdateFormValid = () => {
+    return (
+      usuarioSeleccionado.nombres.trim() !== "" &&
+      usuarioSeleccionado.apellidos.trim() !== "" &&
+      usuarioSeleccionado.correo.trim() !== "" &&
+      usuarioSeleccionado.rol.trim() !== "" &&
+      usuarioSeleccionado.lugar.trim() !== "" &&
+      usuarioSeleccionado.status.trim() !== ""
+    );
+  };
+
   const columns = [
     { id: "id", label: "#", minWidth: 50 },
     { id: "nombres", label: "Nombres", minWidth: 100 },
@@ -500,6 +525,7 @@ const Usuarios = () => {
         setNuevoUsuario={setNuevoUsuario}
         rolOptions={rolOptions}
         handleCrearUsuario={handleCrearUsuario}
+        isFormValid={isFormValid}
       />
 
       {/* Modal para editar usuario */}
@@ -508,8 +534,9 @@ const Usuarios = () => {
         setOpenModalEditar={setOpenModalEditar}
         usuarioSeleccionado={usuarioSeleccionado}
         setUsuarioSeleccionado={setUsuarioSeleccionado}
-        statusOptions={statusOptions}
+        statusActivoOptions={statusActivoOptions}
         handleActualizarUsuario={handleActualizarUsuario}
+        isUpdateFormValid={isUpdateFormValid}
       />
 
       {/* Modal para eliminar usuario */}

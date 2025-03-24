@@ -42,6 +42,16 @@ const Modelos = () => {
     { value: "INACTIVO", label: "Inactivo" },
   ];
 
+  const statusActivoOptions = [{ value: "ACTIVO", label: "Activo" }];
+
+  const isFormValid = () => {
+    return nuevoModelo.nombreModelo.trim() !== "";
+  };
+
+  const isUpdateFormValid = () => {
+    return modeloSeleccionado.nombreModelo.trim() !== "";
+  };
+
   useEffect(() => {
     const token = sessionStorage.getItem("token");
 
@@ -434,6 +444,7 @@ const Modelos = () => {
         nuevoModelo={nuevoModelo}
         setNuevoModelo={setNuevoModelo}
         handleCrearModelo={handleCrearModelo}
+        isFormValid={isFormValid}
       />
 
       {/* Modal para editar modelo */}
@@ -442,8 +453,9 @@ const Modelos = () => {
         setOpenModalEditar={setOpenModalEditar}
         modeloSeleccionado={modeloSeleccionado}
         setModeloSeleccionado={setModeloSeleccionado}
-        statusOptions={statusOptions}
+        statusActivoOptions={statusActivoOptions}
         handleActualizarModelo={handleActualizarModelo}
+        isUpdateFormValid={isUpdateFormValid}
       />
 
       {/* Modal para eliminar modelo */}

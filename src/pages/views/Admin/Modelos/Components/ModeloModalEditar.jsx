@@ -10,8 +10,9 @@ export default function ModeloModalEditar({
   setOpenModalEditar,
   modeloSeleccionado,
   setModeloSeleccionado,
-  statusOptions,
+  statusActivoOptions,
   handleActualizarModelo,
+  isUpdateFormValid,
 }) {
   return (
     <AnimatePresence>
@@ -77,14 +78,22 @@ export default function ModeloModalEditar({
                           <strong>Estado:</strong>
                         </label>
                         <Select
-                          options={statusOptions}
-                          value={statusOptions.find((option) => option.value === modeloSeleccionado?.status)}
-                          onChange={(selected) =>
-                            setModeloSeleccionado({
-                              ...modeloSeleccionado,
-                              status: selected.value,
-                            })
+                          options={statusActivoOptions} // Solo "ACTIVO"
+                          value={
+                            statusActivoOptions.find((option) => option.value === modeloSeleccionado?.status) || {
+                              value: modeloSeleccionado?.status,
+                              label: modeloSeleccionado?.status,
+                            } // Muestra el status actual
                           }
+                          onChange={(selected) => {
+                            if (selected.value === "ACTIVO") {
+                              setModeloSeleccionado({
+                                ...modeloSeleccionado,
+                                status: selected.value, // Cambia a "ACTIVO"
+                              });
+                            }
+                            // Si no se selecciona "ACTIVO", no se hace nada (el status permanece igual)
+                          }}
                           required
                           styles={SelectOptionsStyles}
                         />
@@ -100,6 +109,7 @@ export default function ModeloModalEditar({
                   >
                     <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
                       <button
+                        type="button"
                         onClick={() => setOpenModalEditar(false)}
                         style={{
                           padding: "10px 20px",
@@ -116,12 +126,13 @@ export default function ModeloModalEditar({
                         type="submit"
                         style={{
                           padding: "10px 20px",
-                          backgroundColor: "#254B5E",
+                          backgroundColor: isUpdateFormValid() ? "#254B5E" : "#b7b7b7",
                           color: "white",
                           border: "none",
                           borderRadius: "5px",
-                          cursor: "pointer",
+                          cursor: isUpdateFormValid() ? "pointer" : "not-allowed",
                         }}
+                        disabled={!isUpdateFormValid()}
                       >
                         Guardar cambios
                       </button>

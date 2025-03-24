@@ -42,6 +42,8 @@ const Areas = () => {
     { value: "INACTIVO", label: "Inactivo" },
   ];
 
+  const statusActivoOptions = [{ value: "ACTIVO", label: "Activo" }];
+
   useEffect(() => {
     const token = sessionStorage.getItem("token");
 
@@ -431,6 +433,14 @@ const Areas = () => {
     { id: "acciones", label: "Acciones", minWidth: 50 },
   ];
 
+  const isFormValid = () => {
+    return nuevaArea.nombreArea.trim() !== "";
+  };
+
+  const isUpdateFormValid = () => {
+    return areaSeleccionada.nombreArea.trim() !== "";
+  };
+
   return (
     <div style={{ display: "flex", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
       {/* Modal para crear área */}
@@ -440,6 +450,7 @@ const Areas = () => {
         nuevaArea={nuevaArea}
         setNuevaArea={setNuevaArea}
         handleCrearArea={handleCrearArea}
+        isFormValid={isFormValid}
       />
 
       {/* Modal para editar área */}
@@ -448,8 +459,9 @@ const Areas = () => {
         setOpenModalEditar={setOpenModalEditar}
         areaSeleccionada={areaSeleccionada}
         setAreaSeleccionada={setAreaSeleccionada}
-        statusOptions={statusOptions}
+        statusActivoOptions={statusActivoOptions}
         handleActualizarArea={handleActualizarArea}
+        isUpdateFormValid={isUpdateFormValid}
       />
 
       {/* Modal para eliminar área */}

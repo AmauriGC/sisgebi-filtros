@@ -10,6 +10,7 @@ export default function TipoModalCrear({
   nuevoTipoBien,
   setNuevoTipoBien,
   handleCrearTipoBien,
+  isFormValid,
 }) {
   return (
     <AnimatePresence>
@@ -67,6 +68,7 @@ export default function TipoModalCrear({
                   >
                     <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
                       <button
+                        type="button"
                         onClick={() => setOpenModalCrear(false)}
                         style={{
                           padding: "10px 20px",
@@ -83,12 +85,13 @@ export default function TipoModalCrear({
                         type="submit"
                         style={{
                           padding: "10px 20px",
-                          backgroundColor: "#254B5E",
+                          backgroundColor: isFormValid() ? "#254B5E" : "#b7b7b7",
                           color: "white",
                           border: "none",
                           borderRadius: "5px",
-                          cursor: "pointer",
+                          cursor: isFormValid() ? "pointer" : "not-allowed",
                         }}
+                        disabled={!isFormValid()}
                       >
                         Registrar
                       </button>

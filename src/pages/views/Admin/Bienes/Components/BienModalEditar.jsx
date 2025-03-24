@@ -14,8 +14,9 @@ export default function BienModalEditar({
   marcaOptions,
   modeloOptions,
   areaComunOptions,
-  statusOptions,
+  statusActivoOptions,
   handleActualizar,
+  isUpdateFormValid,
 }) {
   return (
     <AnimatePresence>
@@ -111,6 +112,7 @@ export default function BienModalEditar({
                         </label>
                         <Select
                           options={marcaOptions}
+                          placeholder={marcaOptions.length === 0 ? "No hay marcas disponibles" : "Seleccione la marca"}
                           value={marcaOptions.find((option) => option.value === bienSeleccionado?.marca?.marcaId)}
                           onChange={(selected) =>
                             setBienSeleccionado({
@@ -119,6 +121,7 @@ export default function BienModalEditar({
                             })
                           }
                           required
+                          isDisabled={marcaOptions.length === 0} // Deshabilitar si no hay opciones
                           styles={SelectOptionsStyles}
                         />
                       </div>
@@ -128,6 +131,9 @@ export default function BienModalEditar({
                         </label>
                         <Select
                           options={modeloOptions}
+                          placeholder={
+                            modeloOptions.length === 0 ? "No hay modelos disponibles" : "Seleccione el modelo"
+                          }
                           value={modeloOptions.find((option) => option.value === bienSeleccionado?.modelo?.modeloId)}
                           onChange={(selected) =>
                             setBienSeleccionado({
@@ -136,6 +142,7 @@ export default function BienModalEditar({
                             })
                           }
                           required
+                          isDisabled={modeloOptions.length === 0} // Deshabilitar si no hay opciones
                           styles={SelectOptionsStyles}
                         />
                       </div>
@@ -155,6 +162,11 @@ export default function BienModalEditar({
                         </label>
                         <Select
                           options={tipoBienOptions}
+                          placeholder={
+                            tipoBienOptions.length === 0
+                              ? "No hay tipos de bien disponibles"
+                              : "Seleccione el tipo de bien"
+                          }
                           value={tipoBienOptions.find(
                             (option) => option.value === bienSeleccionado?.tipoBien?.tipoBienId
                           )}
@@ -165,6 +177,7 @@ export default function BienModalEditar({
                             })
                           }
                           required
+                          isDisabled={tipoBienOptions.length === 0} // Deshabilitar si no hay opciones
                           styles={SelectOptionsStyles}
                         />
                       </div>
@@ -174,6 +187,11 @@ export default function BienModalEditar({
                         </label>
                         <Select
                           options={areaComunOptions}
+                          placeholder={
+                            areaComunOptions.length === 0
+                              ? "No hay áreas comunes disponibles"
+                              : "Seleccione el área común"
+                          }
                           value={areaComunOptions.find(
                             (option) => option.value === bienSeleccionado?.areaComun?.areaId
                           )}
@@ -183,6 +201,7 @@ export default function BienModalEditar({
                               areaComun: { areaId: selected.value },
                             })
                           }
+                          isDisabled={areaComunOptions.length === 0} // Deshabilitar si no hay opciones
                           styles={SelectOptionsStyles}
                         />
                       </div>
@@ -201,14 +220,22 @@ export default function BienModalEditar({
                           <strong>Estado:</strong>
                         </label>
                         <Select
-                          options={statusOptions}
-                          value={statusOptions.find((option) => option.value === bienSeleccionado?.status)}
-                          onChange={(selected) =>
-                            setBienSeleccionado({
-                              ...bienSeleccionado,
-                              status: selected.value,
-                            })
+                          options={statusActivoOptions} // Solo "ACTIVO"
+                          value={
+                            statusActivoOptions.find((option) => option.value === bienSeleccionado?.status) || {
+                              value: bienSeleccionado?.status,
+                              label: bienSeleccionado?.status,
+                            } // Muestra el status actual
                           }
+                          onChange={(selected) => {
+                            if (selected.value === "ACTIVO") {
+                              setBienSeleccionado({
+                                ...bienSeleccionado,
+                                status: selected.value, // Cambia a "ACTIVO"
+                              });
+                            }
+                            // Si no se selecciona "ACTIVO", no se hace nada (el status permanece igual)
+                          }}
                           required
                           styles={SelectOptionsStyles}
                         />
@@ -224,6 +251,7 @@ export default function BienModalEditar({
                   >
                     <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
                       <button
+                        type="button"
                         onClick={() => setOpenModalEditar(false)}
                         style={{
                           padding: "10px 20px",
@@ -240,12 +268,13 @@ export default function BienModalEditar({
                         type="submit"
                         style={{
                           padding: "10px 20px",
-                          backgroundColor: "#254B5E",
+                          backgroundColor: isUpdateFormValid() ? "#254B5E" : "#b7b7b7",
                           color: "white",
                           border: "none",
                           borderRadius: "5px",
-                          cursor: "pointer",
+                          cursor: isUpdateFormValid() ? "pointer" : "not-allowed",
                         }}
+                        disabled={!isUpdateFormValid()}
                       >
                         Guardar cambios
                       </button>

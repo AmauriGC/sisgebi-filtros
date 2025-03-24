@@ -15,6 +15,7 @@ export default function BienModalCrear({
   modeloOptions,
   areaComunOptions,
   handleCrear,
+  isFormValid,
 }) {
   return (
     <AnimatePresence>
@@ -102,10 +103,11 @@ export default function BienModalCrear({
                         </label>
                         <Select
                           options={marcaOptions}
-                          placeholder="Seleccione la marca"
+                          placeholder={marcaOptions.length === 0 ? "No hay marcas disponibles" : "Seleccione la marca"}
                           value={marcaOptions.find((option) => option.value === nuevoBien.marca?.value)}
                           onChange={(selected) => setNuevoBien({ ...nuevoBien, marca: selected })}
                           required
+                          isDisabled={marcaOptions.length === 0}
                           styles={SelectOptionsStyles}
                         />
                       </div>
@@ -115,10 +117,13 @@ export default function BienModalCrear({
                         </label>
                         <Select
                           options={modeloOptions}
-                          placeholder="Seleccione el modelo"
+                          placeholder={
+                            modeloOptions.length === 0 ? "No hay modelos disponibles" : "Seleccione el modelo"
+                          }
                           value={modeloOptions.find((option) => option.value === nuevoBien.modelo?.value)}
                           onChange={(selected) => setNuevoBien({ ...nuevoBien, modelo: selected })}
                           required
+                          isDisabled={modeloOptions.length === 0} // Deshabilitar si no hay opciones
                           styles={SelectOptionsStyles}
                         />
                       </div>
@@ -138,10 +143,15 @@ export default function BienModalCrear({
                         </label>
                         <Select
                           options={tipoBienOptions}
-                          placeholder="Seleccione el tipo de bien"
+                          placeholder={
+                            tipoBienOptions.length === 0
+                              ? "No hay tipos de bien disponibles"
+                              : "Seleccione el tipo de bien"
+                          }
                           value={tipoBienOptions.find((option) => option.value === nuevoBien.tipoBien?.value)}
                           onChange={(selected) => setNuevoBien({ ...nuevoBien, tipoBien: selected })}
                           required
+                          isDisabled={tipoBienOptions.length === 0} // Deshabilitar si no hay opciones
                           styles={SelectOptionsStyles}
                         />
                       </div>
@@ -151,9 +161,14 @@ export default function BienModalCrear({
                         </label>
                         <Select
                           options={areaComunOptions}
-                          placeholder="Seleccione el área común"
+                          placeholder={
+                            areaComunOptions.length === 0
+                              ? "No hay áreas comunes disponibles"
+                              : "Seleccione el área común"
+                          }
                           value={areaComunOptions.find((option) => option.value === nuevoBien.areaComun?.value)}
                           onChange={(selected) => setNuevoBien({ ...nuevoBien, areaComun: selected })}
+                          isDisabled={areaComunOptions.length === 0} // Deshabilitar si no hay opciones
                           styles={SelectOptionsStyles}
                         />
                       </div>
@@ -168,7 +183,21 @@ export default function BienModalCrear({
                   >
                     <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
                       <button
-                        onClick={() => setOpenModalCrear(false)}
+                        type="button"
+                        onClick={() => {
+                          setOpenModalCrear(false),
+                            setNuevoBien({
+                              codigo: "",
+                              numeroSerie: "",
+                              tipoBien: null,
+                              marca: null,
+                              modelo: null,
+                              areaComun: null,
+                              status: "ACTIVO",
+                              disponibilidad: "DISPONIBLE",
+                              motivo: "",
+                            });
+                        }}
                         style={{
                           padding: "10px 20px",
                           backgroundColor: "#b7b7b7",
@@ -184,12 +213,13 @@ export default function BienModalCrear({
                         type="submit"
                         style={{
                           padding: "10px 20px",
-                          backgroundColor: "#254B5E",
+                          backgroundColor: isFormValid() ? "#254B5E" : "#b7b7b7",
                           color: "white",
                           border: "none",
                           borderRadius: "5px",
-                          cursor: "pointer",
+                          cursor: isFormValid() ? "pointer" : "not-allowed",
                         }}
+                        disabled={!isFormValid()}
                       >
                         Crear
                       </button>
