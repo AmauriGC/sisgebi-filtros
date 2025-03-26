@@ -363,14 +363,22 @@ const Modelos = () => {
 
     if (!modeloSeleccionado) return;
 
-    const modeloParaEnviar = {
-      nombreModelo: modeloSeleccionado.nombreModelo,
-      status: modeloSeleccionado.status,
-    };
+    // Crear FormData para enviar la imagen
+    const formData = new FormData();
+    formData.append("nombreModelo", modeloSeleccionado.nombreModelo);
+    formData.append("status", modeloSeleccionado.status);
+
+    // Solo agregar la foto si se seleccionó una nueva
+    if (modeloSeleccionado.foto && modeloSeleccionado.foto instanceof File) {
+      formData.append("foto", modeloSeleccionado.foto);
+    }
 
     axios
-      .put(`http://localhost:8080/api/modelo/${modeloSeleccionado.modeloId}`, modeloParaEnviar, {
-        headers: { Authorization: `Bearer ${token}` },
+      .put(`http://localhost:8080/api/modelo/${modeloSeleccionado.modeloId}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       })
       .then((response) => {
         setModelos(modelos.map((modelo) => (modelo.modeloId === modeloSeleccionado.modeloId ? response.data : modelo)));
@@ -392,6 +400,17 @@ const Modelos = () => {
           showConfirmButton: true,
         });
       });
+  };
+
+  // Cuando cambies la imagen en el formulario
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setModeloSeleccionado({
+        ...modeloSeleccionado,
+        foto: file,
+      });
+    }
   };
 
   const handleEliminarModelo = (id) => {
@@ -484,6 +503,7 @@ const Modelos = () => {
         setNuevoModelo={setNuevoModelo}
         handleCrearModelo={handleCrearModelo}
         isFormValid={isFormValid}
+        handleFileChange={handleFileChange}
       />
 
       {/* Modal para editar modelo */}
@@ -495,6 +515,7 @@ const Modelos = () => {
         statusActivoOptions={statusActivoOptions}
         handleActualizarModelo={handleActualizarModelo}
         isUpdateFormValid={isUpdateFormValid}
+        handleImageChange={handleImageChange}
       />
 
       {/* Modal para eliminar modelo */}

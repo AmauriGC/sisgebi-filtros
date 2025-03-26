@@ -1,5 +1,5 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion"; // Importar Framer Motion
+import { motion, AnimatePresence } from "framer-motion";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -13,6 +13,7 @@ export default function ModeloModalEditar({
   statusActivoOptions,
   handleActualizarModelo,
   isUpdateFormValid,
+  handleImageChange,
 }) {
   return (
     <AnimatePresence>
@@ -25,9 +26,9 @@ export default function ModeloModalEditar({
         >
           <Box sx={style}>
             <motion.div
-              initial={{ opacity: 0, y: -50 }} // Animación inicial: invisible y desplazado hacia arriba
-              animate={{ opacity: 1, y: 0 }} // Animación al abrir: visible y en su posición
-              transition={{ duration: 0.3, ease: "easeInOut" }} // Duración y tipo de animación
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               <Typography id="modal-modal-title" variant="h4" component="h2">
                 <strong>Editar Modelo</strong>
@@ -39,7 +40,7 @@ export default function ModeloModalEditar({
                     handleActualizarModelo();
                   }}
                 >
-                  {/* Animación para el input del nombre del modelo */}
+                  {/* Input del nombre del modelo */}
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -66,7 +67,60 @@ export default function ModeloModalEditar({
                     </div>
                   </motion.div>
 
-                  {/* Animación para el select de estado */}
+                  {/* Sección de foto con animación mejorada */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{
+                      delay: 0.2,
+                      type: "spring",
+                      stiffness: 100,
+                      damping: 10,
+                    }}
+                    whileHover={{ scale: 1.01 }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        marginBottom: "10px",
+                        padding: "15px",
+                        backgroundColor: "#f8f8f8",
+                        borderRadius: "8px",
+                        border: "2px dashed #e0e0e0",
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <label>
+                          <strong>Foto del Modelo:</strong>
+                        </label>
+                        <motion.div whileHover={{ scale: 1.02 }}>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            style={{
+                              width: "100%",
+                              height: "40px",
+                              border: "solid 1px #c2c2c2",
+                              borderRadius: "5px",
+                              padding: "5px",
+                              cursor: "pointer",
+                            }}
+                          />
+                        </motion.div>
+                        {modeloSeleccionado.foto ? (
+                          <p style={{ marginTop: "8px" }}>Nueva imagen seleccionada: {modeloSeleccionado.foto.name}</p>
+                        ) : (
+                          <p style={{ marginTop: "8px" }}>
+                            No se ha seleccionado nueva imagen (se mantendrá la actual)
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Select de estado */}
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -78,21 +132,20 @@ export default function ModeloModalEditar({
                           <strong>Estado:</strong>
                         </label>
                         <Select
-                          options={statusActivoOptions} // Solo "ACTIVO"
+                          options={statusActivoOptions}
                           value={
                             statusActivoOptions.find((option) => option.value === modeloSeleccionado?.status) || {
                               value: modeloSeleccionado?.status,
                               label: modeloSeleccionado?.status,
-                            } // Muestra el status actual
+                            }
                           }
                           onChange={(selected) => {
                             if (selected.value === "ACTIVO") {
                               setModeloSeleccionado({
                                 ...modeloSeleccionado,
-                                status: selected.value, // Cambia a "ACTIVO"
+                                status: selected.value,
                               });
                             }
-                            // Si no se selecciona "ACTIVO", no se hace nada (el status permanece igual)
                           }}
                           required
                           styles={SelectOptionsStyles}
@@ -101,7 +154,7 @@ export default function ModeloModalEditar({
                     </div>
                   </motion.div>
 
-                  {/* Animación para los botones */}
+                  {/* Botones */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}

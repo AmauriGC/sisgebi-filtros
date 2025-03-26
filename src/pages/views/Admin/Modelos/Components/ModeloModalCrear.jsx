@@ -1,5 +1,5 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion"; // Importar Framer Motion
+import { motion, AnimatePresence } from "framer-motion";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -24,9 +24,9 @@ export default function ModeloModalCrear({
         >
           <Box sx={style}>
             <motion.div
-              initial={{ opacity: 0, y: -50 }} // Animación inicial: invisible y desplazado hacia arriba
-              animate={{ opacity: 1, y: 0 }} // Animación al abrir: visible y en su posición
-              transition={{ duration: 0.3, ease: "easeInOut" }} // Duración y tipo de animación
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               <Typography id="modal-modal-title" variant="h4" component="h2">
                 <strong>Registrar Modelo</strong>
@@ -38,7 +38,7 @@ export default function ModeloModalCrear({
                     handleCrearModelo();
                   }}
                 >
-                  {/* Animación para el input del nombre del modelo */}
+                  {/* Input del nombre del modelo (sin cambios) */}
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -61,15 +61,56 @@ export default function ModeloModalCrear({
                     </div>
                   </motion.div>
 
-                  {/* Animación para la foto del modelo */}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileChange(e)} // Llamando a la función que maneja el cambio
-                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
-                  />
+                  {/* SECCIÓN DE FOTO CON ANIMACIÓN MEJORADA */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{
+                      delay: 0.2,
+                      type: "spring",
+                      stiffness: 100,
+                      damping: 10,
+                    }}
+                    whileHover={{ scale: 1.01 }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        marginBottom: "10px",
+                        padding: "15px",
+                        backgroundColor: "#f8f8f8",
+                        borderRadius: "8px",
+                        border: "2px dashed #e0e0e0",
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <label>
+                          <strong>Foto del Modelo:</strong>
+                        </label>
+                        <motion.div whileHover={{ scale: 1.02 }}>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            required
+                            style={{
+                              width: "100%",
+                              height: "40px",
+                              border: "solid 1px #c2c2c2",
+                              borderRadius: "5px",
+                              padding: "5px",
+                              cursor: "pointer",
+                              backgroundColor: "#254B5E",
+                              color: "white",
+                            }}
+                          />
+                        </motion.div>
+                      </div>
+                    </div>
+                  </motion.div>
 
-                  {/* Animación para los botones */}
+                  {/* Botones (sin cambios) */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
