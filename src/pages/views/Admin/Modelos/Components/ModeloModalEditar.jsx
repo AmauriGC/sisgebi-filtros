@@ -1,5 +1,5 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion"; // Importar Framer Motion
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -26,9 +26,9 @@ export default function ModeloModalEditar({
         >
           <Box sx={style}>
             <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              initial={{ opacity: 0, y: -50 }} // Animación inicial: invisible y desplazado hacia arriba
+              animate={{ opacity: 1, y: 0 }} // Animación al abrir: visible y en su posición
+              transition={{ duration: 0.3, ease: "easeInOut" }} // Duración y tipo de animación
             >
               <Typography id="modal-modal-title" variant="h4" component="h2">
                 <strong>Editar Modelo</strong>
@@ -40,7 +40,7 @@ export default function ModeloModalEditar({
                     handleActualizarModelo();
                   }}
                 >
-                  {/* Input del nombre del modelo */}
+                  {/* Animación para el input del nombre del modelo */}
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -102,10 +102,12 @@ export default function ModeloModalEditar({
                             style={{
                               width: "100%",
                               height: "40px",
-                              border: "solid 1px #c2c2c2",
+                              border: "solid 1px #1a3a4a", // Borde más oscuro para combinar
                               borderRadius: "5px",
                               padding: "5px",
                               cursor: "pointer",
+                              backgroundColor: "#254B5E", // Color azul oscuro
+                              color: "white", // Texto en blanco
                             }}
                           />
                         </motion.div>
@@ -120,7 +122,7 @@ export default function ModeloModalEditar({
                     </div>
                   </motion.div>
 
-                  {/* Select de estado */}
+                  {/* Animación para el select de estado */}
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -132,20 +134,21 @@ export default function ModeloModalEditar({
                           <strong>Estado:</strong>
                         </label>
                         <Select
-                          options={statusActivoOptions}
+                          options={statusActivoOptions} // Solo "ACTIVO"
                           value={
                             statusActivoOptions.find((option) => option.value === modeloSeleccionado?.status) || {
                               value: modeloSeleccionado?.status,
                               label: modeloSeleccionado?.status,
-                            }
+                            } // Muestra el status actual
                           }
                           onChange={(selected) => {
                             if (selected.value === "ACTIVO") {
                               setModeloSeleccionado({
                                 ...modeloSeleccionado,
-                                status: selected.value,
+                                status: selected.value, // Cambia a "ACTIVO"
                               });
                             }
+                            // Si no se selecciona "ACTIVO", no se hace nada (el status permanece igual)
                           }}
                           required
                           styles={SelectOptionsStyles}
@@ -154,7 +157,7 @@ export default function ModeloModalEditar({
                     </div>
                   </motion.div>
 
-                  {/* Botones */}
+                  {/* Animación para los botones */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
