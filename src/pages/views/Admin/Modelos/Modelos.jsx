@@ -30,11 +30,6 @@ const Modelos = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [nuevoModelo, setNuevoModelo] = useState({
-    nombreModelo: "",
-    status: "ACTIVO",
-  });
-
   const navigate = useNavigate();
 
   const statusOptions = [
@@ -50,6 +45,50 @@ const Modelos = () => {
 
   const isUpdateFormValid = () => {
     return modeloSeleccionado.nombreModelo.trim() !== "";
+  };
+
+  const [nuevoModelo, setNuevoModelo] = useState({
+    nombreModelo: "",
+    foto: "",
+    status: "ACTIVO",
+  });
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!validTypes.includes(file.type)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Formato no soportado",
+        text: "Solo se permiten imágenes JPEG, PNG o JPG.",
+        showConfirmButton: false,
+        timer: 3000,
+      });
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      Swal.fire({
+        icon: "warning",
+        title: "Error",
+        text: "El archivo es demasiado grande. El límite es 10MB.",
+        showConfirmButton: false,
+        timer: 3000,
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setNuevoModelo({
+        ...nuevoModelo,
+        foto: file,
+        preview: e.target.result,
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
   useEffect(() => {
@@ -219,7 +258,6 @@ const Modelos = () => {
 
   const handleCrearModelo = () => {
     const token = sessionStorage.getItem("token");
-
     if (!token) {
       Swal.fire({
         icon: "warning",
@@ -249,23 +287,24 @@ const Modelos = () => {
       return;
     }
 
-    const modeloParaEnviar = {
-      nombreModelo: nuevoModelo.nombreModelo,
-      status: nuevoModelo.status,
-    };
+    const formData = new FormData();
+    formData.append("nombreModelo", nuevoModelo.nombreModelo);
+    formData.append("status", nuevoModelo.status);
+    if (nuevoModelo.foto) {
+      formData.append("foto", nuevoModelo.foto);
+    }
 
     axios
-      .post("http://localhost:8080/api/modelo", modeloParaEnviar, {
-        headers: { Authorization: `Bearer ${token}` },
+      .post("http://localhost:8080/api/modelo", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       })
       .then((response) => {
         setModelos([...modelos, response.data]);
-
         setOpenModalCrear(false);
-        setNuevoModelo({
-          nombreModelo: "",
-          status: "ACTIVO",
-        });
+        setNuevoModelo({ nombreModelo: "", status: "ACTIVO", foto: null });
 
         Swal.fire({
           icon: "success",
@@ -276,11 +315,10 @@ const Modelos = () => {
         });
       })
       .catch((error) => {
-        console.error("Hubo un error al crear el modelo:", error);
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "No se pudo crear el modelo. Por favor, verifica los datos e inténtalo de nuevo.",
+          text: "No se pudo crear el modelo.",
           showConfirmButton: true,
         });
       });
@@ -431,6 +469,7 @@ const Modelos = () => {
   const columns = [
     { id: "modeloId", label: "#", minWidth: 50 },
     { id: "nombreModelo", label: "Nombre", minWidth: 100 },
+    { id: "foto", label: "Imagen", minWidth: 100 },
     { id: "status", label: "Estado", minWidth: 100 },
     { id: "acciones", label: "Acciones", minWidth: 50 },
   ];
@@ -538,7 +577,7 @@ const Modelos = () => {
                       {columns.map((column) => {
                         if (column.id === "acciones") {
                           return (
-                            <TableCell key={column.id} align={column.align} style={{ textAlign: "center" }}>
+                            <TableCell key={column.id} align="center">
                               <div style={{ display: "flex" }}>
                                 <img
                                   src={edit}
@@ -564,14 +603,33 @@ const Modelos = () => {
                               </div>
                             </TableCell>
                           );
+                        } else if (column.id === "foto") {
+                          return (
+                            <TableCell key={column.id} align="center">
+                              {modelo.foto ? (
+                                <img
+                                  src={`data:image/${
+                                    modelo.foto.includes("image/")
+                                      ? modelo.foto.split("image/")[1].split(";")[0]
+                                      : "jpeg"
+                                  };base64,${modelo.foto}`}
+                                  alt="Modelo"
+                                  style={{
+                                    width: "75px",
+                                    height: "75px",
+                                    borderRadius: "5px",
+                                    objectFit: "scale-down",
+                                  }}
+                                />
+                              ) : (
+                                "Sin imagen"
+                              )}
+                            </TableCell>
+                          );
                         } else {
                           const value = modelo[column.id];
                           return (
-                            <TableCell
-                              key={column.id}
-                              align={column.align}
-                              style={{ fontSize: "12px", textAlign: "start" }}
-                            >
+                            <TableCell key={column.id} align="left" style={{ fontSize: "12px" }}>
                               {value}
                             </TableCell>
                           );

@@ -54,7 +54,8 @@ export default function Form() {
       Swal.fire({
         icon: "success",
         title: "Inicio de sesión exitoso",
-        text: `Bienvenido, ${rol.toLowerCase()}.`,
+        // text: `Bienvenido, ${rol.toLowerCase()}.`,
+        text: "Bienvenido.",
         showConfirmButton: false,
         timer: 1500,
       }).then(() => {

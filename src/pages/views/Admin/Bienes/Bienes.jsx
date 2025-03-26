@@ -28,6 +28,11 @@ const Bienes = () => {
   const [filtroStatus, setFiltroStatus] = React.useState(null);
   const [filtroDisponibilidad, setFiltroDisponibilidad] = React.useState(null);
 
+  const [filtroAreaComun, setFiltroAreaComun] = React.useState(null);
+  const [filtroTipoBien, setFiltroTipoBien] = React.useState(null);
+  const [filtroMarca, setFiltroMarca] = React.useState(null);
+  const [filtroModelo, setFiltroModelo] = React.useState(null);
+
   const [areaComunOptions, setAreaComunOptions] = React.useState([]);
   const [tipoBienOptions, setTipoBienOptions] = React.useState([]);
   const [marcaOptions, setMarcaOptions] = React.useState([]);
@@ -86,7 +91,7 @@ const Bienes = () => {
 
   React.useEffect(() => {
     aplicarFiltros();
-  }, [filtroStatus, filtroDisponibilidad]);
+  }, [filtroStatus, filtroDisponibilidad, filtroAreaComun, filtroTipoBien, filtroMarca, filtroModelo]);
 
   const obtenerBienes = () => {
     const token = sessionStorage.getItem("token");
@@ -262,6 +267,10 @@ const Bienes = () => {
     const params = {};
     if (filtroStatus) params.status = filtroStatus.value;
     if (filtroDisponibilidad) params.disponibilidad = filtroDisponibilidad.value;
+    if (filtroAreaComun) params.areaId = filtroAreaComun.value;
+    if (filtroTipoBien) params.tipoBienId = filtroTipoBien.value;
+    if (filtroMarca) params.marcaId = filtroMarca.value;
+    if (filtroModelo) params.modeloId = filtroModelo.value;
     const token = sessionStorage.getItem("token");
 
     if (!token) {
@@ -676,49 +685,89 @@ const Bienes = () => {
           {/* Título y filtros */}
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Bienes existentes</h3>
+            <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
 
-            {/* Contenedor principal con distribución adecuada */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              {/* Filtros alineados a la izquierda */}
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
-                {/* Primera fila de filtros */}
-                <Select
-                  placeholder="Disponibilidad"
-                  value={filtroDisponibilidad}
-                  onChange={setFiltroDisponibilidad}
-                  options={disponibilidadOptions}
-                  styles={customSelectStyles}
-                />
-                <Select
-                  placeholder="Estado"
-                  value={filtroStatus}
-                  onChange={setFiltroStatus}
-                  options={statusOptions}
-                  styles={customSelectStyles}
-                />
-              </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                justifyItems: "center",
+              }}
+            >
+              {/* Fila 1 */}
+              <Select
+                placeholder="Área Común"
+                value={filtroAreaComun}
+                onChange={setFiltroAreaComun}
+                options={areaComunOptions}
+                styles={customSelectStyles}
+              />
+              <Select
+                placeholder="Tipo de Bien"
+                value={filtroTipoBien}
+                onChange={setFiltroTipoBien}
+                options={tipoBienOptions}
+                styles={customSelectStyles}
+              />
+              <Select
+                placeholder="Marca"
+                value={filtroMarca}
+                onChange={setFiltroMarca}
+                options={marcaOptions}
+                styles={customSelectStyles}
+              />
 
-              {/* Botones alineados a la derecha en columna */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginLeft: "auto" }}>
-                <button onClick={resetearFiltros} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
-                  Borrar
-                </button>
-                <button
-                  onClick={() => setOpenModalCrear(true)}
-                  style={{
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    backgroundColor: "#254B5E",
-                    padding: "8px",
-                  }}
-                >
-                  Crear
-                </button>
-              </div>
+              {/* Fila 2 */}
+              <Select
+                placeholder="Modelo"
+                value={filtroModelo}
+                onChange={setFiltroModelo}
+                options={modeloOptions}
+                styles={customSelectStyles}
+              />
+              <Select
+                placeholder="Disponibilidad"
+                value={filtroDisponibilidad}
+                onChange={setFiltroDisponibilidad}
+                options={disponibilidadOptions}
+                styles={customSelectStyles}
+              />
+              <Select
+                placeholder="Estado"
+                value={filtroStatus}
+                onChange={setFiltroStatus}
+                options={statusOptions}
+                styles={customSelectStyles}
+              />
+            </div>
+
+            {/* Botones alineados a la derecha en columna */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                gap: "10px",
+              }}
+            >
+              <button onClick={resetearFiltros} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
+                Borrar
+              </button>
+              <button
+                onClick={() => setOpenModalCrear(true)}
+                style={{
+                  backgroundColor: "#254B5E",
+                  padding: "8px",
+                  border: "none",
+                  borderRadius: "5px",
+                  color: "#fff",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  width: "150px",
+                }}
+              >
+                Crear
+              </button>
             </div>
           </Box>
           {/* Tabla */}
@@ -866,6 +915,7 @@ const customSelectStyles = {
     width: "200px",
     backgroundColor: "#A7D0D2",
     border: "none",
+    marginBottom: "10px",
   }),
   option: (base) => ({
     ...base,

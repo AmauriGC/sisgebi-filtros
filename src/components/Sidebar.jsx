@@ -18,7 +18,7 @@ const SidebarItem = ({ icon, label, isExpanded, isSelected, onClick, children })
   return (
     <div>
       <motion.div
-        className={`align-items-center p-1 cursor-pointer rounded transition-colors ${
+        className={`align-items-center p-1 rounded transition-colors ${
           isSelected ? "bg-white fw-bold" : "hover:bg-light"
         }`}
         onClick={onClick}
@@ -29,7 +29,6 @@ const SidebarItem = ({ icon, label, isExpanded, isSelected, onClick, children })
           textAlign: "start",
           marginBottom: "25px",
           color: "#254B5E",
-          cursor: "pointer",
         }}
         whileHover={{ scale: 1.05 }} // Efecto hover: se hace un poco más grande
         whileTap={{ scale: 0.9 }} // Efecto al hacer clic
@@ -87,7 +86,7 @@ const Sidebar = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsExpanded(window.innerWidth >= 768);
+      //setIsExpanded(window.innerWidth >= 768);
     };
     handleResize(); // Establecer el estado inicial basado en el ancho de la pantalla
     window.addEventListener("resize", handleResize);

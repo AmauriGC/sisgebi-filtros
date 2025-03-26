@@ -11,6 +11,7 @@ export default function ModeloModalCrear({
   setNuevoModelo,
   handleCrearModelo,
   isFormValid,
+  handleFileChange,
 }) {
   return (
     <AnimatePresence>
@@ -59,6 +60,14 @@ export default function ModeloModalCrear({
                       </div>
                     </div>
                   </motion.div>
+
+                  {/* Animación para la foto del modelo */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(e)} // Llamando a la función que maneja el cambio
+                    style={{ width: "100%", height: "40px", border: "solid 1px #c2c2c2", borderRadius: "5px" }}
+                  />
 
                   {/* Animación para los botones */}
                   <motion.div

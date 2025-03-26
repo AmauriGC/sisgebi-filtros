@@ -51,6 +51,7 @@ export default function BienModalVer({ openModalVer, setOpenModalVer, bienSelecc
                     p: 3,
                     borderRadius: "8px",
                     border: "1px solid #e0e0e0",
+                    justifyContent: "center",
                   }}
                 >
                   {[
@@ -60,9 +61,9 @@ export default function BienModalVer({ openModalVer, setOpenModalVer, bienSelecc
                     { label: "Modelo:", value: bienSeleccionado?.modelo?.nombreModelo },
                     { label: "Tipo de Bien:", value: bienSeleccionado?.tipoBien?.nombreTipoBien },
                     { label: "Área Común:", value: bienSeleccionado?.areaComun?.nombreArea },
-                    { label: "Estado:", value: bienSeleccionado?.status },
                     { label: "Disponibilidad:", value: bienSeleccionado?.disponibilidad },
-                    { label: "Motivo:", value: bienSeleccionado?.motivo },
+                    { label: "Estado:", value: bienSeleccionado?.status },
+                    { label: "Motivo de eliminación:", value: bienSeleccionado?.motivo },
                     {
                       label: "Fecha de eliminación:",
                       value: bienSeleccionado?.deleteAt
