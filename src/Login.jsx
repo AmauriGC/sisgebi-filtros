@@ -1,13 +1,23 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import "./assets/css/Login.css";
-import logo from "./assets/img/sisgebi.jpeg";
+import Swal from "sweetalert2";
+import at from "./assets/img/at.svg";
+import lock from "./assets/img/lock-outline.svg";
+import closeEye from "./assets/img/eye-off-outline.svg";
+import eye from "./assets/img/eye-outline.svg";
+import logo from "./assets/img/ICON.png";
 import roles from "./assets/img/account-tie.svg";
 import roles2 from "./assets/img/account-badge.svg";
 import roles3 from "./assets/img/account.svg";
 
-const Login = () => {
+export default function Form() {
+  const [correo, setCorreo] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [error, setError] = useState("");
+  const [mostrarContrasena, setMostrarContrasena] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [rol, setRol] = useState("");
   const navigate = useNavigate();
 
@@ -45,194 +55,343 @@ const Login = () => {
     "": "",
   };
 
+  const correoValido = /^[a-zA-Z0-9@._´]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/;
+  const contrasenaValida = /^[a-zA-Z0-9@._´]+$/;
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    // Validación del correo
+    if (!correoValido.test(correo)) {
+      Swal.fire({
+        icon: "error",
+        title: "Correo inválido",
+        text: "Por favor, ingresa un correo electrónico válido.",
+        showConfirmButton: true,
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Validación de la contraseña
+    if (!contrasenaValida.test(contrasena)) {
+      Swal.fire({
+        icon: "error",
+        title: "Contraseña inválida",
+        text: "La contraseña solo puede contener caracteres alfanuméricos.",
+        showConfirmButton: true,
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post(`http://localhost:8080/auth/login?correo=${correo}&contrasena=${contrasena}`);
+
+      const { token, rol } = response.data;
+      sessionStorage.setItem("token", token);
+
+      // Mostrar alerta de éxito antes de redirigir
+      Swal.fire({
+        icon: "success",
+        title: "Inicio de sesión exitoso",
+        text: "Bienvenido.",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        // Redirigir según el rol
+        if (rol === "ADMINISTRADOR") {
+          navigate("/admin-dashboard");
+        } else if (rol === "BECARIO") {
+          navigate("/becario-dashboard");
+        } else if (rol === "RESPONSABLE") {
+          navigate("/responsable-dashboard");
+        }
+      });
+    } catch (err) {
+      // Mostrar alerta de error si las credenciales son incorrectas
+      Swal.fire({
+        icon: "error",
+        title: "Error de autenticación",
+        text: "Correo o contraseña incorrectos. Por favor, inténtalo de nuevo.",
+        showConfirmButton: true,
+      });
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <motion.div
       className="d-flex min-vh-100 align-items-center justify-content-center"
-      style={{ background: "linear-gradient(135deg, #254b5e, #546eab, #4697b4, #a7d0d2)", gap: "100px" }}
+      style={{ 
+        background: "linear-gradient(135deg, #254b5e, #546eab, #4697b4, #a7d0d2)",
+        padding: "20px"
+      }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Sección izquierda (iconos que cambian según el rol) */}
       <motion.div
-        className="d-flex flex-column align-items-center col-6 col-sm-6 col-md-4 col-lg-4"
-        style={{ alignSelf: "flex-start" }}
-        initial={{ opacity: 0, x: -100 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
+        className="container"
+        style={{
+          width: "100%",
+          maxWidth: "1000px",
+          backgroundColor: colores[rol].fondo,
+          borderRadius: "15px",
+          boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
+          display: "flex",
+          overflow: "hidden",
+          color: colores[rol].texto,
+        }}
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 100 }}
       >
+        {/* Sección izquierda - Imagen del rol */}
         <motion.div
-          className="p-5 shadow text-center d-flex flex-column"
+          className="d-flex flex-column align-items-center justify-content-center p-5"
           style={{
-            width: "420px",
-            height: "580px",
-            borderRadius: "0 0 15px 15px",
+            width: "40%",
+            minHeight: "600px",
             backgroundColor: colores[rol].fondo,
-            color: colores[rol].texto,
           }}
-          initial={{ scale: 0.8, rotate: -5 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 100, damping: 10 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
         >
-          <div className="mx-auto" style={{ width: "120px", height: "120px" }}>
-            {/* Imagen que cambia según el rol */}
-            <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={rol}
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {rol && (
+                <>
+                  <motion.img
+                    src={imagenRol[rol]}
+                    className="img-fluid mb-4"
+                    style={{
+                      width: "200px",
+                      height: "200px",
+                      backgroundColor: "white",
+                      borderRadius: "50%",
+                      padding: "20px",
+                      objectFit: "contain",
+                    }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 200,
+                      damping: 15
+                    }}
+                  />
+                  <motion.h2
+                    className="fw-bold mb-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    {rol}
+                  </motion.h2>
+                </>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Sección derecha - Formulario */}
+        <motion.div
+          className="p-5"
+          style={{
+            width: "60%",
+            backgroundColor: "white",
+            color: "#254B5E",
+          }}
+          initial={{ x: 50 }}
+          animate={{ x: 0 }}
+          transition={{ type: "spring", stiffness: 100 }}
+        >
+          <div className="d-flex justify-content-between align-items-center mb-5">
+            <div className="d-flex align-items-center">
               <motion.img
-                key={rol}
-                src={imagenRol[rol]}
+                src={logo}
+                alt="LOGO"
                 className="img-fluid"
                 style={{
-                  maxHeight: "240px",
-                  maxWidth: "240px",
-                  backgroundColor: rol === "" ? "white" : "white",
-                  borderRadius: "50%",
-                  padding: rol === "" ? "0" : "10px",
+                  width: "60px",
+                  height: "60px",
+                  marginRight: "20px",
                 }}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={{ duration: 0.3, type: "spring" }}
+                whileHover={{ rotate: 5 }}
               />
-            </AnimatePresence>
+              <Link to="/">
+                <motion.button
+                  type="button"
+                  className="btn btn-link"
+                  style={{
+                    color: "#254B5E",
+                    textDecoration: "none",
+                    fontSize: "18px",
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Regresar
+                </motion.button>
+              </Link>
+            </div>
+            <h3 className="mb-0">Iniciar sesión</h3>
           </div>
 
-          {/* Cambia dinámicamente el texto */}
-          <motion.p
-            className="fw-bold fs-3 mt-3"
-            key={rol}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+          {/* Selector de rol con animaciones */}
+          <motion.div 
+            className="mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
           >
-            {rol || "Seleciona un rol"}
-          </motion.p>
-
-          {/* Botones abajo */}
-          <div className="mt-auto d-flex flex-row gap-3 justify-content-center">
-            <motion.button
-              className="btn w-50 fw-bold"
-              style={{
-                backgroundColor: colores[rol].btnFondo,
-                color: colores[rol].btnTexto,
-                height: "60px",
-              }}
-              whileHover={{ scale: 1.05, boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)" }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate("/forgot")}
-            >
-              Olvidé mis datos
-            </motion.button>
-            <motion.button
-              className="btn w-50 fw-bold"
-              style={{
-                backgroundColor: colores[rol].btnFondo,
-                color: colores[rol].btnTexto,
-              }}
-              whileHover={{ scale: 1.05, boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)" }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate("/form")}
-            >
-              Iniciar sesión
-            </motion.button>
-          </div>
-        </motion.div>
-      </motion.div>
-
-      {/* Sección derecha (logo y selección de rol) */}
-      <motion.div
-        className="d-flex flex-column align-items-center col-6 col-sm-6 col-md-4 col-lg-4"
-        style={{ alignSelf: "flex-end" }}
-        initial={{ opacity: 0, x: 100 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-      >
-        <motion.div
-          className="bg-white p-5 shadow text-center"
-          style={{
-            width: "420px",
-            height: "580px",
-            borderRadius: "15px 15px 0 0",
-          }}
-          initial={{ scale: 0.8, rotate: 5 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 100, damping: 10 }}
-        >
-          <motion.div
-            className="d-flex justify-content-center"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-          >
-            <img
-              src={logo}
-              alt="LOGO"
-              className="img-fluid p-3"
-              style={{ maxHeight: "150px", maxWidth: "150px", borderRadius: "50%" }}
-            />
+            <h5 className="mb-3">Selecciona tu rol:</h5>
+            <div className="d-flex flex-column gap-3">
+              <motion.button
+                className="btn w-100 text-center p-3 shadow-sm"
+                style={{
+                  backgroundColor: "#A7D0D2",
+                  color: "#254B5E",
+                  borderRadius: "10px",
+                }}
+                whileHover={{ 
+                  scale: 1.02,
+                  boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)"
+                }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setRol("Administrador")}
+              >
+                Administrador
+              </motion.button>
+              <motion.button
+                className="btn w-100 text-center p-3 shadow-sm"
+                style={{
+                  backgroundColor: "#F1E6D2",
+                  color: "#254B5E",
+                  borderRadius: "10px",
+                }}
+                whileHover={{ 
+                  scale: 1.02,
+                  boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)"
+                }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setRol("Responsable")}
+              >
+                Responsable
+              </motion.button>
+              <motion.button
+                className="btn w-100 text-center p-3 shadow-sm"
+                style={{
+                  backgroundColor: "#546EAB",
+                  color: "#F1E6D2",
+                  borderRadius: "10px",
+                }}
+                whileHover={{ 
+                  scale: 1.02,
+                  boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)"
+                }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setRol("Becario")}
+              >
+                Becario
+              </motion.button>
+            </div>
           </motion.div>
 
-          <motion.p
-            className="fs-5 mt-1"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
+          {/* Formulario */}
+          <motion.form
+            onSubmit={handleLogin}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
           >
-            Bienvenido a
-          </motion.p>
-          <motion.p
-            className="fw-bold fs-3"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-          >
-            SISGEBI
-          </motion.p>
-          <div className="mt-4 d-flex flex-column gap-3 align-items-center">
-            {/* Al hacer clic en un botón, cambia el rol y el color de la tarjeta izquierda */}
+            <div className="mb-4">
+              <label htmlFor="correo" className="form-label">Correo</label>
+              <div className="input-group">
+                <span className="input-group-text bg-transparent border-end-0">
+                  <img src={at} alt="at" width="20" />
+                </span>
+                <input
+                  type="email"
+                  className="form-control border-start-0"
+                  id="correo"
+                  placeholder="Correo"
+                  value={correo}
+                  onChange={(e) => setCorreo(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="contrasena" className="form-label">Contraseña</label>
+              <div className="input-group">
+                <span className="input-group-text bg-transparent border-end-0">
+                  <img src={lock} alt="lock" width="20" />
+                </span>
+                <input
+                  type={mostrarContrasena ? "text" : "password"}
+                  className="form-control border-start-0"
+                  id="contrasena"
+                  placeholder="Contraseña"
+                  value={contrasena}
+                  onChange={(e) => setContrasena(e.target.value)}
+                  required
+                />
+                <motion.button
+                  type="button"
+                  className="input-group-text bg-transparent border-start-0"
+                  onClick={() => setMostrarContrasena(!mostrarContrasena)}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <img 
+                    src={mostrarContrasena ? closeEye : eye} 
+                    alt="toggle visibility" 
+                    width="20" 
+                  />
+                </motion.button>
+              </div>
+            </div>
+
+            {error && (
+              <div className="alert alert-danger">
+                {error}
+              </div>
+            )}
+
             <motion.button
-              className="btn w-100 text-center p-4 shadow-sm"
+              type="submit"
+              className="btn w-100 py-3 fw-bold mt-3"
               style={{
-                backgroundColor: "#A7D0D2",
-                color: "#254B5E",
+                backgroundColor: colores[rol].btnFondo,
+                color: colores[rol].btnTexto,
                 borderRadius: "10px",
               }}
-              whileHover={{ scale: 1.05, boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)" }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setRol("Administrador")}
-            >
-              Administrador
-            </motion.button>
-            <motion.button
-              className="btn w-100 text-center p-4 shadow-sm"
-              style={{
-                backgroundColor: "#F1E6D2",
-                color: "#254B5E",
-                borderRadius: "10px",
+              whileHover={{ 
+                scale: 1.02,
+                boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)"
               }}
-              whileHover={{ scale: 1.05, boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)" }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setRol("Responsable")}
+              whileTap={{ scale: 0.98 }}
+              disabled={isSubmitting}
             >
-              Responsable
+              {isSubmitting ? (
+                <span className="spinner-border spinner-border-sm me-2"></span>
+              ) : null}
+              Ingresar
             </motion.button>
-            <motion.button
-              className="btn w-100 text-center p-4 shadow-sm"
-              style={{
-                backgroundColor: "#546EAB",
-                color: "#F1E6D2",
-                borderRadius: "10px",
-              }}
-              whileHover={{ scale: 1.05, boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)" }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setRol("Becario")}
-            >
-              Becario
-            </motion.button>
-          </div>
+          </motion.form>
         </motion.div>
       </motion.div>
     </motion.div>
   );
-};
-
-export default Login;
+}

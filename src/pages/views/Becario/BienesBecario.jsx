@@ -16,20 +16,16 @@ import Typography from "@mui/material/Typography";
 import ver from "../../../assets/img/eye-outline.svg";
 import SidebarBecario from "../../../components/SidebarBecario";
 import { jwtDecode } from "jwt-decode"; // Importa jwtDecode para decodificar el token
+import Swal from "sweetalert2";
 
 const Bienes = () => {
-  const [bienes, setBienes] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
+  const [bienes, setBienes] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [bienSeleccionado, setBienSeleccionado] = useState(null);
+  const [openModalVer, setOpenModalVer] = useState(false);
+  const [id, setUserId] = useState(null); // Estado para guardar el ID del usuario
   const navigate = useNavigate();
-
-  const [bienSeleccionado, setBienSeleccionado] = React.useState(null);
-
-  const [openModalVer, setOpenModalVer] = React.useState(false);
-
-  const [mensajeAlerta, setMensajeAlerta] = useState("");
-  const [colorAlerta, setColorAlerta] = useState("");
 
   const columns = [
     { id: "bienId", label: "#", minWidth: 25 },
@@ -41,9 +37,42 @@ const Bienes = () => {
   ];
 
   // Cargar los bienes al montar el componente
-  React.useEffect(() => {
+  // Obtener el ID del usuario al montar el componente
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "BECARIO") {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
+    setUserId(decodedToken.id); // Guardar el ID del usuario
     obtenerBienes();
-  }, []);
+  }, [navigate]);
 
   React.useEffect(() => {
     aplicarFiltros();
@@ -92,7 +121,6 @@ const Bienes = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Filtrar solo los bienes con disponibilidad "DISPONIBLE" y estado "ACTIVO"
         const bienesFiltrados = response.data.filter(
           (bien) => bien.disponibilidad === "DISPONIBLE" && bien.status === "ACTIVO"
         );
@@ -100,15 +128,113 @@ const Bienes = () => {
       })
       .catch((error) => {
         console.error("Error al obtener los bienes:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudieron cargar los bienes. Inténtalo de nuevo más tarde.",
+          showConfirmButton: false,
+          timer: 3000,
+        });
       });
   };
 
   const handleVerBien = (bien) => {
-    setBienSeleccionado(bien); // Establece el bien seleccionado
-    setOpenModalVer(true); // Abre el modal de detalles
+    setBienSeleccionado(bien);
+    setOpenModalVer(true);
   };
 
-  const handleCrearAsignacion = () => {};
+  const handleCrearAsignacion = async () => {
+    if (!bienSeleccionado || !id) return;
+  
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Sesión expirada",
+        text: "Por favor, inicia sesión nuevamente",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => navigate("/"));
+      return;
+    }
+  
+    try {
+      // Primero obtener los objetos completos de usuario y bien
+      const [usuarioResponse, bienResponse] = await Promise.all([
+        axios.get(`http://localhost:8080/api/usuarios/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get(`http://localhost:8080/api/bienes/${bienSeleccionado.bienId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+  
+      const usuario = usuarioResponse.data;
+      const bien = bienResponse.data;
+  
+      const confirmacion = await Swal.fire({
+        title: "¿Confirmar asignación?",
+        text: `¿Deseas asignar el bien ${bien.codigo} a tu cuenta?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#254B5E",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, asignar",
+        cancelButtonText: "Cancelar",
+      });
+  
+      if (confirmacion.isConfirmed) {
+        const asignacionData = {
+          usuario: usuario, // Enviar objeto usuario completo
+          bien: bien, // Enviar objeto bien completo
+          fechaAsignacion: new Date().toISOString(),
+          status: "ACTIVO",
+        };
+  
+        const response = await axios.post(
+          "http://localhost:8080/api/asignaciones",
+          asignacionData,
+          {
+            headers: { 
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+          }
+        );
+  
+        await Swal.fire({
+          icon: "success",
+          title: "Asignación exitosa",
+          text: "El bien ha sido asignado correctamente.",
+          showConfirmButton: false,
+          timer: 3000,
+        });
+  
+        // Actualizar la lista de bienes y cerrar el modal
+        obtenerBienes();
+        setOpenModalVer(false);
+      }
+    } catch (error) {
+      console.error("Error en la asignación:", error);
+      
+      let errorMessage = "Ocurrió un error al procesar la asignación";
+      if (error.response) {
+        if (error.response.status === 403) {
+          errorMessage = "No tienes permiso para realizar esta acción";
+        } else if (error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+      }
+  
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+        showConfirmButton: false,
+        timer: 3000,
+      });
+    }
+  };
 
   return (
     <div
@@ -120,29 +246,6 @@ const Bienes = () => {
         fontFamily: "Montserrat, sans-serif",
       }}
     >
-      {/* Modal de alerta */}
-      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 3,
-            borderRadius: "10px",
-            textAlign: "center",
-            border: `3px solid ${colorAlerta}`,
-          }}
-        >
-          <Typography id="alerta-modal-title" sx={{ color: colorAlerta, fontWeight: "bold" }}>
-            {mensajeAlerta}
-          </Typography>
-        </Box>
-      </Modal>
-
       {/* Modal para ver detalles de un bien */}
       <Modal
         open={openModalVer}
