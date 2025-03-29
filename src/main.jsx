@@ -12,7 +12,7 @@ import Forgot from "./Forgot";
 
 import Admin from "./pages/views/Admin/Perfil/AdminDashboard";
 import Responsable from "./pages/views/Responsable/ResponsablesDashboard";
-import Becario from "./pages/views/Becario/BecarioDashboard";
+import Becario from "./pages/views/Becario/Perfil/BecarioDashboard";
 
 import Bienes from "./pages/views/Admin/Bienes/Bienes";
 import Usuarios from "./pages/views/Admin/Usuarios/Usuarios";
@@ -22,8 +22,8 @@ import Marcas from "./pages/views/Admin/Marcas/Marcas";
 import Modelos from "./pages/views/Admin/Modelos/Modelos";
 import Asignaciones from "./pages/views/Admin/Asignaciones/Asignaciones";
 
-import BienesBecario from "./pages/views/Becario/BienesBecario";
-import MisAsignaciones from "./pages/views/Becario/MisAsignaciones";
+import BienesBecario from "./pages/views/Becario/Bienes/BienesBecario";
+import MisAsignaciones from "./pages/views/Becario/Asignaciones/MisAsignaciones";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 

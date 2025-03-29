@@ -20,7 +20,7 @@ const AdminDashboard = () => {
     }
 
     const decodedToken = jwtDecode(token);
-    const userId = decodedToken.userId;
+    const id = decodedToken.id;
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
@@ -30,7 +30,7 @@ const AdminDashboard = () => {
 
     setIsLoading(true);
     axios
-      .get(`http://localhost:8080/api/usuarios/${userId}`, {
+      .get(`http://localhost:8080/api/usuarios/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {

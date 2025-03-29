@@ -13,22 +13,32 @@ import { useNavigate } from "react-router-dom";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import ver from "../../../assets/img/eye-outline.svg";
-import SidebarBecario from "../../../components/SidebarBecario";
-import { jwtDecode } from "jwt-decode"; // Importa jwtDecode para decodificar el token
+import ver from "../../../../assets/img/eye-outline.svg";
+import SidebarBecario from "../../../../components/SidebarBecario";
+import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
 
-const Bienes = () => {
+const BienesBecario = () => {
   const [bienes, setBienes] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [bienSeleccionado, setBienSeleccionado] = useState(null);
   const [openModalVer, setOpenModalVer] = useState(false);
-  const [id, setUserId] = useState(null); // Estado para guardar el ID del usuario
+  const [id, setUserId] = useState(null);
   const navigate = useNavigate();
 
+  const [filtroAreaComun, setFiltroAreaComun] = React.useState(null);
+  const [filtroTipoBien, setFiltroTipoBien] = React.useState(null);
+  const [filtroMarca, setFiltroMarca] = React.useState(null);
+  const [filtroModelo, setFiltroModelo] = React.useState(null);
+
+  const [areaComunOptions, setAreaComunOptions] = React.useState([]);
+  const [tipoBienOptions, setTipoBienOptions] = React.useState([]);
+  const [marcaOptions, setMarcaOptions] = React.useState([]);
+  const [modeloOptions, setModeloOptions] = React.useState([]);
+
   const columns = [
-    { id: "bienId", label: "#", minWidth: 25 },
+    { id: "numero", label: "#", minWidth: 25 },
     { id: "codigo", label: "Código", minWidth: 40 },
     { id: "numeroSerie", label: "No. Serie", minWidth: 40 },
     { id: "disponibilidad", label: "Disponibilidad", minWidth: 60 },
@@ -37,8 +47,7 @@ const Bienes = () => {
   ];
 
   // Cargar los bienes al montar el componente
-  // Obtener el ID del usuario al montar el componente
-  useEffect(() => {
+  React.useEffect(() => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
@@ -70,20 +79,174 @@ const Bienes = () => {
       return;
     }
 
-    setUserId(decodedToken.id); // Guardar el ID del usuario
+    setUserId(decodedToken.id);
     obtenerBienes();
+    cargarOpcionesFiltros();
   }, [navigate]);
 
   React.useEffect(() => {
     aplicarFiltros();
-  }, []);
+  }, [filtroAreaComun, filtroTipoBien, filtroMarca, filtroModelo]);
+
+  const cargarOpcionesFiltros = () => {
+    const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "BECARIO") {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
+    axios
+      .get("http://localhost:8080/api/areas", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const areasActivas = response.data.filter((area) => area.status === "ACTIVO");
+        setAreaComunOptions(
+          areasActivas.map((area) => ({
+            value: area.areaId,
+            label: area.nombreArea,
+          }))
+        );
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar áreas comunes",
+          text: "Hubo un problema al intentar cargar las áreas comunes. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
+      });
+
+    axios
+      .get("http://localhost:8080/api/tipo-bien", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const tiposActivos = response.data.filter((tipo) => tipo.status === "ACTIVO");
+        setTipoBienOptions(
+          tiposActivos.map((tipo) => ({
+            value: tipo.tipoBienId,
+            label: tipo.nombreTipoBien,
+          }))
+        );
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar tipos de bien",
+          text: "Hubo un problema al intentar cargar los tipos de bien. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
+      });
+
+    axios
+      .get("http://localhost:8080/api/marca", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const marcasActivas = response.data.filter((marca) => marca.status === "ACTIVO");
+        setMarcaOptions(
+          marcasActivas.map((marca) => ({
+            value: marca.marcaId,
+            label: marca.nombreMarca,
+          }))
+        );
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar marcas",
+          text: "Hubo un problema al intentar cargar las marcas. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
+      });
+
+    axios
+      .get("http://localhost:8080/api/modelo", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const modelosActivos = response.data.filter((modelo) => modelo.status === "ACTIVO");
+        setModeloOptions(
+          modelosActivos.map((modelo) => ({
+            value: modelo.modeloId,
+            label: modelo.nombreModelo,
+          }))
+        );
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar modelos",
+          text: "Hubo un problema al intentar cargar los modelos. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
+      });
+  };
 
   // Aplicar filtros adicionales si es necesario
   const aplicarFiltros = () => {
     const params = {};
+    if (filtroAreaComun) params.areaId = filtroAreaComun.value;
+    if (filtroTipoBien) params.tipoBienId = filtroTipoBien.value;
+    if (filtroMarca) params.marcaId = filtroMarca.value;
+    if (filtroModelo) params.modeloId = filtroModelo.value;
 
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "BECARIO") {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
 
     axios
       .get("http://localhost:8080/api/bienes/filter", {
@@ -102,6 +265,14 @@ const Bienes = () => {
       });
   };
 
+  const resetearFiltros = () => {
+    setFiltroAreaComun(null);
+    setFiltroTipoBien(null);
+    setFiltroMarca(null);
+    setFiltroModelo(null);
+    obtenerBienes();
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -114,8 +285,35 @@ const Bienes = () => {
   // Obtener los bienes con disponibilidad "DISPONIBLE" y estado "ACTIVO"
   const obtenerBienes = () => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
 
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "BECARIO") {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
     axios
       .get("http://localhost:8080/api/bienes", {
         headers: { Authorization: `Bearer ${token}` },
@@ -143,97 +341,87 @@ const Bienes = () => {
     setOpenModalVer(true);
   };
 
-  const handleCrearAsignacion = async () => {
-    if (!bienSeleccionado || !id) return;
-  
+  const handleCrearAsignacion = () => {
     const token = sessionStorage.getItem("token");
+
     if (!token) {
       Swal.fire({
         icon: "warning",
-        title: "Sesión expirada",
-        text: "Por favor, inicia sesión nuevamente",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
         showConfirmButton: false,
         timer: 3000,
-      }).then(() => navigate("/"));
+      }).then(() => {
+        navigate("/");
+      });
       return;
     }
-  
-    try {
-      // Primero obtener los objetos completos de usuario y bien
-      const [usuarioResponse, bienResponse] = await Promise.all([
-        axios.get(`http://localhost:8080/api/usuarios/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        axios.get(`http://localhost:8080/api/bienes/${bienSeleccionado.bienId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
-  
-      const usuario = usuarioResponse.data;
-      const bien = bienResponse.data;
-  
-      const confirmacion = await Swal.fire({
-        title: "¿Confirmar asignación?",
-        text: `¿Deseas asignar el bien ${bien.codigo} a tu cuenta?`,
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#254B5E",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí, asignar",
-        cancelButtonText: "Cancelar",
+
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "BECARIO") {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
       });
-  
-      if (confirmacion.isConfirmed) {
-        const asignacionData = {
-          usuario: usuario, // Enviar objeto usuario completo
-          bien: bien, // Enviar objeto bien completo
-          fechaAsignacion: new Date().toISOString(),
-          status: "ACTIVO",
-        };
-  
-        const response = await axios.post(
-          "http://localhost:8080/api/asignaciones",
-          asignacionData,
-          {
-            headers: { 
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json"
-            },
-          }
-        );
-  
-        await Swal.fire({
-          icon: "success",
-          title: "Asignación exitosa",
-          text: "El bien ha sido asignado correctamente.",
-          showConfirmButton: false,
-          timer: 3000,
-        });
-  
-        // Actualizar la lista de bienes y cerrar el modal
-        obtenerBienes();
-        setOpenModalVer(false);
-      }
-    } catch (error) {
-      console.error("Error en la asignación:", error);
-      
-      let errorMessage = "Ocurrió un error al procesar la asignación";
-      if (error.response) {
-        if (error.response.status === 403) {
-          errorMessage = "No tienes permiso para realizar esta acción";
-        } else if (error.response.data && error.response.data.message) {
-          errorMessage = error.response.data.message;
-        }
-      }
-  
+      return;
+    }
+
+    if (!bienSeleccionado) {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: errorMessage,
-        showConfirmButton: false,
-        timer: 3000,
+        text: "No se ha seleccionado ningún bien para asignar.",
+        showConfirmButton: true,
       });
+      return;
     }
+
+    // Objeto que coincide con lo que espera el backend
+    const asignacionParaEnviar = {
+      usuario: { id: id }, // Usuario con solo el ID
+      bien: { bienId: bienSeleccionado.bienId }, // Bien con solo el ID
+      status: "ACTIVO",
+    };
+
+    axios
+      .post("http://localhost:8080/api/asignaciones", asignacionParaEnviar, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        setOpenModalVer(false);
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "Bien asignado correctamente",
+          showConfirmButton: false,
+          timer: 3000,
+        }).then(() => {
+          obtenerBienes(); // Actualizar la lista
+        });
+      })
+      .catch((error) => {
+        console.error("Error al asignar el bien:", error);
+        setOpenModalVer(false);
+
+        let errorMessage = "No se pudo asignar el bien. ";
+
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorMessage,
+          showConfirmButton: true,
+        });
+      });
   };
 
   return (
@@ -324,26 +512,6 @@ const Bienes = () => {
                 </Typography>
                 <Typography variant="body1">{bienSeleccionado?.status}</Typography>
               </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
-                  Disponibilidad:
-                </Typography>
-                <Typography variant="body1">{bienSeleccionado?.disponibilidad}</Typography>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
-                  Motivo:
-                </Typography>
-                <Typography variant="body1">{bienSeleccionado?.motivo}</Typography>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
-                  Fecha de eliminación:
-                </Typography>
-                <Typography variant="body1">
-                  {bienSeleccionado?.deleteAt ? new Date(bienSeleccionado?.deleteAt).toLocaleString() : "No eliminado"}
-                </Typography>
-              </Box>
             </Box>
 
             {/* Botón de Cerrar */}
@@ -388,7 +556,65 @@ const Bienes = () => {
           {/* Título y filtros */}
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Bienes existentes</h3>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+              <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
+              <button
+                onClick={resetearFiltros}
+                style={{
+                  ...buttonStyle,
+                  backgroundColor: "#546EAB",
+                  minWidth: "100px",
+                }}
+              >
+                Borrar
+              </button>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-around",
+                gap: "10px",
+                marginTop: "15px",
+              }}
+            >
+              {/* Contenedor de los selects (izquierda) */}
+              <div style={{ display: "flex", gap: "10px" }}>
+                <Select
+                  placeholder="Área Común"
+                  value={filtroAreaComun}
+                  onChange={setFiltroAreaComun}
+                  options={areaComunOptions}
+                  styles={customSelectStyles}
+                />
+                <Select
+                  placeholder="Tipo de Bien"
+                  value={filtroTipoBien}
+                  onChange={setFiltroTipoBien}
+                  options={tipoBienOptions}
+                  styles={customSelectStyles}
+                />
+
+                <Select
+                  placeholder="Marca"
+                  value={filtroMarca}
+                  onChange={setFiltroMarca}
+                  options={marcaOptions}
+                  styles={customSelectStyles}
+                />
+                <Select
+                  placeholder="Modelo"
+                  value={filtroModelo}
+                  onChange={setFiltroModelo}
+                  options={modeloOptions}
+                  styles={customSelectStyles}
+                />
+              </div>
+            </div>
+            {/* Botón (derecha) */}
+            <div style={{ marginLeft: "auto" }}></div>
           </Box>
+
           {/* Tabla */}
           <TableContainer sx={{ width: "100%", padding: "20px", paddingTop: "0px", paddingBottom: "0px" }}>
             <Table size="small">
@@ -410,7 +636,8 @@ const Bienes = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {bienes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((bien) => {
+                {bienes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((bien, index) => {
+                  const numeroFila = page * rowsPerPage + index + 1; // Calculamos el número de fila
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={bien.bienId}>
                       {columns.map((column) => {
@@ -429,6 +656,16 @@ const Bienes = () => {
                                   onClick={() => handleVerBien(bien)}
                                 />
                               </div>
+                            </TableCell>
+                          );
+                        } else if (column.id === "numero") {
+                          return (
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              style={{ fontSize: "12px", textAlign: "start" }}
+                            >
+                              {numeroFila}
                             </TableCell>
                           );
                         } else {
@@ -596,4 +833,4 @@ const SelectOptionsStyles = {
     backgroundColor: "#c2c2c2",
   }),
 };
-export default Bienes;
+export default BienesBecario;

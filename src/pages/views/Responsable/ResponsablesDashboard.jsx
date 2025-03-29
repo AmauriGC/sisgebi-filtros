@@ -13,11 +13,11 @@ const AdminDashboard = () => {
     if (token) {
       // Decodifica el token para obtener el ID del usuario
       const decodedToken = jwtDecode(token);
-      const userId = decodedToken.userId; // Extrae el ID del usuario
+      const id = decodedToken.id; // Extrae el ID del usuario
 
       // Hace una solicitud al backend para obtener los detalles del usuario
       axios
-        .get(`http://localhost:8080/api/usuarios/${userId}`, {
+        .get(`http://localhost:8080/api/usuarios/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {

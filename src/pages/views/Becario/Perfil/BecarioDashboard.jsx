@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import SidebarBecario from "../../../components/SidebarBecario";
+import SidebarBecario from "../../../../components/SidebarBecario";
 
 const BecarioDashboard = () => {
   const [usuario, setUsuario] = useState(null);
@@ -27,7 +27,7 @@ const BecarioDashboard = () => {
     }
 
     const decodedToken = jwtDecode(token);
-    const userId = decodedToken.userId;
+    const id = decodedToken.id;
     const role = decodedToken.role;
 
     if (role !== "BECARIO") {
@@ -44,7 +44,7 @@ const BecarioDashboard = () => {
     }
 
     axios
-      .get(`http://localhost:8080/api/usuarios/${userId}`, {
+      .get(`http://localhost:8080/api/usuarios/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {

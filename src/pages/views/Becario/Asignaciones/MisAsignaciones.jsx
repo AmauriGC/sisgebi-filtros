@@ -11,27 +11,22 @@ import axios from "axios";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
-import SidebarBecario from "../../../components/SidebarBecario";
-import eye from "../../../assets/img/eye-outline.svg";
+import SidebarBecario from "../../../../components/SidebarBecario";
+import eye from "../../../../assets/img/eye-outline.svg";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
+import { jwtDecode } from "jwt-decode";
+import Swal from "sweetalert2";
 
-const Asignaciones = () => {
+const MisAsignaciones = () => {
   const [asignaciones, setAsignaciones] = React.useState([]);
   const [filtroStatus, setFiltroStatus] = React.useState(null);
-  const [filtroUsuario, setFiltroUsuario] = React.useState(null);
-  const [usuarioOptions, setUsuarioOptions] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(8);
-
-  // Estado para controlar el modal y los detalles del bien
   const [openModalBien, setOpenModalBien] = React.useState(false);
-  const [] = React.useState(false);
   const [bienSeleccionado, setBienSeleccionado] = React.useState(null);
-
-  // Estado para el modal de alerta
-  const [mensajeAlerta, setMensajeAlerta] = React.useState("");
-  const [colorAlerta, setColorAlerta] = React.useState("");
+  const [id, setUserId] = React.useState(null);
+  const navigate = useNavigate();
 
   const statusOptions = [
     { value: "ACTIVO", label: "Activo" },
@@ -39,25 +34,80 @@ const Asignaciones = () => {
   ];
 
   const columns = [
-    { id: "asignacionesId", label: "#", minWidth: 25 },
-    { id: "usuario", label: "Usuario", minWidth: 80 },
+    { id: "numero", label: "#", minWidth: 25 },
     { id: "bien", label: "Bien", minWidth: 80 },
     { id: "status", label: "Estado de la asignación", minWidth: 60 },
     { id: "acciones", label: "Acciones", minWidth: 80 },
   ];
 
+  // Verificar token y rol al montar el componente
   React.useEffect(() => {
-    obtenerAsignaciones();
-    cargarOpcionesFiltros();
-  }, []);
+    const token = sessionStorage.getItem("token");
 
-  React.useEffect(() => {
-    aplicarFiltros();
-  }, [filtroStatus, filtroUsuario]);
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "BECARIO") {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
+    setUserId(decodedToken.id);
+    obtenerAsignaciones();
+  }, [navigate]);
 
   const obtenerAsignaciones = () => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "BECARIO") {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
 
     axios
       .get("http://localhost:8080/api/asignaciones", {
@@ -68,82 +118,18 @@ const Asignaciones = () => {
       })
       .catch((error) => {
         console.error("Error al obtener las asignaciones:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudieron cargar las asignaciones. Inténtalo de nuevo más tarde.",
+          showConfirmButton: false,
+          timer: 3000,
+        });
       });
-  };
-
-  const cargarOpcionesFiltros = () => {
-    const token = sessionStorage.getItem("token");
-    if (!token) return;
-
-    // Obtener las asignaciones para extraer los IDs de los usuarios con asignaciones
-    axios
-      .get("http://localhost:8080/api/asignaciones", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        const usuariosConAsignaciones = response.data.map((asignacion) => asignacion.usuario.id);
-
-        // Obtener solo los becarios que tienen asignaciones
-        axios
-          .get("http://localhost:8080/api/usuarios/becarios", {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-          .then((response) => {
-            const becariosConAsignaciones = response.data.filter((usuario) =>
-              usuariosConAsignaciones.includes(usuario.id)
-            );
-
-            setUsuarioOptions(
-              becariosConAsignaciones.map((usuario) => ({
-                value: usuario.id,
-                label: usuario.nombres,
-              }))
-            );
-          })
-          .catch((error) => {
-            console.error("Error al cargar becarios:", error);
-          });
-      })
-      .catch((error) => {
-        console.error("Error al obtener las asignaciones:", error);
-      });
-  };
-
-  const aplicarFiltros = async () => {
-    const token = sessionStorage.getItem("token");
-    if (!token) return;
-
-    try {
-      const paramsAsignaciones = {};
-      if (filtroStatus) paramsAsignaciones.status = filtroStatus.value;
-      if (filtroUsuario) paramsAsignaciones.id = filtroUsuario.value;
-
-      // Obtener asignaciones filtradas por status y usuario
-      const responseAsignaciones = await axios.get("http://localhost:8080/api/asignaciones/filter", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: paramsAsignaciones,
-      });
-
-      // Obtener bienes filtrados por disponibilidad
-      const responseBienes = await axios.get("http://localhost:8080/api/bienes/filter", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      // Filtrar asignaciones que coincidan con los bienes disponibles
-      const asignacionesFiltradas = responseAsignaciones.data.filter((asignacion) =>
-        responseBienes.data.some((bien) => bien.bienId === asignacion.bien.bienId)
-      );
-
-      // Actualizar el estado de las asignaciones
-      setAsignaciones(asignacionesFiltradas);
-    } catch (error) {
-      console.error("Error al aplicar filtros:", error);
-    }
   };
 
   const resetearFiltros = () => {
     setFiltroStatus(null);
-    setFiltroUsuario(null);
     obtenerAsignaciones();
   };
 
@@ -156,22 +142,155 @@ const Asignaciones = () => {
     setPage(0);
   };
 
-  // Función para abrir el modal y obtener los detalles del bien
   const handleVerBien = (bien) => {
     const token = sessionStorage.getItem("token");
-    if (!token) return;
+
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "BECARIO") {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
 
     axios
       .get(`http://localhost:8080/api/bienes/${bien.bienId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setBienSeleccionado(response.data); // Guardar los detalles del bien
-        setOpenModalBien(true); // Abrir el modal
+        setBienSeleccionado(response.data);
+        setOpenModalBien(true);
       })
       .catch((error) => {
         console.error("Error al obtener los detalles del bien:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudieron cargar los detalles del bien. Inténtalo de nuevo más tarde.",
+          showConfirmButton: false,
+          timer: 3000,
+        });
       });
+  };
+
+  const handleEliminarAsignacion = () => {
+    const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "BECARIO") {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
+    if (!bienSeleccionado) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se ha seleccionado ningún bien para eliminar la asignación.",
+        showConfirmButton: true,
+      });
+      return;
+    }
+
+    // Primero necesitamos encontrar la asignación correspondiente al bien seleccionado
+    const asignacionAEliminar = asignaciones.find((asignacion) => asignacion.bien.bienId === bienSeleccionado.bienId);
+
+    if (!asignacionAEliminar) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se encontró la asignación para este bien.",
+        showConfirmButton: true,
+      });
+      return;
+    }
+    setOpenModalBien(false);
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción eliminará la asignación del bien seleccionado.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#254B5E",
+      cancelButtonColor: "#c2c2c2",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`http://localhost:8080/api/asignaciones/${asignacionAEliminar.asignacionesId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then((response) => {
+            setOpenModalBien(false);
+            Swal.fire({
+              icon: "success",
+              title: "¡Éxito!",
+              text: "Asignación eliminada correctamente",
+              showConfirmButton: false,
+              timer: 3000,
+            }).then(() => {
+              obtenerAsignaciones(); // Actualizar la lista
+            });
+          })
+          .catch((error) => {
+            console.error("Error al eliminar la asignación:", error);
+            setOpenModalBien(false);
+
+            let errorMessage = "No se pudo eliminar la asignación. ";
+
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: errorMessage,
+              showConfirmButton: true,
+            });
+          });
+      }
+    });
   };
 
   return (
@@ -200,7 +319,6 @@ const Asignaciones = () => {
             Detalles del Bien
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {/* Lista de detalles del bien */}
             <Box
               sx={{
                 display: "flex",
@@ -262,9 +380,22 @@ const Asignaciones = () => {
               </Box>
             </Box>
           </Typography>
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3, gap: "10px" }}>
             <button
               onClick={() => setOpenModalBien(false)}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#c2c2c2",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Cerrar
+            </button>
+            <button
+              onClick={handleEliminarAsignacion}
               style={{
                 padding: "10px 20px",
                 backgroundColor: "#254B5E",
@@ -274,55 +405,7 @@ const Asignaciones = () => {
                 cursor: "pointer",
               }}
             >
-              Cerrar
-            </button>
-          </Box>
-        </Box>
-      </Modal>
-
-      {/* Modal de alerta */}
-      <Modal open={!!mensajeAlerta} onClose={() => setMensajeAlerta("")} aria-labelledby="alerta-modal-title">
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: "10px",
-            textAlign: "center",
-            border: `3px solid ${colorAlerta}`,
-          }}
-        >
-          <Typography
-            id="alerta-modal-title"
-            variant="h6"
-            component="h2"
-            sx={{
-              color: colorAlerta,
-              fontWeight: "bold",
-              mb: 2,
-            }}
-          >
-            {mensajeAlerta}
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-            <button
-              onClick={() => setMensajeAlerta("")}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#254B5E",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-            >
-              Cerrar
+              Eliminar
             </button>
           </Box>
         </Box>
@@ -331,42 +414,11 @@ const Asignaciones = () => {
       <SidebarBecario />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}>
-        <Paper className="col-md-8 col-lg-8 col-xl-6" style={{ height: "fit-content" }}>
-          {/* Título y filtros */}
+        <Paper className="col-md-4 col-lg-4 col-xl-4" style={{ height: "fit-content" }}>
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Asignaciones realizadas</h3>
-
-            {/* Contenedor principal con distribución adecuada */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              {/* Filtros alineados a la izquierda */}
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
-                <Select
-                  placeholder="Usuario"
-                  value={filtroUsuario}
-                  onChange={setFiltroUsuario}
-                  options={usuarioOptions}
-                  styles={customSelectStyles}
-                />
-                <Select
-                  placeholder="Estado"
-                  value={filtroStatus}
-                  onChange={setFiltroStatus}
-                  options={statusOptions}
-                  styles={customSelectStyles}
-                />
-              </div>
-
-              {/* Botones alineados a la derecha en columna */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginLeft: "auto" }}>
-                <button onClick={resetearFiltros} style={{ ...buttonStyle, backgroundColor: "#546EAB" }}>
-                  Borrar
-                </button>
-              </div>
-            </div>
           </Box>
 
-          {/* Tabla */}
           <TableContainer sx={{ width: "100%", padding: "20px", paddingTop: "0px", paddingBottom: "0px" }}>
             <Table size="small">
               <TableHead>
@@ -387,7 +439,9 @@ const Asignaciones = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {asignaciones.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((asignacion) => {
+                {asignaciones.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((asignacion, index) => {
+                  const numeroFila = page * rowsPerPage + index + 1; // Calculamos el número de fila
+
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={asignacion.asignacionesId}>
                       {columns.map((column) => {
@@ -404,16 +458,24 @@ const Asignaciones = () => {
                                     cursor: "pointer",
                                     marginRight: "8px",
                                   }}
-                                  onClick={() => handleVerBien(asignacion.bien)} // Pasar el bien seleccionado
+                                  onClick={() => handleVerBien(asignacion.bien)}
                                 />
                               </div>
                             </TableCell>
                           );
+                        } else if (column.id === "numero") {
+                          return (
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              style={{ fontSize: "12px", textAlign: "start" }}
+                            >
+                              {numeroFila}
+                            </TableCell>
+                          );
                         } else {
                           const value =
-                            column.id === "usuario"
-                              ? asignacion.usuario?.nombres
-                              : column.id === "bien"
+                            column.id === "bien"
                               ? asignacion.bien?.codigo
                               : column.id === "status"
                               ? asignacion.status
@@ -436,7 +498,6 @@ const Asignaciones = () => {
             </Table>
           </TableContainer>
 
-          {/* Paginación */}
           <TablePagination
             rowsPerPageOptions={[10, 25, 100]}
             component="div"
@@ -531,15 +592,4 @@ const customSelectStyles = {
   }),
 };
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "800px",
-  backgroundColor: "#fff",
-  borderRadius: "8px",
-  boxShadow: 24,
-  p: 4,
-};
-export default Asignaciones;
+export default MisAsignaciones;

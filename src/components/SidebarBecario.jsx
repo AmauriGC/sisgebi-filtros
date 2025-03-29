@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion"; // Importamos Framer Motion
+import { motion, AnimatePresence } from "framer-motion";
 import menu from "../assets/img/menu.svg";
 import asignaciones from "../assets/img/clipboard-check.svg";
 import bienes from "../assets/img/package-variant.svg";
@@ -12,7 +12,7 @@ const SidebarItem = ({ icon, label, isExpanded, isSelected, onClick, children })
   return (
     <div>
       <motion.div
-        className={`d-flex align-items-center p-1 cursor-pointer rounded transition-colors ${
+        className={`align-items-center p-1 rounded transition-colors ${
           isSelected ? "bg-white fw-bold" : "hover:bg-light"
         }`}
         onClick={onClick}
@@ -20,24 +20,23 @@ const SidebarItem = ({ icon, label, isExpanded, isSelected, onClick, children })
           borderRadius: "10px",
           whiteSpace: "nowrap",
           overflow: "hidden",
-          marginBottom: "25px",
           textAlign: "start",
-          color: "#000",
-          cursor: "pointer",
+          marginBottom: "25px",
+          color: isSelected ? "#000" : "#FFF", // Cambia el color basado en isSelected
         }}
-        whileHover={{ scale: 1.05, backgroundColor: "#fff", color: "" }} // Efecto hover
-        whileTap={{ scale: 0.95 }} // Efecto al hacer clic
+        whileHover={{ scale: 1.05 }} // Efecto hover: se hace un poco más grande
+        whileTap={{ scale: 0.9 }} // Efecto al hacer clic
       >
         <img
           src={icon}
           alt={label}
           style={{ width: "32px", height: "32px" }}
-          className={`me-2 ${isExpanded ? "" : "p-1"}`}
+          className={`me-4 ${isExpanded ? "" : "p-1"}`}
         />
         {isExpanded && (
           <motion.span
             className="flex-grow-1"
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: 75 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
           >
@@ -56,9 +55,19 @@ const Sidebar = () => {
   const [selectedItem, setSelectedItem] = useState("");
   const [expandedItem, setExpandedItem] = useState("");
 
-  const toggleSidebar = () => setIsExpanded(!isExpanded);
-  const expandSidebar = () => setIsExpanded(true);
-  const collapseSidebar = () => setIsExpanded(false);
+  const toggleSidebar = () => {
+    setIsExpanded(!isExpanded);
+    setExpandedItem(""); // Contraer todas las opciones al expandir/contraer el sidebar
+  };
+
+  const expandSidebar = () => {
+    setIsExpanded(true);
+  };
+
+  const collapseSidebar = () => {
+    setIsExpanded(false);
+    setExpandedItem(""); // Contraer todas las opciones al contraer el sidebar
+  };
 
   const handleItemClick = (label) => {
     setSelectedItem(label);
@@ -69,11 +78,11 @@ const Sidebar = () => {
     }
   };
 
-  // Manejo de redimensionamiento de pantalla
   useEffect(() => {
     const handleResize = () => {
-      setIsExpanded(window.innerWidth < 768);
+      //setIsExpanded(window.innerWidth >= 768);
     };
+    handleResize(); // Establecer el estado inicial basado en el ancho de la pantalla
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -86,14 +95,14 @@ const Sidebar = () => {
         minHeight: "100vh",
         width: isExpanded ? "250px" : "70px",
         overflow: "hidden",
-        transition: "width 0.2s ease",
+        transition: "width 0.3s ease",
         cursor: "pointer",
       }}
       onMouseEnter={expandSidebar}
       onMouseLeave={collapseSidebar}
-      initial={{ opacity: 0, x: -50 }}
+      initial={{ opacity: 0, x: 0 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }}
     >
       {/* Botón menú */}
       <SidebarItem
@@ -125,8 +134,6 @@ const Sidebar = () => {
               <div
                 onClick={() => navigate("/becario-dashboard")}
                 style={{
-                  marginTop: "-20px",
-                  marginBottom: "20px",
                   marginLeft: "-40px",
                 }}
               >
@@ -149,7 +156,7 @@ const Sidebar = () => {
           {expandedItem === "Bienes" && (
             <motion.div
               className="ps-4"
-              style={{ textAlign: "start", marginLeft: "20px", marginRight: "15px" }}
+              style={{ textAlign: "start", marginLeft: "20px" }}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
@@ -158,8 +165,6 @@ const Sidebar = () => {
               <div
                 onClick={() => navigate("/bienesBecario")}
                 style={{
-                  marginTop: "-20px",
-                  marginBottom: "20px",
                   marginLeft: "-40px",
                 }}
               >
@@ -191,13 +196,11 @@ const Sidebar = () => {
               <div
                 onClick={() => navigate("/misAsignaciones")}
                 style={{
-                  marginTop: "-20px",
-                  marginBottom: "20px",
                   marginLeft: "-40px",
                 }}
               >
                 <img src={arrow} alt="arrow" style={{ width: "20px", height: "20px", marginRight: "15px" }} />
-                Mis asignaciones
+                Mostrar asignaciones
               </div>
             </motion.div>
           )}
@@ -211,7 +214,7 @@ const Sidebar = () => {
           label="Salir"
           isExpanded={isExpanded}
           onClick={() => {
-            handleItemClick("Salir");
+            sessionStorage.removeItem("token");
             navigate("/");
           }}
         />
