@@ -8,10 +8,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // import Login from "./Login";
 import Form from "./Form";
-import Forgot from "./Forgot";
 
 import Admin from "./pages/views/Admin/Perfil/AdminDashboard";
-import Responsable from "./pages/views/Responsable/ResponsablesDashboard";
+import Responsable from "./pages/views/Responsable/Perfil/ResponsablesDashboard";
 import Becario from "./pages/views/Becario/Perfil/BecarioDashboard";
 
 import Bienes from "./pages/views/Admin/Bienes/Bienes";
@@ -23,7 +22,10 @@ import Modelos from "./pages/views/Admin/Modelos/Modelos";
 import Asignaciones from "./pages/views/Admin/Asignaciones/Asignaciones";
 
 import BienesBecario from "./pages/views/Becario/Bienes/BienesBecario";
-import MisAsignaciones from "./pages/views/Becario/Asignaciones/MisAsignaciones";
+import MisAsignacionesBecario from "./pages/views/Becario/Asignaciones/MisAsignaciones";
+
+import BienesResponsable from "./pages/views/Responsable/Bienes/BienesResponsable";
+import MisAsignacionesResponsable from "./pages/views/Responsable/Asignaciones/MisAsignacionesResponsable";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -32,7 +34,6 @@ root.render(
     <Routes>
       {/* <Route path="/" element={<Login />} /> */}
       <Route path="/" element={<Form />} />
-      <Route path="/forgot" element={<Forgot />} />
 
       <Route path="/admin-dashboard" element={<Admin />} />
       <Route path="/bienes" element={<Bienes />} />
@@ -44,10 +45,12 @@ root.render(
       <Route path="/asignaciones" element={<Asignaciones />} />
 
       <Route path="/responsable-dashboard" element={<Responsable />} />
+      <Route path="/bienesResponsable" element={<BienesResponsable />} />
+      <Route path="/misAsignacionesResponsable" element={<MisAsignacionesResponsable />} />
 
       <Route path="/becario-dashboard" element={<Becario />} />
       <Route path="/bienesBecario" element={<BienesBecario />} />
-      <Route path="/misAsignaciones" element={<MisAsignaciones />} />
+      <Route path="/misAsignaciones" element={<MisAsignacionesBecario />} />
     </Routes>
   </Router>
 );

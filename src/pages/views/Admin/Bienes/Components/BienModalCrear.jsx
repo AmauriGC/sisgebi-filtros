@@ -11,6 +11,7 @@ export default function BienModalCrear({
   nuevoBien,
   setNuevoBien,
   tipoBienOptions,
+  usuarioOptions,
   marcaOptions,
   modeloOptions,
   areaComunOptions,
@@ -99,6 +100,24 @@ export default function BienModalCrear({
                     <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                       <div style={{ flex: 1 }}>
                         <label>
+                          <strong>Responsable:</strong>
+                        </label>
+                        <Select
+                          options={usuarioOptions}
+                          placeholder={
+                            usuarioOptions.length === 0
+                              ? "No hay responsables disponibles"
+                              : "Seleccione el responsable"
+                          }
+                          value={usuarioOptions.find((option) => option.value === nuevoBien.usuario?.value)}
+                          onChange={(selected) => setNuevoBien({ ...nuevoBien, usuario: selected })}
+                          required
+                          isDisabled={usuarioOptions.length === 0}
+                          styles={SelectOptionsStyles}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label>
                           <strong>Marca:</strong>
                         </label>
                         <Select
@@ -111,6 +130,16 @@ export default function BienModalCrear({
                           styles={SelectOptionsStyles}
                         />
                       </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Animación para el tercer grupo de inputs */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3, duration: 0.3 }}
+                  >
+                    <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                       <div style={{ flex: 1 }}>
                         <label>
                           <strong>Modelo:</strong>
@@ -127,16 +156,6 @@ export default function BienModalCrear({
                           styles={SelectOptionsStyles}
                         />
                       </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Animación para el tercer grupo de inputs */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3, duration: 0.3 }}
-                  >
-                    <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                       <div style={{ flex: 1 }}>
                         <label>
                           <strong>Tipo de Bien:</strong>
@@ -155,6 +174,16 @@ export default function BienModalCrear({
                           styles={SelectOptionsStyles}
                         />
                       </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Animación para los botones */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.3 }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
                       <div style={{ flex: 1 }}>
                         <label>
                           <strong>Área Común:</strong>
@@ -172,16 +201,6 @@ export default function BienModalCrear({
                           styles={SelectOptionsStyles}
                         />
                       </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Animación para los botones */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.3 }}
-                  >
-                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", gap: "10px" }}>
                       <button
                         type="button"
                         onClick={() => {

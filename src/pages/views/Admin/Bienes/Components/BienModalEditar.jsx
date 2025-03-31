@@ -10,6 +10,7 @@ export default function BienModalEditar({
   setOpenModalEditar,
   bienSeleccionado,
   setBienSeleccionado,
+  usuarioOptions,
   tipoBienOptions,
   marcaOptions,
   modeloOptions,
@@ -108,6 +109,30 @@ export default function BienModalEditar({
                     <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                       <div style={{ flex: 1 }}>
                         <label>
+                          <strong>Responsable:</strong>
+                        </label>
+                        <Select
+                          options={usuarioOptions}
+                          placeholder={
+                            usuarioOptions.length === 0
+                              ? "No hay responsables disponibles"
+                              : "Seleccione el responsable"
+                          }
+                          value={usuarioOptions.find((option) => option.value === bienSeleccionado?.usuario?.id)}
+                          onChange={(selected) =>
+                            setBienSeleccionado({
+                              ...bienSeleccionado,
+                              usuario: { id: selected.value },
+                            })
+                          }
+                          required
+                          isDisabled={usuarioOptions.length === 0} // Deshabilitar si no hay opciones
+                          styles={SelectOptionsStyles}
+                        />
+                      </div>
+
+                      <div style={{ flex: 1 }}>
+                        <label>
                           <strong>Marca:</strong>
                         </label>
                         <Select
@@ -125,6 +150,16 @@ export default function BienModalEditar({
                           styles={SelectOptionsStyles}
                         />
                       </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Animación para el tercer grupo de inputs */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3, duration: 0.3 }}
+                  >
+                    <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                       <div style={{ flex: 1 }}>
                         <label>
                           <strong>Modelo:</strong>
@@ -146,16 +181,6 @@ export default function BienModalEditar({
                           styles={SelectOptionsStyles}
                         />
                       </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Animación para el tercer grupo de inputs */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3, duration: 0.3 }}
-                  >
-                    <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                       <div style={{ flex: 1 }}>
                         <label>
                           <strong>Tipo de Bien:</strong>
@@ -181,6 +206,16 @@ export default function BienModalEditar({
                           styles={SelectOptionsStyles}
                         />
                       </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Animación para el cuarto grupo de inputs */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4, duration: 0.3 }}
+                  >
+                    <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                       <div style={{ flex: 1 }}>
                         <label>
                           <strong>Área Común:</strong>
@@ -205,16 +240,6 @@ export default function BienModalEditar({
                           styles={SelectOptionsStyles}
                         />
                       </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Animación para el cuarto grupo de inputs */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4, duration: 0.3 }}
-                  >
-                    <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
                       <div style={{ flex: 1 }}>
                         <label>
                           <strong>Estado:</strong>

@@ -57,6 +57,7 @@ export default function BienModalVer({ openModalVer, setOpenModalVer, bienSelecc
                   {[
                     { label: "Código:", value: bienSeleccionado?.codigo },
                     { label: "Número de Serie:", value: bienSeleccionado?.numeroSerie },
+                    { label: "Usuario:", value: bienSeleccionado?.usuario?.nombres },
                     { label: "Marca:", value: bienSeleccionado?.marca?.nombreMarca },
                     { label: "Modelo:", value: bienSeleccionado?.modelo?.nombreModelo },
                     { label: "Tipo de Bien:", value: bienSeleccionado?.tipoBien?.nombreTipoBien },

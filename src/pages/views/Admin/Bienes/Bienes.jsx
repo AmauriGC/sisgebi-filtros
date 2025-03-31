@@ -32,11 +32,13 @@ const Bienes = () => {
   const [filtroTipoBien, setFiltroTipoBien] = React.useState(null);
   const [filtroMarca, setFiltroMarca] = React.useState(null);
   const [filtroModelo, setFiltroModelo] = React.useState(null);
+  const [filtroUsuario, setFiltroUsuario] = React.useState(null);
 
   const [areaComunOptions, setAreaComunOptions] = React.useState([]);
   const [tipoBienOptions, setTipoBienOptions] = React.useState([]);
   const [marcaOptions, setMarcaOptions] = React.useState([]);
   const [modeloOptions, setModeloOptions] = React.useState([]);
+  const [usuarioOptions, setUsuarioOptions] = React.useState([]);
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -79,6 +81,7 @@ const Bienes = () => {
     { id: "bienId", label: "#", minWidth: 25 },
     { id: "codigo", label: "Código", minWidth: 40 },
     { id: "numeroSerie", label: "No. Serie", minWidth: 40 },
+    { id: "id", label: "Responsable", minWidth: 80 },
     { id: "disponibilidad", label: "Disponibilidad", minWidth: 60 },
     { id: "status", label: "Estado", minWidth: 60 },
     { id: "acciones", label: "Acciones", minWidth: 50 },
@@ -91,7 +94,7 @@ const Bienes = () => {
 
   React.useEffect(() => {
     aplicarFiltros();
-  }, [filtroStatus, filtroDisponibilidad, filtroAreaComun, filtroTipoBien, filtroMarca, filtroModelo]);
+  }, [filtroStatus, filtroDisponibilidad, filtroUsuario, filtroAreaComun, filtroTipoBien, filtroMarca, filtroModelo]);
 
   const obtenerBienes = () => {
     const token = sessionStorage.getItem("token");
@@ -261,12 +264,35 @@ const Bienes = () => {
           showConfirmButton: true,
         });
       });
+
+    axios
+      .get("http://localhost:8080/api/usuarios/responsables", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const usuariosActivos = response.data.filter((usuario) => usuario.status === "ACTIVO");
+        setUsuarioOptions(
+          usuariosActivos.map((usuario) => ({
+            value: usuario.id,
+            label: usuario.nombres,
+          }))
+        );
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar los usuarios",
+          text: "Hubo un problema al intentar cargar los usuarios. Por favor, inténtalo de nuevo más tarde.",
+          showConfirmButton: true,
+        });
+      });
   };
 
   const aplicarFiltros = () => {
     const params = {};
     if (filtroStatus) params.status = filtroStatus.value;
     if (filtroDisponibilidad) params.disponibilidad = filtroDisponibilidad.value;
+    if (filtroUsuario) params.id = filtroUsuario.value;
     if (filtroAreaComun) params.areaId = filtroAreaComun.value;
     if (filtroTipoBien) params.tipoBienId = filtroTipoBien.value;
     if (filtroMarca) params.marcaId = filtroMarca.value;
@@ -323,6 +349,7 @@ const Bienes = () => {
   const resetearFiltros = () => {
     setFiltroStatus(null);
     setFiltroDisponibilidad(null);
+    setFiltroUsuario(null);
     setFiltroAreaComun(null);
     setFiltroTipoBien(null);
     setFiltroMarca(null);
@@ -374,6 +401,7 @@ const Bienes = () => {
     const bienParaEnviar = {
       codigo: nuevoBien.codigo,
       numeroSerie: nuevoBien.numeroSerie,
+      usuario: { id: nuevoBien.usuario.value },
       tipoBien: { tipoBienId: nuevoBien.tipoBien.value },
       marca: { marcaId: nuevoBien.marca.value },
       modelo: { modeloId: nuevoBien.modelo.value },
@@ -388,12 +416,24 @@ const Bienes = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setBienes([...bienes, response.data]);
+        // Obtener el ID del nuevo bien creado
+        const nuevoBienId = response.data.bienId;
 
+        // Hacer una nueva petición para obtener el bien con relaciones completas
+        return axios.get(`http://localhost:8080/api/bienes/${nuevoBienId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      })
+      .then((response) => {
+        // Ahora response.data contiene el bien con todas las relaciones
+        setBienes((prevBienes) => [...prevBienes, response.data]);
+
+        // Resetear formulario y cerrar modal
         setOpenModalCrear(false);
         setNuevoBien({
           codigo: "",
           numeroSerie: "",
+          usuario: null,
           tipoBien: null,
           marca: null,
           modelo: null,
@@ -407,30 +447,23 @@ const Bienes = () => {
           icon: "success",
           title: "¡Éxito!",
           text: "Bien creado correctamente",
-          showConfirmButton: true,
-          timer: 3000,
+          showConfirmButton: false,
+          timer: 2000,
         });
       })
       .catch((error) => {
         console.error("Error al crear el bien:", error);
-        setOpenModalCrear(false);
-        setNuevoBien({
-          codigo: "",
-          numeroSerie: "",
-          tipoBien: null,
-          marca: null,
-          modelo: null,
-          areaComun: null,
-          status: "ACTIVO",
-          disponibilidad: "DISPONIBLE",
-          motivo: "",
-        });
+
+        let errorMessage = "No se pudo crear el bien. Verifica los datos.";
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        }
 
         Swal.fire({
           icon: "error",
-          title: "Oops...",
-          text: "No se pudo crear el bien. Por favor, verifica los datos e inténtalo de nuevo.",
-          showConfirmButton: true,
+          title: "Error",
+          text: errorMessage,
+          confirmButtonColor: "#254B5E",
         });
       });
   };
@@ -603,6 +636,7 @@ const Bienes = () => {
       nuevoBien.codigo.trim() !== "" &&
       nuevoBien.numeroSerie.trim() !== "" &&
       nuevoBien.tipoBien !== null &&
+      nuevoBien.usuario !== null &&
       nuevoBien.marca !== null &&
       nuevoBien.modelo !== null &&
       nuevoBien.areaComun !== null &&
@@ -615,6 +649,7 @@ const Bienes = () => {
     return (
       bienSeleccionado.codigo.trim() !== "" &&
       bienSeleccionado.numeroSerie.trim() !== "" &&
+      bienSeleccionado.usuario !== null &&
       bienSeleccionado.tipoBien !== null &&
       bienSeleccionado.marca !== null &&
       bienSeleccionado.modelo !== null &&
@@ -640,6 +675,7 @@ const Bienes = () => {
         setOpenModalCrear={setOpenModalCrear}
         nuevoBien={nuevoBien}
         setNuevoBien={setNuevoBien}
+        usuarioOptions={usuarioOptions}
         tipoBienOptions={tipoBienOptions}
         marcaOptions={marcaOptions}
         modeloOptions={modeloOptions}
@@ -656,6 +692,7 @@ const Bienes = () => {
         setOpenModalEditar={setOpenModalEditar}
         bienSeleccionado={bienSeleccionado}
         setBienSeleccionado={setBienSeleccionado}
+        usuarioOptions={usuarioOptions}
         tipoBienOptions={tipoBienOptions}
         marcaOptions={marcaOptions}
         modeloOptions={modeloOptions}
@@ -695,6 +732,14 @@ const Bienes = () => {
               }}
             >
               {/* Fila 1 */}
+
+              <Select
+                placeholder="Usuario"
+                value={filtroUsuario}
+                onChange={setFiltroUsuario}
+                options={usuarioOptions}
+                styles={customSelectStyles}
+              />
               <Select
                 placeholder="Área Común"
                 value={filtroAreaComun}
@@ -836,7 +881,9 @@ const Bienes = () => {
                           );
                         } else {
                           const value =
-                            column.id === "tipoBien"
+                            column.id === "id"
+                              ? bien.usuario?.nombres
+                              : column.id === "tipoBien"
                               ? bien.tipoBien?.nombreTipoBien
                               : column.id === "marca"
                               ? bien.marca?.nombreMarca
