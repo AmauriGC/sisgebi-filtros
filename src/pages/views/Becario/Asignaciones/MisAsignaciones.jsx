@@ -294,7 +294,16 @@ const MisAsignaciones = () => {
   };
 
   return (
-    <div style={{ display: "flex", backgroundColor: "#F0F0F0", fontFamily: "Montserrat, sans-serif" }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100%",
+        width: "100%",
+        backgroundColor: "#F0F0F0",
+        fontFamily: "Montserrat, sans-serif",
+      }}
+    >
+      {" "}
       {/* Modal para mostrar los detalles del bien */}
       <Modal
         open={openModalBien}
@@ -341,6 +350,12 @@ const MisAsignaciones = () => {
                   Número de Serie:
                 </Typography>
                 <Typography variant="body1">{bienSeleccionado?.numeroSerie}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
+                  Responsable:
+                </Typography>
+                <Typography variant="body1">{`${bienSeleccionado?.usuario.nombres} ${bienSeleccionado?.usuario.apellidos}`}</Typography>
               </Box>
               <Box sx={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e0e0e0", pb: 1 }}>
                 <Typography variant="body1" sx={{ fontWeight: "bold", color: "#546E7A" }}>
@@ -410,13 +425,11 @@ const MisAsignaciones = () => {
           </Box>
         </Box>
       </Modal>
-
       <SidebarBecario />
-
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}>
-        <Paper className="col-md-4 col-lg-4 col-xl-4" style={{ height: "fit-content" }}>
+        <Paper className="col-md-5 col-lg-5 col-xl-5" style={{ height: "fit-content" }}>
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
-            <h3>Asignaciones realizadas</h3>
+            <h3>Mis asignaciones</h3>
           </Box>
 
           <TableContainer sx={{ width: "100%", padding: "20px", paddingTop: "0px", paddingBottom: "0px" }}>

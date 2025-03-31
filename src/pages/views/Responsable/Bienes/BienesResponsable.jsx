@@ -241,7 +241,35 @@ const BienesResponsable = () => {
     if (filtroModelo) params.modeloId = filtroModelo.value;
 
     const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "Debes iniciar sesión para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
+
     const decodedToken = jwtDecode(token);
+    const role = decodedToken.role;
+
+    if (role !== "RESPONSABLE") {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso no autorizado",
+        text: "No tienes permiso para acceder a esta página.",
+        showConfirmButton: false,
+        timer: 3000,
+      }).then(() => {
+        navigate("/");
+      });
+      return;
+    }
 
     axios
       .get("http://localhost:8080/api/bienes/filter", {
@@ -449,7 +477,7 @@ const BienesResponsable = () => {
       <SidebarResponsable />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}>
-        <Paper className="col-md-8 col-lg-8 col-xl-8" style={{ height: "fit-content" }}>
+        <Paper className="col-md-9 col-lg-9 col-xl-9" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Mis bienes asignados</h3>

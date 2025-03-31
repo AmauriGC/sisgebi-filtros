@@ -56,6 +56,7 @@ const Bienes = () => {
   const [nuevoBien, setNuevoBien] = React.useState({
     codigo: "",
     numeroSerie: "",
+    usuario: null,
     tipoBien: null,
     marca: null,
     modelo: null,

@@ -41,7 +41,8 @@ const BienesBecario = () => {
     { id: "numero", label: "#", minWidth: 25 },
     { id: "codigo", label: "Código", minWidth: 40 },
     { id: "numeroSerie", label: "No. Serie", minWidth: 40 },
-    { id: "disponibilidad", label: "Disponibilidad", minWidth: 60 },
+    { id: "id", label: "Responsable", minWidth: 80 },
+    // { id: "disponibilidad", label: "Disponibilidad", minWidth: 60 },
     { id: "status", label: "Estado", minWidth: 60 },
     { id: "acciones", label: "Acciones", minWidth: 50 },
   ];
@@ -552,10 +553,10 @@ const BienesBecario = () => {
       <SidebarBecario />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}>
-        <Paper className="col-md-8 col-lg-8 col-xl-8" style={{ height: "fit-content" }}>
+        <Paper className="col-md-9 col-lg-9 col-xl-9" style={{ height: "fit-content" }}>
           {/* Título y filtros */}
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
-            <h3>Bienes existentes</h3>
+            <h3>Bienes disponibles</h3>
             <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
               <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
               <button
@@ -670,7 +671,9 @@ const BienesBecario = () => {
                           );
                         } else {
                           const value =
-                            column.id === "tipoBien"
+                            column.id === "id"
+                              ? `${bien.usuario?.nombres} ${bien.usuario?.apellidos}`
+                              : column.id === "tipoBien"
                               ? bien.tipoBien?.nombreTipoBien
                               : column.id === "marca"
                               ? bien.marca?.nombreMarca

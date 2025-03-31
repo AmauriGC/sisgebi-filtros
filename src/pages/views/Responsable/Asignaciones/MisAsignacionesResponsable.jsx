@@ -36,6 +36,7 @@ const MisAsignaciones = () => {
   const columns = [
     { id: "numero", label: "#", minWidth: 25 },
     { id: "bien", label: "Bien", minWidth: 80 },
+    { id: "id", label: "Becario", minWidth: 80 },
     { id: "status", label: "Estado de la asignación", minWidth: 60 },
     { id: "acciones", label: "Acciones", minWidth: 80 },
   ];
@@ -414,9 +415,9 @@ const MisAsignaciones = () => {
       <SidebarResponsable />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}>
-        <Paper className="col-md-4 col-lg-4 col-xl-4" style={{ height: "fit-content" }}>
+        <Paper className="col-md-6 col-lg-6 col-xl-6" style={{ height: "fit-content" }}>
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
-            <h3>Asignaciones realizadas</h3>
+            <h3>Asignaciones de mis bienes</h3>
           </Box>
 
           <TableContainer sx={{ width: "100%", padding: "20px", paddingTop: "0px", paddingBottom: "0px" }}>
@@ -475,7 +476,9 @@ const MisAsignaciones = () => {
                           );
                         } else {
                           const value =
-                            column.id === "bien"
+                            column.id === "id"
+                              ? `${asignacion.usuario?.nombres} ${asignacion.usuario?.apellidos}`
+                              : column.id === "bien"
                               ? asignacion.bien?.codigo
                               : column.id === "status"
                               ? asignacion.status
