@@ -1,10 +1,17 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion"; // Importar Framer Motion
+import { motion, AnimatePresence } from "framer-motion";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Barcode from "react-barcode";
 
 export default function BienModalVer({ openModalVer, setOpenModalVer, bienSeleccionado }) {
+  // Función para generar el valor del código de barras
+  const getBarcodeValue = () => {
+    if (!bienSeleccionado) return "";
+    return bienSeleccionado.codigo || `BIEN-${bienSeleccionado.bienId}`;
+  };
+
   return (
     <AnimatePresence>
       {openModalVer && (
@@ -28,9 +35,9 @@ export default function BienModalVer({ openModalVer, setOpenModalVer, bienSelecc
             }}
           >
             <motion.div
-              initial={{ opacity: 0, y: -50 }} // Animación inicial: invisible y desplazado hacia arriba
-              animate={{ opacity: 1, y: 0 }} // Animación al abrir: visible y en su posición
-              transition={{ duration: 0.5, ease: "easeInOut" }} // Duración y tipo de animación
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
             >
               <Typography
                 id="modal-modal-title"
@@ -41,6 +48,50 @@ export default function BienModalVer({ openModalVer, setOpenModalVer, bienSelecc
                 Detalles del Bien
               </Typography>
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                {/* Sección del código de barras */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      mb: 3,
+                      p: 2,
+                      backgroundColor: "#ffffff",
+                      borderRadius: "8px",
+                      border: "1px solid #e0e0e0",
+                    }}
+                  >
+                    <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: "bold" }}>
+                      Código de Barras
+                    </Typography>
+                    <Box
+                      sx={{
+                        p: 1,
+                        backgroundColor: "white",
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Barcode
+                        value={getBarcodeValue()}
+                        format="CODE128"
+                        width={1.5}
+                        height={80}
+                        displayValue={false}
+                        margin={10}
+                      />
+                    </Box>
+                    <Typography variant="body2" sx={{ mt: 1, fontFamily: "monospace" }}>
+                      {getBarcodeValue()}
+                    </Typography>
+                  </Box>
+                </motion.div>
+
                 {/* Lista de detalles del bien */}
                 <Box
                   sx={{
@@ -101,7 +152,7 @@ export default function BienModalVer({ openModalVer, setOpenModalVer, bienSelecc
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5, duration: 0.3 }}
                 >
-                  {/* <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+                  <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
                     <button
                       onClick={() => setOpenModalVer(false)}
                       style={{
@@ -116,7 +167,7 @@ export default function BienModalVer({ openModalVer, setOpenModalVer, bienSelecc
                     >
                       Cerrar
                     </button>
-                  </Box> */}
+                  </Box>
                 </motion.div>
               </Typography>
             </motion.div>
