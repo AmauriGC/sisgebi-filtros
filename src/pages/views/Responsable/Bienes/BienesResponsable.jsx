@@ -18,6 +18,10 @@ import SidebarResponsable from "../../../../components/SidebarResponsable";
 import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
 
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import Barcode from "react-barcode";
+
 const BienesResponsable = () => {
   const [bienes, setBienes] = useState([]);
   const [page, setPage] = useState(0);
@@ -26,7 +30,6 @@ const BienesResponsable = () => {
   const [openModalVer, setOpenModalVer] = useState(false);
   const [id, setUserId] = useState(null);
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState(null);
 
   const [filtroAreaComun, setFiltroAreaComun] = React.useState(null);
   const [filtroTipoBien, setFiltroTipoBien] = React.useState(null);
@@ -37,6 +40,108 @@ const BienesResponsable = () => {
   const [tipoBienOptions, setTipoBienOptions] = React.useState([]);
   const [marcaOptions, setMarcaOptions] = React.useState([]);
   const [modeloOptions, setModeloOptions] = React.useState([]);
+
+  const handleDescargarPDF = async () => {
+    if (bienes.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "No hay bienes para exportar",
+        text: "No tienes bienes asignados para generar el reporte.",
+        showConfirmButton: false,
+        timer: 3000,
+      });
+      return;
+    }
+
+    // Crear el documento PDF
+    const doc = new jsPDF();
+
+    // Configuración inicial
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(37, 75, 94); // Color #254B5E
+
+    // Encabezado del reporte
+    doc.setFontSize(20);
+    doc.text("Reporte de Bienes Asignados", 105, 15, { align: "center" });
+
+    // Información del usuario responsable
+    const token = sessionStorage.getItem("token");
+    const decodedToken = jwtDecode(token);
+    doc.setFontSize(12);
+    doc.text(`Responsable: ${decodedToken.nombres} ${decodedToken.apellidos}`, 14, 25);
+    doc.text(`Fecha de generación: ${new Date().toLocaleDateString()}`, 14, 30);
+
+    // Configurar columnas de la tabla
+    const columnas = [
+      { header: "ID", dataKey: "bienId", cellWidth: 10 },
+      { header: "Código", dataKey: "codigo", cellWidth: 25 },
+      { header: "No. Serie", dataKey: "numeroSerie", cellWidth: 25 },
+      { header: "Tipo", dataKey: "tipo", cellWidth: 25 },
+      { header: "Area Comun", dataKey: "areaComun", cellWidth: 25 },
+      { header: "Modelo", dataKey: "modelo", cellWidth: 25 },
+      { header: "Marca", dataKey: "marca", cellWidth: 25 },
+      { header: "Estado", dataKey: "status", cellWidth: 20 },
+      { header: "Disponibilidad", dataKey: "disponibilidad", cellWidth: 20 },
+    ];
+
+    // Preparar datos para la tabla
+    const datos = bienes.map((bien) => ({
+      bienId: bien.bienId,
+      codigo: bien.codigo || "N/A",
+      numeroSerie: bien.numeroSerie || "N/A",
+      tipo: bien.tipoBien?.nombreTipoBien || "N/A",
+      areaComun: bien.areaComun?.nombreArea || "N/A",
+      modelo: bien.modelo?.nombreModelo || "N/A",
+      marca: bien.marca?.nombreMarca || "N/A",
+      status: bien.status === "ACTIVO" ? "Activo" : "Inactivo",
+      disponibilidad: bien.disponibilidad === "DISPONIBLE" ? "Disponible" : "No disponible",
+    }));
+
+    // Agregar tabla al PDF
+    autoTable(doc, {
+      columns: columnas,
+      body: datos,
+      startY: 40,
+      margin: { horizontal: 10 },
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: "linebreak",
+        textColor: [51, 51, 51],
+      },
+      headerStyles: {
+        fillColor: [37, 75, 94],
+        textColor: 255,
+        fontStyle: "bold",
+        fontSize: 9,
+      },
+      alternateRowStyles: {
+        fillColor: [241, 230, 210],
+      },
+      didDrawPage: (data) => {
+        // Pie de página
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text(
+          `Página ${data.pageNumber}`,
+          doc.internal.pageSize.getWidth() - 15,
+          doc.internal.pageSize.getHeight() - 5
+        );
+      },
+    });
+
+    // Crear una página adicional con los códigos de barras
+    doc.addPage();
+
+    // Título de la sección de códigos de barras
+    doc.setFontSize(16);
+    doc.text("Códigos de Barras de Bienes", 105, 20, { align: "center" });
+
+    let yPosition = 30; // Posición vertical inicial
+
+    // Guardar PDF
+    doc.save(`bienes_asignados_${decodedToken.nombres}_${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
 
   const columns = [
     { id: "numero", label: "#", minWidth: 25 },
@@ -459,7 +564,7 @@ const BienesResponsable = () => {
                 onClick={() => setOpenModalVer(false)}
                 style={{
                   padding: "10px 20px",
-                  backgroundColor: "#c2c2c2",
+                  backgroundColor: "#254B5E",
                   color: "white",
                   border: "none",
                   borderRadius: "5px",
@@ -481,19 +586,45 @@ const BienesResponsable = () => {
           {/* Título y filtros */}
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Mis bienes asignados</h3>
-            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-              <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
-              <button
-                onClick={resetearFiltros}
-                style={{
-                  ...buttonStyle,
-                  backgroundColor: "#546EAB",
-                  minWidth: "100px",
-                }}
-              >
-                Borrar
-              </button>
+
+            <div
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}
+            >
+              <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Filtros</p>
+                <button
+                  onClick={resetearFiltros}
+                  style={{
+                    ...buttonStyle,
+                    backgroundColor: "#546EAB",
+                    minWidth: "100px",
+                  }}
+                >
+                  Borrar
+                </button>
+              </div>
+
+              <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                {/* <p style={{ color: "#546EAB", fontSize: "20px", marginBottom: "10px" }}>Descargar mis bienes asignados</p> */}
+                <button
+                  onClick={handleDescargarPDF}
+                  disabled={bienes.length === 0}
+                  style={{
+                    ...buttonStyle,
+                    backgroundColor: "#546EAB",
+                    minWidth: "220px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <i className="fas fa-file-pdf" style={{ fontSize: "16px" }}></i>
+                  Descargar mis bienes asignados
+                </button>
+              </div>
             </div>
+
             <div
               style={{
                 display: "flex",
@@ -714,48 +845,6 @@ const customSelectStyles = {
   indicatorSeparator: (base) => ({
     ...base,
     backgroundColor: "#000",
-  }),
-};
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "800px",
-  backgroundColor: "#fff",
-  borderRadius: "8px",
-  boxShadow: 24,
-  p: 4,
-};
-
-const SelectOptionsStyles = {
-  control: (base) => ({
-    ...base,
-    width: "100%",
-    height: "40px",
-    border: "solid 1px #c2c2c2",
-  }),
-  option: (base) => ({
-    ...base,
-    color: "#000",
-    textAlign: "start",
-  }),
-  singleValue: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  placeholder: (base) => ({
-    ...base,
-    color: "#757575",
-  }),
-  dropdownIndicator: (base) => ({
-    ...base,
-    color: "#000",
-  }),
-  indicatorSeparator: (base) => ({
-    ...base,
-    backgroundColor: "#c2c2c2",
   }),
 };
 

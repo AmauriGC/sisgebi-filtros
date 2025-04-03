@@ -17,6 +17,8 @@ import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const MisAsignaciones = () => {
   const [asignaciones, setAsignaciones] = React.useState([]);
@@ -32,6 +34,99 @@ const MisAsignaciones = () => {
     { value: "ACTIVO", label: "Activo" },
     { value: "INACTIVO", label: "Inactivo" },
   ];
+
+  const handleDescargarPDF = () => {
+    if (asignaciones.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "No hay asignaciones para exportar",
+        text: "No tienes asignaciones para generar el reporte.",
+        showConfirmButton: false,
+        timer: 3000,
+      });
+      return;
+    }
+
+    // Crear el documento PDF
+    const doc = new jsPDF();
+
+    // Configuración inicial
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(37, 75, 94); // Color #254B5E
+
+    // Encabezado del reporte
+    doc.setFontSize(20);
+    doc.text("Reporte de Mis Asignaciones", 105, 15, { align: "center" });
+
+    // Información del usuario becario
+    const token = sessionStorage.getItem("token");
+    const decodedToken = jwtDecode(token);
+    doc.setFontSize(12);
+    doc.text(`Becario: ${decodedToken.nombres} ${decodedToken.apellidos}`, 14, 25);
+    doc.text(`Fecha de generación: ${new Date().toLocaleDateString()}`, 14, 30);
+
+    // Configurar columnas de la tabla
+    const columnas = [
+      { header: "ID", dataKey: "asignacionId", cellWidth: 10 },
+      { header: "Código Bien", dataKey: "codigoBien", cellWidth: 25 },
+      { header: "No. Serie", dataKey: "noSerie", cellWidth: 25 },
+      { header: "Responsable", dataKey: "responsable", cellWidth: 25 },
+      { header: "Tipo Bien", dataKey: "tipoBien", cellWidth: 25 },
+      { header: "Area Comun", dataKey: "areaComun", cellWidth: 25 },
+      { header: "Marca", dataKey: "marca", cellWidth: 25 },
+      { header: "Modelo", dataKey: "modelo", cellWidth: 25 },
+      { header: "Estado", dataKey: "status", cellWidth: 20 },
+    ];
+
+    // Preparar datos para la tabla
+    const datos = asignaciones.map((asignacion) => ({
+      asignacionId: asignacion.asignacionesId,
+      codigoBien: asignacion.bien?.codigo || "N/A",
+      noSerie: asignacion.bien?.numeroSerie || "N/A",
+      responsable: `${asignacion.bien?.usuario?.nombres} ${asignacion.bien?.usuario?.apellidos}`,
+      tipoBien: asignacion.bien?.tipoBien?.nombreTipoBien || "N/A",
+      areaComun: asignacion.bien?.areaComun?.nombreArea || "N/A",
+      marca: asignacion.bien?.marca?.nombreMarca || "N/A",
+      modelo: asignacion.bien?.modelo?.nombreModelo || "N/A",
+      status: asignacion.status === "ACTIVO" ? "Activo" : "Inactivo",
+    }));
+
+    // Agregar tabla al PDF
+    autoTable(doc, {
+      columns: columnas,
+      body: datos,
+      startY: 40,
+      margin: { horizontal: 10 },
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: "linebreak",
+        textColor: [51, 51, 51],
+      },
+      headerStyles: {
+        fillColor: [37, 75, 94],
+        textColor: 255,
+        fontStyle: "bold",
+        fontSize: 9,
+      },
+      alternateRowStyles: {
+        fillColor: [241, 230, 210],
+      },
+      didDrawPage: (data) => {
+        // Pie de página
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text(
+          `Página ${data.pageNumber}`,
+          doc.internal.pageSize.getWidth() - 15,
+          doc.internal.pageSize.getHeight() - 5
+        );
+      },
+    });
+
+    // Guardar PDF
+    doc.save(`mis_asignaciones_${decodedToken.nombres}_${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
 
   const columns = [
     { id: "numero", label: "#", minWidth: 25 },
@@ -430,6 +525,25 @@ const MisAsignaciones = () => {
         <Paper className="col-md-5 col-lg-5 col-xl-5" style={{ height: "fit-content" }}>
           <Box sx={{ padding: "20px", borderBottom: "2px solid #546EAB", textAlign: "start" }}>
             <h3>Mis asignaciones</h3>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px" }}>
+              <button
+                onClick={handleDescargarPDF}
+                disabled={asignaciones.length === 0}
+                style={{
+                  ...buttonStyle,
+                  backgroundColor: "#546EAB",
+                  minWidth: "220px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                }}
+              >
+                <i className="fas fa-file-pdf" style={{ fontSize: "16px" }}></i>
+                Descargar mis asignaciones
+              </button>
+            </div>
           </Box>
 
           <TableContainer sx={{ width: "100%", padding: "20px", paddingTop: "0px", paddingBottom: "0px" }}>
