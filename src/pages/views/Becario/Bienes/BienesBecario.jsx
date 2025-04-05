@@ -638,7 +638,7 @@ const BienesBecario = () => {
               </TableHead>
               <TableBody>
                 {bienes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((bien, index) => {
-                  const numeroFila = page * rowsPerPage + index + 1; // Calculamos el número de fila
+                  const numeroFila = page * rowsPerPage + index + 1;
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={bien.bienId}>
                       {columns.map((column) => {

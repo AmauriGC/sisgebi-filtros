@@ -74,6 +74,7 @@ const Usuarios = () => {
     }
 
     const decodedToken = jwtDecode(token);
+    const currentUserId = decodedToken.id;
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
@@ -99,7 +100,9 @@ const Usuarios = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setUsuarios(response.data);
+        // setUsuarios(response.data);
+        const filteredUsers = response.data.filter((user) => user.id !== currentUserId);
+        setUsuarios(filteredUsers);
       })
       .catch((error) => {
         Swal.fire({
@@ -161,6 +164,7 @@ const Usuarios = () => {
     }
 
     const decodedToken = jwtDecode(token);
+    const currentUserId = decodedToken.id;
     const role = decodedToken.role;
 
     if (role !== "ADMINISTRADOR") {
@@ -189,7 +193,9 @@ const Usuarios = () => {
         params,
       })
       .then((response) => {
-        setUsuarios(response.data);
+        const filteredUsers = response.data.filter((user) => user.id !== currentUserId);
+        setUsuarios(filteredUsers);
+        // setUsuarios(response.data);
       })
       .catch((error) => {
         Swal.fire({
@@ -249,7 +255,9 @@ const Usuarios = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setUsuarios(response.data);
+        // setUsuarios(response.data);
+        const filteredUsers = response.data.filter((user) => user.id !== currentUserId);
+        setUsuarios(filteredUsers);
       })
       .catch((error) => {
         Swal.fire({
@@ -505,7 +513,7 @@ const Usuarios = () => {
   };
 
   const columns = [
-    { id: "id", label: "#", minWidth: 50 },
+    { id: "numero", label: "#", minWidth: 25 },
     { id: "nombres", label: "Nombres", minWidth: 100 },
     { id: "apellidos", label: "Apellidos", minWidth: 100 },
     { id: "correo", label: "Correo", minWidth: 100 },
@@ -626,7 +634,8 @@ const Usuarios = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {usuarios.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((usuario) => {
+                {usuarios.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((usuario, index) => {
+                  const numeroFila = page * rowsPerPage + index + 1;
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={usuario.id}>
                       {columns.map((column) => {
@@ -656,6 +665,17 @@ const Usuarios = () => {
                                   onClick={() => handleEliminarUsuario(usuario.id)}
                                 />
                               </div>
+                            </TableCell>
+                          );
+                        }
+                        if (column.id === "numero") {
+                          return (
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              style={{ fontSize: "12px", textAlign: "start" }}
+                            >
+                              {numeroFila}
                             </TableCell>
                           );
                         } else {
