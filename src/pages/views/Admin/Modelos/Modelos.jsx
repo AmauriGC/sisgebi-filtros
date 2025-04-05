@@ -31,7 +31,7 @@ const Modelos = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [openImageModal, setOpenImageModal] = useState(false);
-const [selectedImage, setSelectedImage] = useState("");
+  const [selectedImage, setSelectedImage] = useState("");
 
   const navigate = useNavigate();
 
@@ -530,55 +530,60 @@ const [selectedImage, setSelectedImage] = useState("");
       />
 
       {/* Modal para visualizar imagen en grande */}
-{openImageModal && (
-  <div style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 9999
-  }} onClick={() => setOpenImageModal(false)}>
-    <div style={{
-      maxWidth: '100%',
-      maxHeight: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center'
-    }}>
-      <img 
-        src={selectedImage} 
-        alt="Modelo en grande" 
-        style={{
-          maxWidth: '100%',
-          maxHeight: '80vh',
-          objectFit: 'contain',
-          padding: '20px',
-          backgroundColor: 'white',
-          borderRadius: '10px'
-        }}
-      />
-      <button 
-        style={{
-          marginTop: '20px',
-          padding: '10px 20px',
-          backgroundColor: '#546EAB',
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer'
-        }}
-        onClick={() => setOpenImageModal(false)}
-      >
-        Cerrar
-      </button>
-    </div>
-  </div>
-)}
+      {openImageModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.8)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+          onClick={() => setOpenImageModal(false)}
+        >
+          <div
+            style={{
+              maxWidth: "100%",
+              maxHeight: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <img
+              src={selectedImage}
+              alt="Modelo en grande"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "80vh",
+                objectFit: "contain",
+                padding: "20px",
+                backgroundColor: "white",
+                borderRadius: "10px",
+              }}
+            />
+            <button
+              style={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                backgroundColor: "#546EAB",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+              onClick={() => setOpenImageModal(false)}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
 
       <Sidebar />
 
@@ -682,32 +687,34 @@ const [selectedImage, setSelectedImage] = useState("");
                           return (
                             <TableCell key={column.id} align="center">
                               {modelo.foto ? (
-  <img
-    src={`data:image/${
-      modelo.foto.includes("image/")
-        ? modelo.foto.split("image/")[1].split(";")[0]
-        : "jpeg"
-    };base64,${modelo.foto}`}
-    alt="Modelo"
-    style={{
-      width: "50px",
-      height: "50px",
-      borderRadius: "5px",
-      objectFit: "scale-down",
-      cursor: "pointer"
-    }}
-    onClick={() => {
-      setSelectedImage(`data:image/${
-        modelo.foto.includes("image/")
-          ? modelo.foto.split("image/")[1].split(";")[0]
-          : "jpeg"
-      };base64,${modelo.foto}`);
-      setOpenImageModal(true);
-    }}
-  />
-) : (
-  "Sin imagen"
-)}
+                                <img
+                                  src={`data:image/${
+                                    modelo.foto.includes("image/")
+                                      ? modelo.foto.split("image/")[1].split(";")[0]
+                                      : "jpeg"
+                                  };base64,${modelo.foto}`}
+                                  alt="Modelo"
+                                  style={{
+                                    width: "50px",
+                                    height: "50px",
+                                    borderRadius: "5px",
+                                    objectFit: "scale-down",
+                                    cursor: "pointer",
+                                  }}
+                                  onClick={() => {
+                                    setSelectedImage(
+                                      `data:image/${
+                                        modelo.foto.includes("image/")
+                                          ? modelo.foto.split("image/")[1].split(";")[0]
+                                          : "jpeg"
+                                      };base64,${modelo.foto}`
+                                    );
+                                    setOpenImageModal(true);
+                                  }}
+                                />
+                              ) : (
+                                "Sin imagen"
+                              )}
                             </TableCell>
                           );
                         } else {
